@@ -14,10 +14,10 @@ class CreateStructure(StructureBase):
 
 class Structure(StructureBase):
     id: int
-    buildings: list[Building] | None = None
+
     class Config:
         orm_mode = True
 
 
-class StructureBuilding(BaseModel):
+class StructureBuilding(Structure):
     buildings: list[Building] | None = None

@@ -7,7 +7,7 @@ class BuildingBase(BaseModel):
 
 
 class CreateBuilding(BuildingBase):
-    pass
+    structure_id: int
 
 
 class Building(BuildingBase):

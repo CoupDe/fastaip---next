@@ -5,12 +5,15 @@ from sqlalchemy import MetaData
 from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
                                     create_async_engine)
 from .models.modelBase import ModelBase
+from config import Config
 
 
-load_dotenv()
+
+
+
 # metadata = MetaData()
-print(ModelBase.metadata.schema)
-DB_URL = f"postgresql+asyncpg://{os.environ.get('DB_USERNAME')}:{os.environ.get('DB_PASSWORD')}@{os.environ.get('DB_HOST')}:{os.environ.get('DB_PORT')}/{os.environ.get('DB_NAME')}"
+#  f"postgresql+asyncpg://{os.environ.get('DB_USERNAME')}:{os.environ.get('DB_PASSWORD')}@{os.environ.get('DB_HOST')}:{os.environ.get('DB_PORT')}/{os.environ.get('DB_NAME')}"
+DB_URL = Config.DB_CONFIG
 
 # Создание асинхронного движка | echo-выводит sql запрос в терминал
 async_engine = create_async_engine(

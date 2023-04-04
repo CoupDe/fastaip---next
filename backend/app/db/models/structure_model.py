@@ -4,12 +4,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .building_model import Building
 
-from .modelBase import ModelBase
+from .modelBase import CommonAbstractBase, ModelBase
 
 
-class Structure(ModelBase):
+class Structure(CommonAbstractBase):
     __tablename__ = "structure_table"
-    id: Mapped[int] = mapped_column(primary_key=True)
+    # id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(100))
     code_structure: Mapped[str] = mapped_column(String(100), unique=True)
     # building_id: Mapped[int] = mapped_column(ForeignKey("building_table.id"))

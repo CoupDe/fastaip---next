@@ -15,10 +15,10 @@ app.include_router(building_route.route,prefix='/api')
 app.include_router(structure_route.route,prefix='/api')
 
 
-@app.on_event("startup")
-async def on_startup():
-    # Not needed if you setup a migration system like Alembic
-    await create_db_and_tables()
+# @app.on_event("startup")
+# async def on_startup():
+#     # Not needed if you setup a migration system like Alembic
+#     await create_db_and_tables()
 
 
 @app.get("/")
@@ -28,6 +28,6 @@ async def root(session: AsyncSession = Depends(get_async_session)):
 
 
 @app.post("/building", response_model=Building)
-async def root(building: CreateBuilding, createsession: AsyncSession = Depends(get_async_session)):
+async def root(building: CreateBuilding, createsessioFn: AsyncSession = Depends(get_async_session)):
 
     return {"message": "Hello World"}
