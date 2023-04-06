@@ -6,8 +6,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   return (
-    <main className={styles.main}>
-      <h1 className="hover:scale-150:text-slate-400  text-slate-800">Darova</h1>
+    <main>
+      <h1 className="text-center">I am main</h1>
     </main>
   );
 }
