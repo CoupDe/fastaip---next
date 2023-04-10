@@ -1,5 +1,6 @@
 import { DM_Mono } from "next/font/google";
 import "./globals.css";
+import AuthContext from "./AuthContext";
 
 export const metadata = {
   title: "Estimates",
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru" className={dmMono.className}>
-      <body className="bg-gray-500 h-screen w-screen">{children}</body>
+      <body className="bg-gray-500 h-screen w-screen">
+        <AuthContext>{children}</AuthContext>
+      </body>
     </html>
   );
 }
+// <AuthContext></AuthContext>
