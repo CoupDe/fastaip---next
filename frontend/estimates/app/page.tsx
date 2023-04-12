@@ -1,10 +1,6 @@
-'use client'
-import Image from "next/image";
-import { Inter } from "next/font/google";
-import styles from "./page.module.css";
-import Login from "./login/page";
-import Test from "./Test";
+"use client";
 import { useSession } from "next-auth/react";
+import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,7 +9,7 @@ export default function Home() {
   return (
     <main>
       <h1 className="text-center">I am main</h1>
-      <Test />
+
       <h1>{status}</h1>
     </main>
   );

@@ -1,6 +1,6 @@
 import { DM_Mono } from "next/font/google";
-import "./globals.css";
 import AuthContext from "./AuthContext";
+import "./globals.css";
 
 export const metadata = {
   title: "Estimates",
