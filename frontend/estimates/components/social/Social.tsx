@@ -1,9 +1,12 @@
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LinkIcon from "@mui/icons-material/Link";
-import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { signIn, signOut } from "next-auth/react";
 import Image from "next/image";
 import VK_Logo from "../../public/VK_Logo.svg";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { getServerSession } from "next-auth";
+
+
 
 export default function Social() {
   return (

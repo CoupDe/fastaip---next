@@ -14,12 +14,15 @@ export const authOptions: NextAuthOptions = {
       clientSecret: String(process.env.VK_CLIENT_SECRET),
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET,
+  debug: true,
+  secret: String(process.env.NEXTAUTH_SECRET),
+
   callbacks: {
     async session({ session }) {
+      console.log("sessionsessionsessionsessionsessionsessionsession", session);
       return session;
     },
   },
-  pages: {},
+  pages: { signIn: "/home" },
 };
 export default NextAuth(authOptions);

@@ -2,6 +2,7 @@
 
 import Social from "@/components/social/Social";
 import { useSession } from "next-auth/react";
+
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import logo from "../../public/estimate-icon.svg";
@@ -9,7 +10,7 @@ type FormValuesLogin = {
   userName: string;
   password: string;
 };
-// 1. Убрать статус 2. Если пользователь авторизированный пропустить сделать redirect
+// 1. Убрать статус 2. Если пользователь авторизирован, сделать redirect to home
 export default function LoginPage() {
   const {
     register,
@@ -97,23 +98,6 @@ export default function LoginPage() {
         </form>
 
         <Social />
-        {/* {!session ? (
-            <button onClick={() => signIn("", { callbackUrl: "/home" })}>
-              <Image
-                className="m-auto w-12 h-12 mb-4 bg-green-700"
-                src={gitLogo}
-                alt="logo"
-              />
-            </button>
-          ) : (
-            <button onClick={() => signOut({ callbackUrl: "/login" })}>
-              <Image
-                className="m-auto w-12 h-12 mb-4 bg-red-700"
-                src={gitLogo}
-                alt="logo"
-              />
-            </button>
-          )} */}
       </div>
     </div>
   );

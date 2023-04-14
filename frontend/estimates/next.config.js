@@ -7,4 +7,7 @@ module.exports = {
     config.experiments = { ...config.experiments, topLevelAwait: true };
     return config;
   },
+  images: {
+    domains: ["sun1-92.userapi.com"],
+  },
 };

@@ -14,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru" className={dmMono.className}>
-      <body className="bg-gray-500 h-screen w-screen">
+      <body className="bg-[#fbf0e4] h-screen w-screen">
         <AuthContext>{children}</AuthContext>
       </body>
     </html>
