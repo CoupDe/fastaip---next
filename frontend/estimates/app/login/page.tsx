@@ -26,7 +26,7 @@ export default function LoginPage() {
     <div className="w-full h-full md:mx-auto flex flex-col justify-center items-center">
       {/* 1 */}
       <h1>{status}</h1>
-      <div className="flex flex-col items-center justify-center  w-1/3 max-w-[300px] shadow-xl  pt-2 rounded-sm bg-gray-700">
+      <div className="flex flex-col items-center justify-center  w-1/3 max-w-[300px] shadow-xl  pt-2 rounded-sm  dark:bg-gray-700">
         <Image className="w-16 h-16 mb-4 " src={logo} alt="logo" />
         <h4 className="text-slate-400">СТНГ-ГСП</h4>
         <form

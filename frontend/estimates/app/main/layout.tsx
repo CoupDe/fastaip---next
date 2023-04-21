@@ -4,15 +4,16 @@ export const metadata: Metadata = {
   title: "Home",
   description: "Welcome to Programm",
 };
-export default function HomeLayout({
+export default function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <>
+      {/* @ts-expect-error Async Server Component */}
       <Header />
-      <main>{children} </main>
+      <main className="mt-2 h-full">{children} </main>
     </>
   );
 }

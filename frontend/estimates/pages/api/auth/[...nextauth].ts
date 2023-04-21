@@ -14,15 +14,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: String(process.env.VK_CLIENT_SECRET),
     }),
   ],
-  debug: true,
-  secret: String(process.env.NEXTAUTH_SECRET),
 
-  callbacks: {
-    async session({ session }) {
-      console.log("sessionsessionsessionsessionsessionsessionsession", session);
-      return session;
-    },
-  },
-  pages: { signIn: "/home" },
+  secret: String(process.env.NEXTAUTH_SECRET),
 };
 export default NextAuth(authOptions);

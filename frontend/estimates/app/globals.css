@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  @apply font-sans;
+}
+
+h3 {
+  font-size: 30px;
+}
+
+@layer {
+  .navLink {
+    @apply relative tracking-wider hover:text-neutral-400;
+  }
+  .navLink::after {
+    @apply content-[''] absolute rounded-sm dark:bg-red-900 bg-sky-600 h-[3px] w-[0]  left-0 -bottom-2 duration-500;
+  }
+
+  .navLink:hover::after {
+    @apply w-[100%] blur-xl;
+  }
+}

@@ -1,13 +1,14 @@
-import Image from "next/image";
 import Link from "next/link";
-import avatar from "../../public/avatar.svg";
-import gazprom_Logo from "../../public/gazprom_Logo.svg";
+import Image from "next/image";
+import gazprom_Logo from "../../public/gazprom_Logo.png";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import ThemeButton from "./themeButton/ThemeButton";
+import LoginAvatar from "./avatar/LoginAvatar";
 
 const navigation = [
-  { name: "Объекты", link: "/objects" },
-  { name: "Импорт", link: "/import" },
+  { name: "Объекты", link: "/main/projects" },
+  { name: "Импорт", link: "/main/import" },
   { name: "Отчеты", link: "/reports" },
 ];
 // Функция ограничение символов в имени User
@@ -28,18 +29,18 @@ export default async function Header() {
 
   return (
     <header>
-      <div className="flex h-16 justify-around py-2 shadow-md shadow-sky-600">
-        <div className="flex align-middle">
-          <Link href={"/home"}>
-            <Image src={gazprom_Logo} width={40} alt="gazp_Logo" />
+      <div className="flex h-16 items-center justify-around py-2 shadow-md shadow-sky-600 dark:shadow-red-900">
+        <div className="flex  h-8 w-8">
+          <Link href={"/main"}>
+            <Image src={gazprom_Logo} alt="gazp_Logo" />
           </Link>
         </div>
-        <nav className="flex items-center">
-          <ul className="flex gap-2 place-content-center uppercase text-slate-500 ">
+        <nav className="flex items-center .nav">
+          <ul className="flex gap-2 place-content-center uppercase  ">
             {navigation.map((link, i) => (
               <li key={i}>
                 <Link
-                  className="text-[0.5rem] sm:text-[0.7rem]"
+                  className="navLink  text-[0.5rem]  sm:text-[0.7rem]"
                   href={link.link}
                 >
                   {link.name}
@@ -48,23 +49,20 @@ export default async function Header() {
             ))}
           </ul>
         </nav>
-        <div className="flex items-center">
+        <div className="flex items-center ">
           <div>
-            <Image
-              className="rounded-xl"
-              src={session ? session.user?.image : avatar}
-              alt="avatar"
-              width={30}
-              height={30}
-            />
+            <LoginAvatar image={session?.user?.image} />
           </div>
-          <div className="flex flex-col pt-1 ml-1">
-            <p className=" text-[0.5rem] sm:text-[0.7rem]  leading-tight">
+          <div className="flex flex-col  pt-1 ml-1">
+            <p className="text-xs sm:text-[0.7rem]  leading-tight">
               {session?.user ? limitName(session.user.name!, 10) : "not auth"}
             </p>
             <p className="text-neutral-500 text-xs  dark:text-neutral-400">
               dep
             </p>
+          </div>
+          <div className="h-8 w-6 ml-4  cursor-pointer">
+            <ThemeButton />
           </div>
         </div>
       </div>
