@@ -1,7 +1,8 @@
 import { DM_Mono, Source_Sans_Pro } from "next/font/google";
-import AuthContext from "./context/AuthContext";
-import ThemeContext from "./context/ThemeContext";
+import AuthContext from "./providers/AuthProvider";
+import ThemeContext from "./providers/ThemeProvider";
 import "./globals.css";
+import { StoreProvider } from "./providers/StoreProvider";
 export const metadata = {
   title: "Estimates",
   description: "Create report KS-2",
@@ -28,9 +29,11 @@ export default function RootLayout({
       <body
         className={`bg-[#fbf0e4] dark:bg-slate-600 h-screen w-screen  flex flex-col ${dmMono.variable} ${SSPro.variable}`}
       >
-        <ThemeContext>
-          <AuthContext>{children}</AuthContext>
-        </ThemeContext>
+        <StoreProvider>
+          <ThemeContext>
+            <AuthContext>{children}</AuthContext>
+          </ThemeContext>
+        </StoreProvider>
       </body>
     </html>
   );

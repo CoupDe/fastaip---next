@@ -1,4 +1,5 @@
 import Header from "@/components/header/Header";
+import Breadcrumbs from "@/components/header/breadcrumbs/Breadcrumbs";
 import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Home",
@@ -13,7 +14,8 @@ export default function MainLayout({
     <>
       {/* @ts-expect-error Async Server Component */}
       <Header />
-      <main className="mt-2 h-full">{children} </main>
+      <Breadcrumbs />
+      <main className=" h-full cantainer p-3 mt-3">{children} </main>
     </>
   );
 }

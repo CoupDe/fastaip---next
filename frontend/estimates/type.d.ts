@@ -1,7 +1,7 @@
 type Building = {
   name: string;
   code_building: string;
-  id: number;
+  readonly id: number;
 };
 
 type Structure = {

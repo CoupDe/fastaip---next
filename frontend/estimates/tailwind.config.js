@@ -14,6 +14,7 @@ module.exports = {
         fade: "fadeOut 0.2s ease-in 3",
         openmenu: "openmenu 0.2s ease-in",
         closemenu: "closemenu 0.2s ease-in",
+        showArrow: "showArrow 0.2s ease-in 3",
       },
       fontFamily: {
         sans: ["var(--font-dmMono)", ...fontFamily.sans],
@@ -21,7 +22,6 @@ module.exports = {
       },
       fontSize: {
         xs: ["0.6rem", "20px"],
-        
       },
       // that is actual animation
       keyframes: (theme) => ({
@@ -42,6 +42,12 @@ module.exports = {
           "0%": { left: "0px" },
           // final position
           "100%": { left: "-224px" },
+        },
+      },
+      keyframes: {
+        showArrow: {
+          "0%": { translateX: "30px" },
+          "100%": { translateX: "20px 4rem 150px" },
         },
       },
     },

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React from "react";
-import doc from "../../../public/doc_download.svg";
+import doc from "@/public/doc_download.svg";
 type Props = {};
 
 const HomeInfo = (props: Props) => {

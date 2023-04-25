@@ -1,6 +1,6 @@
+import "server-only";
 import { getAllStructures } from "@/lib/getAllStructure";
-import next from "next/types";
-import React from "react";
+import ConstructionItem from "@/components/building/BuildingItem";
 
 type Props = {};
 
@@ -10,14 +10,30 @@ const Project = async (props: Props) => {
   console.log(projects);
   return (
     <div>
-      {JSON.stringify(projects)}
-      <p>
-        {projects.map((project) =>
-          project.buildings.map((building) =>
-            JSON.stringify(building, null, "\n")
-          )
-        )}
-      </p>
+      <div>
+        {projects.map((project) => (
+          <details className="group relative">
+            <summary className="flex justify-between items-center font-medium cursor-pointer list-none  ">
+              <ul
+                key={project.id}
+                role="list"
+                className="ulTree sm:after:content-['\2190'] sm:after:right-[70%]  dark:hover:text-neutral-300 hover:text-gray-700 normal-case"
+              >
+                <i className="text-neutral-400 mr-2 text-sm">
+                  {project.code_structure}
+                </i>
+                {project.name}
+              </ul>
+            </summary>
+            <ConstructionItem buildings={project.buildings} />
+            {/* {project.buildings.map((building) => (
+                <li key={building.id} className="list-none indent-14">
+                  {building.code_building} ---&#8594; {building.name}
+                </li>
+              ))} */}
+          </details>
+        ))}
+      </div>
     </div>
   );
 };
