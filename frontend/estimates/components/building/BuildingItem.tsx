@@ -2,7 +2,7 @@
 import React from "react";
 import { useAppDispatch } from "@/redux/hook";
 import { setBuilding } from "@/redux/slice/buildingSlice";
-
+import Link from "next/link";
 interface iBuilding {
   buildings: Building[];
 }
@@ -19,7 +19,7 @@ const ConstructionItem: React.FC<iBuilding> = ({ buildings }) => {
             {building.code_building}
           </i>
           <button onClick={() => dispatch(setBuilding(building))}>
-            {building.name}
+            <Link href={`/main/srv/${building.id}`}>{building.name}</Link>
           </button>
         </li>
       ))}

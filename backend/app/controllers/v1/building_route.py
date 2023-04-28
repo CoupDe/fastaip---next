@@ -7,10 +7,10 @@ from services.v1 import building_service
 from sqlalchemy.exc import IntegrityError
 
 
-route = APIRouter(prefix='/v1/buildings', tags=['buildings'])
+route = APIRouter(prefix='/v1/building', tags=['building'])
 
 
-@route.get('/', response_model=list[building_schema.Building])
+@route.get('/all', response_model=list[building_schema.Building])
 async def read_all_buildings(session: AsyncSession = Depends(get_async_session)):
     buildings = await building_service.read_all_buildings(session)
     return buildings

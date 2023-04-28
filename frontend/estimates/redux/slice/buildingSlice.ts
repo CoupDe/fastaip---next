@@ -1,27 +1,37 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, current } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "../store/store";
 // partial дулает все свойства необязательными, Pick выберает поля и делает их обязательными
 type SelectedBuilding = Partial<Building> &
   Pick<Building, "name" | "code_building">;
 
-const initialState: SelectedBuilding = {
-  name: "Не выбран",
-  code_building: "",
-  id: undefined,
+interface IBuilding {
+  building: SelectedBuilding;
+}
+// const initialState: SelectedBuilding = {
+//   name: "Не выбран",
+//   code_building: "",
+//   id: undefined,
+// };
+const initialState: IBuilding = {
+  building: { name: "Не выбран", code_building: "", id: undefined },
 };
 
 const buildingSlice = createSlice({
-  name: "building",
+  name: "buildings",
   initialState,
   reducers: {
     setBuilding: (state, action: PayloadAction<SelectedBuilding>) => {
-      console.log("Before", state);
-      console.log("action.payload", action.payload);
-      state = action.payload;
-      console.log("after", state);
+      state.building = action.payload;
+    },
+    getBuilding: (state) => {
+      return state;
     },
   },
 });
-export const { setBuilding } = buildingSlice.actions;
+export const { setBuilding, getBuilding } = buildingSlice.actions;
+
+// Получение выбранного объекта
+export const ActiveBuilding = (state: RootState) => state.buildings.building;
 
 export default buildingSlice.reducer;

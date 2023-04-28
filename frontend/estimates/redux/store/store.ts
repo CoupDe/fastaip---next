@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import buildingSlice from "../slice/buildingSlice";
 
 export const store = configureStore({
-  reducer: { building: buildingSlice },
+  reducer: { buildings: buildingSlice },
   devTools: true,
 });
 

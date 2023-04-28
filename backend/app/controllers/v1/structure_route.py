@@ -5,10 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from schemas import structure_schema
 from services.v1 import structure_service
 from sqlalchemy.exc import IntegrityError
-route = APIRouter(prefix='/v1/projects', tags=['structures'])
+route = APIRouter(prefix='/v1/construction', tags=['construction'])
 
 
-@route.get('/', response_model=list[structure_schema.StructureBuilding])
+@route.get('/all', response_model=list[structure_schema.StructureBuilding])
 async def read_all_structures(session: AsyncSession = Depends(get_async_session)):
     structures = await structure_service.read_all_structures(session)
     return structures

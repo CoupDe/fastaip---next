@@ -1,20 +1,29 @@
 "use client";
-import React, { useEffect } from "react";
-import HomeWorkIcon from "@mui/icons-material/HomeWork";
+import { getBuildingById } from "@/lib/api/getBuildingById";
 import { useAppSelector } from "@/redux/hook";
+import { ActiveBuilding } from "@/redux/slice/buildingSlice";
+import HomeWorkIcon from "@mui/icons-material/HomeWork";
 
-const Breadcrumbs = () => {
-  const buildingName = useAppSelector((state) => state.building.name);
-  useEffect(() => {
-    console.log("useEffect", buildingName);
-  }, [buildingName]);
-  console.log("in bread", buildingName);
+
+export default function Breadcrumbs() {
+  const buildingName = useAppSelector(ActiveBuilding);
+
+  // async function getBuilding(id: string | undefined) {
+  //   if (buildingName.id !== undefined) {
+  //     const buildingData: Promise<Building> = getBuildingById(buildingName.id);
+  //     const building = await buildingData;
+  //     console.log(building);
+  //     return building;
+  //   } else {
+  //     return;
+  //   }
+  // }
+
   return (
-    <div className="flex justify-end items-center mt-2 mr-3 ">
+    <div className="flex justify-end mt-2 align-middle mr-3 opacity-70">
       <HomeWorkIcon fontSize="small" />
-      <h6 className="text-xs ml-2 pt-1">{buildingName}</h6>
+      <button>aaa</button>
+      <h6 className="text-xs ml-2   cursor-pointer">{buildingName.name}</h6>
     </div>
   );
-};
-
-export default Breadcrumbs;
+}

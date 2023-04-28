@@ -3,6 +3,7 @@ import AuthContext from "./providers/AuthProvider";
 import ThemeContext from "./providers/ThemeProvider";
 import "./globals.css";
 import { StoreProvider } from "./providers/StoreProvider";
+
 export const metadata = {
   title: "Estimates",
   description: "Create report KS-2",

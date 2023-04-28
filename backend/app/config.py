@@ -5,6 +5,10 @@ import os
 # DB_HOST = 'localhost'
 # DB_PORT = '5433'
 # DB_NAME = 'estimates'
+origins = [
+    "http://localhost:3000",
+
+]
 
 
 class Config:

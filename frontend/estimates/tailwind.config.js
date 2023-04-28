@@ -21,7 +21,7 @@ module.exports = {
         sspro: ["var(--font-sspro)"],
       },
       fontSize: {
-        xs: ["0.6rem", "20px"],
+        xs: ["0.6rem", "1.45rem"],
       },
       // that is actual animation
       keyframes: (theme) => ({
@@ -30,25 +30,12 @@ module.exports = {
           "100%": { color: theme("colors.red.300") },
         },
       }),
-      keyframes: {
-        openmenu: {
-          // initial position
-          "0%": { opacity: 0 },
-          // final position
-          "100%": { opacity: 1 },
-        },
-        closemenu: {
-          // initial position
-          "0%": { left: "0px" },
-          // final position
-          "100%": { left: "-224px" },
-        },
-      },
-      keyframes: {
-        showArrow: {
-          "0%": { translateX: "30px" },
-          "100%": { translateX: "20px 4rem 150px" },
-        },
+
+      openmenu: {
+        // initial position
+        "0%": { opacity: 0 },
+        // final position
+        "100%": { opacity: 1 },
       },
     },
   },
