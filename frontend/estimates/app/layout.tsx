@@ -3,6 +3,7 @@ import AuthContext from "./providers/AuthProvider";
 import ThemeContext from "./providers/ThemeProvider";
 import "./globals.css";
 import { StoreProvider } from "./providers/StoreProvider";
+import PersistorContext from "./providers/PersistProvider";
 
 export const metadata = {
   title: "Estimates",
@@ -31,9 +32,11 @@ export default function RootLayout({
         className={`bg-[#fbf0e4] dark:bg-slate-600 h-screen w-screen  flex flex-col ${dmMono.variable} ${SSPro.variable}`}
       >
         <StoreProvider>
-          <ThemeContext>
-            <AuthContext>{children}</AuthContext>
-          </ThemeContext>
+          <PersistorContext>
+            <ThemeContext>
+              <AuthContext>{children}</AuthContext>
+            </ThemeContext>
+          </PersistorContext>
         </StoreProvider>
       </body>
     </html>

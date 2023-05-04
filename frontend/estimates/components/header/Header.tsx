@@ -1,19 +1,10 @@
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import gazprom_Logo from "../../public/gazprom_Logo.png";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import ThemeButton from "./themeButton/ThemeButton";
-import LoginAvatar from "./avatar/LoginAvatar";
-import { Suspense } from "react";
-const dynamic = "force-static";
-const navigation = [
-  { name: "Объекты", link: "/main/projects" },
-  { name: "Структура", link: "/main/srv" },
-  { name: "Импорт", link: "/main/import" },
-  { name: "Отчеты", link: "/reports" },
-];
-// Функция ограничение символов в имени User
+import NavPanel from "./nav/NavPanel";
+
+// Функция ограниченивает количество символов в имени User
 const limitName = (name: string, limit: number): string => {
   if (name.length > limit) {
     return name.slice(0, limit) + "...";
@@ -38,20 +29,7 @@ export default async function Header() {
             <Image src={gazprom_Logo} alt="gazp_Logo" />
           </Link>
         </div>
-        <nav className="flex items-center .nav">
-          <ul className="flex gap-2 place-content-center uppercase  ">
-            {navigation.map((link, i) => (
-              <li key={i}>
-                <Link
-                  className="navLink  text-[0.5rem]  sm:text-[0.7rem]"
-                  href={link.link}
-                >
-                  {link.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <NavPanel />
         <div className="flex items-center ">
           <div>{/* <LoginAvatar image={session?.user?.image} /> */}</div>
           <div className="flex flex-col  pt-1 ml-1">

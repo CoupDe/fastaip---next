@@ -19,7 +19,7 @@ const ConstructionItem: React.FC<iBuilding> = ({ buildings }) => {
             {building.code_building}
           </i>
           <button onClick={() => dispatch(setBuilding(building))}>
-            <Link href={`/main/srv/${building.id}`}>{building.name}</Link>
+            <p>{building.name}</p>
           </button>
         </li>
       ))}

@@ -4,7 +4,8 @@ import { RootState } from "../store/store";
 // partial дулает все свойства необязательными, Pick выберает поля и делает их обязательными
 type SelectedBuilding = Partial<Building> &
   Pick<Building, "name" | "code_building">;
-
+const ISSERVER = typeof window === "undefined";
+console.log();
 interface IBuilding {
   building: SelectedBuilding;
 }
@@ -18,20 +19,17 @@ const initialState: IBuilding = {
 };
 
 const buildingSlice = createSlice({
-  name: "buildings",
+  name: "building",
   initialState,
   reducers: {
     setBuilding: (state, action: PayloadAction<SelectedBuilding>) => {
       state.building = action.payload;
     },
-    getBuilding: (state) => {
-      return state;
-    },
   },
 });
-export const { setBuilding, getBuilding } = buildingSlice.actions;
+export const { setBuilding } = buildingSlice.actions;
 
 // Получение выбранного объекта
-export const ActiveBuilding = (state: RootState) => state.buildings.building;
+export const ActiveBuilding = (state: RootState) => state.building.building;
 
 export default buildingSlice.reducer;

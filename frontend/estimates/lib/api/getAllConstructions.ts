@@ -1,6 +1,6 @@
-import {  allProjects } from "@/const/apiRout";
+import { allProjects } from "@/const/apiRout";
 
-export async function getAllStructures() {
+export const getAllStructures = async (): Promise<Structure[]> => {
   const result = await fetch(allProjects, {
     next: { revalidate: 60 },
   });
@@ -9,4 +9,4 @@ export async function getAllStructures() {
     throw new Error("Failed fetch data");
   }
   return result.json();
-}
+};

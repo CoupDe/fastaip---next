@@ -6,9 +6,8 @@ import { Suspense } from "react";
 type Props = {};
 
 const Project = async (props: Props) => {
-  const projectsData: Promise<Structure[]> = getAllStructures();
-  const projects = await projectsData;
-
+  const projects = await getAllStructures();
+  
   return (
     <>
       {projects.map((project) => (
