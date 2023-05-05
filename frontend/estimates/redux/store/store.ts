@@ -10,12 +10,13 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
-import storage from "redux-persist/lib/storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 //Объединение редюсеров из слайсов
 const rootReducer = combineReducers({ building: buildingSlice });
 const buildingPersistConfig = {
   key: "building",
-  storage,
+  storage: AsyncStorage,
   whiteList: ["building"],
 };
 const persistedReducer = persistReducer(buildingPersistConfig, rootReducer);
