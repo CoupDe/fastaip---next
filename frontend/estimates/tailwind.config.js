@@ -17,11 +17,11 @@ module.exports = {
         showArrow: "showArrow 0.2s ease-in 3",
       },
       fontFamily: {
-        sans: ["var(--font-dmMono)", ...fontFamily.sans],
-        sspro: ["var(--font-sspro)"],
+        sans: "var(--font-dmMono)",
+        sspro: "var(--font-sspro)",
       },
       fontSize: {
-        xs: ["0.6rem", "1.45rem"],
+        xs: ["0.6rem", "1.35rem"],
       },
       // that is actual animation
       keyframes: (theme) => ({

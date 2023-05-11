@@ -1,7 +1,6 @@
-import "server-only";
+import BuildingItem from "@/components/building/BuildingItem";
 import { getAllStructures } from "@/lib/api/getAllConstructions";
-import ConstructionItem from "@/components/building/BuildingItem";
-import { Suspense } from "react";
+import "server-only";
 
 type Props = {};
 
@@ -11,7 +10,7 @@ const Project = async (props: Props) => {
   return (
     <>
       {projects.map((project) => (
-        <details key={project.id} className="group relative">
+        <details key={project.id} className="group relative w-1/2">
           <summary className="flex justify-between items-center font-medium cursor-pointer list-none  ">
             <ul
               role="list"
@@ -24,7 +23,7 @@ const Project = async (props: Props) => {
             </ul>
           </summary>
 
-          <ConstructionItem buildings={project.buildings} />
+          <BuildingItem buildings={project.buildings} />
         </details>
       ))}
     </>

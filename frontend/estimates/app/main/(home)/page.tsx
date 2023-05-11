@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React from "react";
 import doc from "@/public/doc_download.svg";
+import { dmMono } from "@/app/layout";
 type Props = {};
 
 const HomeInfo = (props: Props) => {
@@ -16,15 +17,15 @@ const HomeInfo = (props: Props) => {
             className="ml-5"
           />
         </button>
-        <h3 className="text-sm tracking-wider font-bold ">
+        <h3 className={`text-sm tracking-wider font-bold `}>
           Техническая документация
         </h3>
-        <p>Content goes here</p>
+        <p className={`text-sm tracking-wider font-bold `}>Content goes here</p>
       </div>
 
       {/* <span className="h-[400px] w-1 bg-red-600 shadow-xl  shadow-sky-600 "></span> */}
       <div className="flex-1 flex flex-col justify-center items-center">
-        <h3 className="text-lg font-bold ">
+        <h3 className={`text-lg font-bold `}>
           Добро пожаловать в{" "}
           <a className="decoration-sky-600 underline underline-offset-4 dark:decoration-red-900">
             ПК ...

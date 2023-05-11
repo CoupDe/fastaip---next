@@ -3,6 +3,9 @@ import Link from "next/link";
 import gazprom_Logo from "../../public/gazprom_Logo.png";
 import ThemeButton from "./themeButton/ThemeButton";
 import NavPanel from "./nav/NavPanel";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import LoginAvatar from "./avatar/LoginAvatar";
 
 // Функция ограниченивает количество символов в имени User
 const limitName = (name: string, limit: number): string => {
@@ -19,7 +22,7 @@ interface IAvatarProps {
 }
 export default async function Header() {
   // Происходит ошибка из-зи header на гитхабе пишут что это программная ошибка связки next-auth/next13
-  // const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
 
   return (
     <header>
@@ -31,10 +34,12 @@ export default async function Header() {
         </div>
         <NavPanel />
         <div className="flex items-center ">
-          <div>{/* <LoginAvatar image={session?.user?.image} /> */}</div>
+          <div>
+            <LoginAvatar image={session?.user?.image} />
+          </div>
           <div className="flex flex-col  pt-1 ml-1">
             <p className="text-xs sm:text-[0.7rem]  leading-tight">
-              {/* {session?.user ? limitName(session.user.name!, 10) : "not auth"} */}
+              {session?.user ? limitName(session.user.name!, 10) : "not auth"}
             </p>
             <p className="text-neutral-500 text-xs  dark:text-neutral-400">
               dep

@@ -3,7 +3,7 @@
 @tailwind utilities;
 /* italic transition ease-in-out delay-75 hover:text-neutral-300 hover:after:-translate-x-6 after:transition-all after:opacity-0 hover:after:opacity-100 after:delay-50 after:absolute after:-right-[35%] md:after:-right-[50%] sm:hover:after:content-['\2190']; */
 body {
-  @apply font-sans;
+ 
 }
 
 h3 {
@@ -11,11 +11,11 @@ h3 {
 }
 @layer components {
   .ulTree {
-    @apply italic  transition ease-in-out ;
+    @apply italic  transition ease-in-out;
   }
 
   .ulTree::after {
-    @apply  absolute opacity-0 transition-all delay-75;
+    @apply absolute opacity-0 transition-all delay-75;
   }
   .ulTree:hover::after {
     @apply -translate-x-6 opacity-100;

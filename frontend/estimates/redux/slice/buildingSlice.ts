@@ -10,11 +10,7 @@ interface IBuilding {
   building: SelectedBuilding;
   buildings: Building[];
 }
-// const initialState: SelectedBuilding = {
-//   name: "Не выбран",
-//   code_building: "",
-//   id: undefined,
-// };
+
 const initialState: IBuilding = {
   building: { name: "Не выбран", code_building: "", id: undefined },
   buildings: [],
@@ -32,9 +28,9 @@ const buildingSlice = createSlice({
         state.buildings = [
           ...current(state.buildings).filter((item) => item !== action.payload),
           action.payload,
-        ].slice(-10);
+        ].slice(-10).reverse();
       } else {
-        state.buildings = [...state.buildings, action.payload].slice(-10);
+        state.buildings = [...state.buildings, action.payload].slice(-10).reverse();
       }
     },
   },

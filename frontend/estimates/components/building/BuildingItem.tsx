@@ -1,12 +1,11 @@
 "use client";
-import React from "react";
 import { useAppDispatch } from "@/redux/hook";
 import { setBuilding } from "@/redux/slice/buildingSlice";
-import Link from "next/link";
+import React from "react";
 interface iBuilding {
   buildings: Building[];
 }
-const ConstructionItem: React.FC<iBuilding> = ({ buildings }) => {
+const BuildingItem: React.FC<iBuilding> = ({ buildings }) => {
   const dispatch = useAppDispatch();
   return (
     <>
@@ -27,4 +26,4 @@ const ConstructionItem: React.FC<iBuilding> = ({ buildings }) => {
   );
 };
 
-export default ConstructionItem;
+export default BuildingItem;

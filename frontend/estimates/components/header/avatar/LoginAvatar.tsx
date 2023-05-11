@@ -1,5 +1,5 @@
 "use client";
-import React, { Fragment, useState } from "react";
+import React, { Fragment } from "react";
 import Image from "next/image";
 import avatar from "../../../public/avatar.svg";
 import { signOut } from "next-auth/react";
@@ -10,7 +10,7 @@ function LoginAvatar({ image }: Props) {
   return (
     <Menu as="div" className="relative inline-block text-left z-50">
       <div>
-        <Menu.Button className="inline-flex w-full justify-center   text-sm font-semibold  ">
+        <Menu.Button className="inline-flex w-full justify-center text-sm font-semibold  ">
           <Image
             className="rounded-xl"
             src={image || avatar}
@@ -31,7 +31,7 @@ function LoginAvatar({ image }: Props) {
         leaveTo="transform opacity-0 scale-95"
       >
         <Menu.Items
-          className="absolute right-0 mt-2 w-36 origin-top-right rounded-md bg-neutral-400 overflow-hidden  dark:bg-neutral-400 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+          className="absolute right-0 mt-2 w-36 origin-top-right rounded-md bg-neutral-400/70 overflow-hidden  shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
           aria-orientation="vertical"
           aria-labelledby="menu-button"
         >
