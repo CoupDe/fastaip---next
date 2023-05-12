@@ -23,14 +23,19 @@ const buildingSlice = createSlice({
     setBuilding: (state, action: PayloadAction<Building>) => {
       state.building = action.payload;
 
+      // console.log("state.buildings", current(state.buildings));
       // Ограничение списка 10ю уникальными записями
-      if (current(state.buildings).includes(action.payload)) {
+      if (
+        state.buildings.some((building) => building.id === action.payload.id)
+      ) {
         state.buildings = [
-          ...current(state.buildings).filter((item) => item !== action.payload),
+          ...current(state.buildings).filter(
+            (item) => item.id !== action.payload.id
+          ),
           action.payload,
-        ].slice(-10).reverse();
+        ].slice(-10);
       } else {
-        state.buildings = [...state.buildings, action.payload].slice(-10).reverse();
+        state.buildings = [...state.buildings, action.payload].slice(-10);
       }
     },
   },
@@ -39,6 +44,7 @@ export const { setBuilding } = buildingSlice.actions;
 
 // Получение выбранного объекта
 export const ActiveBuilding = (state: RootState) => state.building.building;
-export const SelectedBuildingList = (state: RootState) =>
-  state.building.buildings;
+export const ReverseBuildingList = (state: RootState) =>
+  [...state.building.buildings].reverse();
+
 export default buildingSlice.reducer;

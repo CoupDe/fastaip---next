@@ -16,7 +16,6 @@ export const dmMono = DM_Mono({
   weight: "500",
   variable: "--font-dmMono",
 });
-const dancingScript = Dancing_Script({ subsets: ["latin"] });
 
 const SSPro = Source_Sans_Pro({
   subsets: ["cyrillic"],

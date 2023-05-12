@@ -1,8 +1,9 @@
 "use client";
-import { useAppSelector } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   ActiveBuilding,
-  SelectedBuildingList,
+  ReverseBuildingList,
+  setBuilding,
 } from "@/redux/slice/buildingSlice";
 import { Popover, Transition } from "@headlessui/react";
 import HomeWorkIcon from "@mui/icons-material/HomeWork";
@@ -12,7 +13,12 @@ import { Fragment, useState } from "react";
 export default function Breadcrumbs() {
   const [isShow, setIsShow] = useState(false);
   const buildingName = useAppSelector(ActiveBuilding);
-  const buildingList = useAppSelector(SelectedBuildingList);
+  const dispatch = useAppDispatch();
+  const buildingList = useAppSelector(ReverseBuildingList);
+  const handleSelectBuilding = (building: Building) => {
+    setIsShow(false);
+    dispatch(setBuilding(building));
+  };
 
   return (
     <div className="flex justify-end mt-2  mr-3 opacity-70 items-center">
@@ -39,15 +45,16 @@ export default function Breadcrumbs() {
             className="  absolute   -top-2 -left-20 h-20 min-w-[110px] "
             onMouseLeave={() => setIsShow(false)}
           >
-            <Popover.Overlay className="p-1  z-10  top-8 absolute min-w-[150px] bg-neutral-400/70 ">
+            <Popover.Overlay className="z-10  top-8 absolute min-w-[150px] bg-neutral-400/70 rounded">
               <ul>
-                {buildingList.map((building) => (
-                  <li key={building.id}>
-                    <Link
-                      onClick={() => setIsShow(false)}
-                      href={`/main/srv/${building.id}`}
-                    >
-                      {building.name}
+                {buildingList.map((build) => (
+                  <li
+                    key={build.id}
+                    className="hover:bg-slate-400 hover:rounded cursor-pointer px-1"
+                    onClick={() => handleSelectBuilding(build)}
+                  >
+                    <Link href={`/main/srv/${build.id}`} className="block">
+                      {build.name}
                     </Link>
                   </li>
                 ))}

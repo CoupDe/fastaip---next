@@ -6,7 +6,7 @@ type Props = {};
 
 const Project = async (props: Props) => {
   const projects = await getAllStructures();
-  
+
   return (
     <>
       {projects.map((project) => (
