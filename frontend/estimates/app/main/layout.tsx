@@ -16,7 +16,9 @@ export default function MainLayout({
       {/* @ts-expect-error Async Server Component */}
       <Header />
       <Breadcrumbs />
-      <main className={`h-full cantainer p-3 mt-3 font-dmMono`}>{children} </main>
+      <section className={`h-full cantainer p-3 mt-3 font-dmMono`}>
+        {children}
+      </section>
     </>
   );
 }

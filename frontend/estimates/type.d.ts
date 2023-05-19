@@ -10,3 +10,10 @@ type Structure = {
   id: number;
   buildings: Building[];
 };
+type Construction = {
+  name: string;
+  code_structure: string;
+  id?: number;
+};
+
+type ActiveLink = "projects" | "import" | null;

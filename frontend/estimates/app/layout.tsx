@@ -36,7 +36,9 @@ export default function RootLayout({
         <StoreProvider>
           <PersistorContext>
             <ThemeContext>
-              <AuthContext>{children}</AuthContext>
+              <main>
+                <AuthContext>{children}</AuthContext>
+              </main>
             </ThemeContext>
           </PersistorContext>
         </StoreProvider>

@@ -6,6 +6,7 @@ function generateRoute(endpoint: string, url = BASEURL, version = apiVersion) {
   return fullUrl;
 }
 
-export const allProjects = generateRoute("construction/all");
-export const allBuildings = generateRoute("building/all");
-export const buildingById = generateRoute("building/");
+export const allProjectsRout = generateRoute("construction/all");
+export const allBuildingsRout = generateRoute("building/all");
+export const buildingByIdRout = generateRoute("building/");
+export const createConstructionRout = generateRoute("construction/");
