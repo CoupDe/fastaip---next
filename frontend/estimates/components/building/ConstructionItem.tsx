@@ -3,12 +3,11 @@ import { Transition } from "@headlessui/react";
 import React, { Fragment, useState } from "react";
 import AddHomeWorkIcon from "@mui/icons-material/AddHomeWork";
 import EditIcon from "@mui/icons-material/Edit";
-import MyModal from "../form/modal/ModalFormConstr";
+import MyModalForm from "../form/modal/MyModalForm";
+
 type Props = { construction: Structure };
-type ModalFormProps = {
-  construction?: Construction;
-  edit?: boolean;
-};
+let showForm: FormStatus;
+
 const ConstructionItem: React.FC<Props> = ({ construction }) => {
   const [isHovered, setHovered] = useState(false);
   const [modalProps, setModalProps] = useState<ModalFormProps>();
@@ -17,9 +16,13 @@ const ConstructionItem: React.FC<Props> = ({ construction }) => {
     setShowModal((showModal) => !showModal);
     setHovered(false);
   };
-  const handleShowButton = (construction: Construction, edit?: boolean) => {
-    console.log(construction);
-    setModalProps({ construction: construction, edit: edit });
+
+  const handleShowButton = <T extends Construction, U extends FormStatus>(
+    construction: T,
+    showForm: U
+  ) => {
+    construction;
+    setModalProps({ construction, showForm });
     setShowModal(true);
   };
 
@@ -54,7 +57,10 @@ const ConstructionItem: React.FC<Props> = ({ construction }) => {
           leaveTo="opacity-0"
         >
           <button
-            onClick={() => handleShowButton(construction)}
+            onClick={() => {
+              showForm = "newBuilding";
+              handleShowButton(construction, showForm);
+            }}
             className={`duration-300 opacity-0  ${
               isHovered && "opacity-100"
             }   ml-4 inline-flex `}
@@ -75,7 +81,10 @@ const ConstructionItem: React.FC<Props> = ({ construction }) => {
           leaveTo="opacity-0"
         >
           <button
-            onClick={() => handleShowButton(construction, true)}
+            onClick={() => {
+              showForm = "editConstruction";
+              handleShowButton(construction, showForm);
+            }}
             className={`duration-300 opacity-0  ${
               isHovered && "opacity-100"
             }   ml-2 inline-flex `}
@@ -88,10 +97,10 @@ const ConstructionItem: React.FC<Props> = ({ construction }) => {
         </Transition.Child>
       </Transition>
       {showModal && (
-        <MyModal
+        <MyModalForm
           showModal={showModal}
           handleShowModal={handleShowModal}
-          modalProps={modalProps}
+          modalProps={modalProps!}
         />
       )}
     </ul>

@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Response
-from schemas.structure_schema import Structure
+
+from schemas.structure_schema import Structure, UpdateStructure
 from db.base import get_async_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from schemas import structure_schema
 from services.v1 import structure_service
-from sqlalchemy.exc import IntegrityError
+
 route = APIRouter(prefix='/v1/construction', tags=['construction'])
 
 
@@ -29,7 +30,6 @@ async def create_structure(structure: structure_schema.CreateStructure, session:
     Raises:
         HTTPException: при совпадении кода объекта
     """
-    print('structure', structure)
     db_structure = await structure_service.get_structure_by_code_name(
         **structure.dict(exclude={'structure_id'}), session=session)
     if db_structure:
@@ -37,10 +37,21 @@ async def create_structure(structure: structure_schema.CreateStructure, session:
                             detail='Объект с таким кодом или названием присутсвует в БД')
     return await structure_service.create_structure(structure, session=session)
 
+# @route.patch('/{structure_id}', response_model=structure_schema.Structure)
 
-@route.patch('/{structure_id}')
-async def update_structure():
-    pass
+
+@route.patch('/{structure_id}', response_model=structure_schema.UpdateStructure)
+async def update_structure(structure: structure_schema.UpdateStructure,  session: AsyncSession = Depends(get_async_session)) -> UpdateStructure | None:
+
+    print('enter route', structure)
+    structures = await structure_service.patch_structure(structure, session=session)
+
+    print('in PATCH', structures)
+
+    return structures
+    # if not structure:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    # return structure
 
 
 @route.delete('/{structure_id}', status_code=status.HTTP_200_OK)

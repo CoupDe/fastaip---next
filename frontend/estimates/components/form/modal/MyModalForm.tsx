@@ -1,30 +1,37 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import ConstructionFormCreate from "../FormCreateConstruction";
-import { capitalize, isNumber } from "@/lib/util/isNumber";
-type ModalFormProps = {
+
+type FormProps = {
   handleShowModal: () => void;
   showModal: boolean;
-  modalProps?: { construction?: Construction; edit?: boolean };
+  modalProps: ModalFormProps;
 };
+const MyTitle = ({
+  construction,
+  showForm,
+}: ModalFormProps): React.ReactElement => {
+  //  edit ? "Редактировать объект" : "Добавить объект в"
+  console.log("showForm", showForm);
+  let variantTitle: string;
+  if (construction !== undefined && showForm === "editConstruction") {
+    variantTitle = `Редактировать объект проектирования ${construction.name}`;
+  } else if (construction != undefined && showForm === "newBuilding") {
+    variantTitle = `Добавить объект в ${construction.name}`;
+  } else {
+    variantTitle = `Создать объект проектирования`;
+  }
 
-const MyTitle: React.FC<{
-  modalProps: { construction: Construction; edit?: boolean };
-}> = ({ modalProps: { construction, edit } }): React.ReactElement => {
-  const variantTitle = edit ? "Редактировать объект" : "Добавить объект в";
   return (
     <>
       {variantTitle} {` `}
-      {isNumber(construction.name[0])
-        ? capitalize(construction.name)
-        : construction.name}
     </>
   );
 };
 
-export default function MyModal(props: ModalFormProps) {
+export default function MyModalForm(props: FormProps) {
   let [isOpen, setIsOpen] = useState(props.showModal);
-  console.log(props.modalProps);
+
   function closeModal() {
     props.handleShowModal();
     setIsOpen(false);
@@ -62,14 +69,13 @@ export default function MyModal(props: ModalFormProps) {
                     as="h3"
                     className="text-sm font-medium leading-6 text-gray-900"
                   >
-                    {!props.modalProps?.construction ? (
-                      "Созание проекта строительства"
-                    ) : (
-                      <MyTitle modalProps={props.modalProps!} />
-                    )}
+                    <MyTitle {...props.modalProps} />
                   </Dialog.Title>
                   <div className="mt-2">
-                    <ConstructionFormCreate closeModal={closeModal} />
+                    <ConstructionFormCreate
+                      closeModal={closeModal}
+                      modalProps={props.modalProps}
+                    />
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

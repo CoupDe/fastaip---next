@@ -1,15 +1,16 @@
 import React, { Fragment, useEffect, useState } from "react";
 import AddHomeIcon from "@mui/icons-material/AddHome";
 import { Transition } from "@headlessui/react";
-import ModalFormConstr from "../../../form/modal/ModalFormConstr";
+import ModalFormConstr from "../../../form/modal/MyModalForm";
 import TestModal from "../dialogAddConstruction/TestModal";
-import MyModal from "../../../form/modal/ModalFormConstr";
+import MyModal from "../../../form/modal/MyModalForm";
 type Props = {};
 // Отображение модального окна и popover
 
 const AddConstructionBtn = (props: Props) => {
   const [isShow, setIsShow] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const modalProps: ModalFormProps = { showForm: "newConstruction" };
   const handleShowModal = () => {
     setShowModal((showModal) => !showModal);
     !showModal && setIsShow((isShow) => !isShow);
@@ -50,7 +51,11 @@ const AddConstructionBtn = (props: Props) => {
       </div>
       {/* {showModal && <TestModal handleShowModal={handleShowModal} />} */}
       {showModal && (
-        <MyModal showModal={showModal} handleShowModal={handleShowModal}  />
+        <MyModal
+          showModal={showModal}
+          handleShowModal={handleShowModal}
+          modalProps={modalProps}
+        />
       )}
     </>
   );

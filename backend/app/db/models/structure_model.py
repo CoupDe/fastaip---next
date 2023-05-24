@@ -17,4 +17,4 @@ class Structure(CommonAbstractBase):
         back_populates='structure', cascade='save-update, merge, delete')
 
     def __repr__(self) -> str:
-        return f"Structure(name={self.name!r}, code_building={self.code_structure!r}, buildings={self.buildings})"
+        return f"Structure(name={self.name!r}, code_building={self.code_structure!r})"

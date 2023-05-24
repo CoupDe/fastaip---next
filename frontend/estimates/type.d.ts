@@ -1,19 +1,24 @@
-type Building = {
+interface Building {
   name: string;
   code_building: string;
-  readonly id: string;
-};
-
-type Structure = {
+  readonly id?: string;
+  structure_id: string;
+}
+interface Construction {
   name: string;
   code_structure: string;
-  id: number;
+  readonly id?: string;
+}
+interface Structure {
+  name: string;
+  code_structure: string;
+  id: string;
   buildings: Building[];
-};
-type Construction = {
-  name: string;
-  code_structure: string;
-  id?: number;
-};
+}
 
+type FormStatus = "newConstruction" | "editConstruction" | "newBuilding";
 type ActiveLink = "projects" | "import" | null;
+interface ModalFormProps {
+  construction?: Construction;
+  showForm: FormStatus;
+}

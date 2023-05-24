@@ -7,16 +7,22 @@ class StructureBase(BaseModel):
     name: str
     code_structure: str
 
+    class Config:
+        orm_mode = True
+
 
 class CreateStructure(StructureBase):
     pass
 
 
-class Structure(StructureBase):
+class UpdateStructure(StructureBase):
+    name: str | None = None
+    code_structure: str | None = None
     id: int
 
-    class Config:
-        orm_mode = True
+
+class Structure(StructureBase):
+    id: int
 
 
 class StructureBuilding(Structure):

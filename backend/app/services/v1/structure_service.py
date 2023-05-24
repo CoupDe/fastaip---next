@@ -1,8 +1,9 @@
 import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
+from schemas.structure_schema import UpdateStructure
 from db.models.structure_model import Structure
 from schemas import structure_schema
-from sqlalchemy import asc, delete, desc, insert, or_, select
+from sqlalchemy import asc, delete, desc, insert, or_, select, update
 from sqlalchemy.orm import selectinload
 
 
@@ -47,3 +48,18 @@ async def delete_structure(id: int, session: AsyncSession) -> str | None:
     result = (await session.scalar(stmt))
     await session.commit()
     return result
+
+
+async def patch_structure(structure: structure_schema.UpdateStructure, session: AsyncSession) -> UpdateStructure | None:
+    print('structure in SERVICE', structure)
+    stmt = update(Structure).where(Structure.id ==
+                                   structure.id).values(**structure.dict(exclude_unset=True)).returning(Structure)
+    res = await session.scalar(stmt)
+    await session.commit()
+    print('result in service', res.id)
+    return res
+
+    # stmt = select(Structure).where(Structure.id == structure.id)
+    # result = (await session.scalar(stmt))
+    # await session.commit()
+    # return result

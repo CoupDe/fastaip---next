@@ -10,9 +10,8 @@ export const createConstruction = async (
       "Content-Type": "application/json",
     },
   });
-  console.log(response);
+
   if (!response.ok) {
-    console.log(response);
   }
   return response.json();
 };
