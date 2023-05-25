@@ -1,7 +1,7 @@
 import asyncio
 from schemas.userTest_schema import GetUser, User
 from fastapi.middleware.cors import CORSMiddleware
-from controllers.v1 import building_route, structure_route
+from controllers.v1 import building_route, structure_route, upload_route
 from db.base import async_engine, create_db_and_tables, get_async_session
 from fastapi import Depends, FastAPI
 from schemas.building_schema import *
@@ -13,6 +13,7 @@ app = FastAPI(title='Parser')
 
 app.include_router(building_route.route, prefix='/api')
 app.include_router(structure_route.route, prefix='/api')
+app.include_router(upload_route.route, prefix='/api')
 app.add_middleware(CORSMiddleware, allow_origins=origins,
                    allow_credentials=True,
                    allow_methods=["*"],

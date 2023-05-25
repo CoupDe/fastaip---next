@@ -1,15 +1,14 @@
 import { createConstruction } from "@/lib/api/createConstruction";
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
 import patchConstruction from "@/lib/api/patchConstruction";
 import createBuilding from "@/lib/api/createBuilding";
+import { isError } from "@/const/typegurads";
+import { error } from "console";
+import SnackBar from "./SnackBar";
 type FormProps = { closeModal: () => void; modalProps: ModalFormProps };
-// type FormValues = {
-//   name: string;
-//   code_structure?: string;
-//   code_building?: string;
-// };
+// ------------!!!!!!!!Реализовать портал для SnackBar!!!!!!!!!!!..
 interface ISubmitConstruction {
   name: string;
   code_structure: string;
@@ -29,13 +28,14 @@ const ConstructionFormCreate: React.FC<FormProps> = ({
     formState: { errors },
   } = useForm<SubmitForm>();
   const router = useRouter();
-  console.log("enter", modalProps.showForm);
+  const [myError, setMyError] = useState<FetchError>();
   // Не уверен что хорошая идея обновлять посредством router.refresh, при добавлении через форму посредством
   // Подходит ли switch для универсальной формы
   // : SubmitHandler<Building | Construction>
+  console.log("myError", myError);
   const onSubmit = async (data: SubmitForm) => {
     let sendData: Building | Construction;
-    let res;
+    let res: Building | Construction | FetchError;
     if ("code_building" in data) {
       console.log("building HERE");
 
@@ -59,12 +59,17 @@ const ConstructionFormCreate: React.FC<FormProps> = ({
         console.log("newBuilding", sendData);
 
         res = await createBuilding(sendData as Building);
+
         break;
     }
-    // res.id && router.refresh();
-    console.log(res);
-    res.id && router.refresh();
-    closeModal();
+
+    if (isError(res)) {
+      setMyError(res);
+      console.log("in errrrr res", res);
+    } else if (res.id) {
+      res.id && router.refresh();
+      closeModal();
+    }
   };
   return (
     <form
@@ -147,6 +152,7 @@ const ConstructionFormCreate: React.FC<FormProps> = ({
           Создать
         </button>
       </div>
+      {myError && <SnackBar />}
     </form>
   );
 };

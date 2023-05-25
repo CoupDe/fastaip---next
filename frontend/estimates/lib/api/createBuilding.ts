@@ -1,6 +1,12 @@
 import { createBuildingRout } from "@/const/apiRout";
 
-const createBuilding = async (data: Building): Promise<Building> => {
+const customError = (status: number, detail: string): FetchError => {
+  return { status, detail };
+};
+
+const createBuilding = async (
+  data: Building
+): Promise<Building | FetchError> => {
   const response = await fetch(createBuildingRout, {
     method: "POST",
     body: JSON.stringify(data),
@@ -9,7 +15,15 @@ const createBuilding = async (data: Building): Promise<Building> => {
     },
   });
   if (!response.ok) {
-    throw new Error("Failed fetch data");
+    const text = await response.text();
+
+    const err = JSON.parse(text);
+    if ("detail" in err) {
+      let myError: FetchError;
+      myError = customError(response.status, err.detail);
+
+      return myError;
+    }
   }
   return response.json();
 };

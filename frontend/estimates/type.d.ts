@@ -1,3 +1,8 @@
+interface FetchError {
+  detail: string;
+  status: number;
+}
+
 interface Building {
   name: string;
   code_building: string;

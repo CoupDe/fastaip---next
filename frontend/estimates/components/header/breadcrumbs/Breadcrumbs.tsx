@@ -52,9 +52,9 @@ export default function Breadcrumbs() {
     >
       {segment === "projects" && <AddConstructionBtn />}
       <motion.nav
+        layout="position"
         transition={{ duration: 0.7 }}
         animate={{ opacity: [1, 0, 1, 0.5, 1] }}
-        layout
         className="flex  mt-2  mr-3 opacity-70 items-center"
       >
         <Popover className="relative mr-3">
@@ -80,7 +80,7 @@ export default function Breadcrumbs() {
               className="  absolute   -top-2 -left-20 h-20 min-w-[110px] "
               onMouseLeave={() => setIsShow(false)}
             >
-              <Popover.Overlay className="z-10  top-8 absolute min-w-[150px] bg-neutral-400/70 rounded">
+              <Popover.Overlay className="z-10  top-8 absolute min-w-[150px] bg-neutral-400/70 rounded ">
                 <motion.ul initial="hidden" animate="visible" variants={list}>
                   {buildingList.map((build) => (
                     <motion.li
