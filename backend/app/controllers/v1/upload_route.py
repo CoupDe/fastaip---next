@@ -7,9 +7,9 @@ from fastapi import UploadFile, File
 route = APIRouter(prefix='/v1/import', tags=['import'])
 
 
-@route.post('/')
-async def upload_estimate(file: list[UploadFile]):
+@route.post('/{building_id}')
+async def upload_estimate(file: list[UploadFile], building_id: int):
 
-    create_dir()
-
+    create_dir(building_id)
+    print(file[0].file)
     return {'fileName': file, 'content_type': file}
