@@ -54,7 +54,7 @@ const UploadForm = (props: Props) => {
         onDrop={(e) => dragHandler(e)}
       >
         <label
-          htmlFor="dragfile"
+        
           className={`dark:hover:bg-bray-800 flex h-28 w-full   flex-col items-center justify-center
            rounded-lg border-2 border-dashed border-gray-400 bg-[#ded0c1]  ${
              !dragActive &&
