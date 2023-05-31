@@ -12,6 +12,7 @@ import Link from "next/link";
 import { Fragment, useState } from "react";
 import AddConstructionBtn from "./constructionBtn/AddConstructionBtn";
 import { useSelectedLayoutSegment } from "next/navigation";
+import ImportRadioBtn from "./importBtn/ImportRadioBtn";
 
 const list = {
   visible: {
@@ -48,14 +49,15 @@ export default function Breadcrumbs() {
     <div
       className={`flex ${
         segment ? "justify-between" : "justify-end"
-      } mt-2  mx-3 opacity-70 items-center`}
+      } mx-3 mt-2  min-h-[39px] items-center opacity-70`}
     >
       {segment === "projects" && <AddConstructionBtn />}
+      {segment === "import" && <ImportRadioBtn />}
       <motion.nav
         layout="position"
         transition={{ duration: 0.7 }}
         animate={{ opacity: [1, 0, 1, 0.5, 1] }}
-        className="flex  mt-2  mr-3 opacity-70 items-center"
+        className="mr-3    flex items-center opacity-70"
       >
         <Popover className="relative mr-3">
           <Popover.Button>
@@ -77,16 +79,16 @@ export default function Breadcrumbs() {
 
             <Popover.Panel
               static
-              className="  absolute   -top-2 -left-20 h-20 min-w-[110px] "
+              className="  absolute   -left-20 -top-2 h-20 min-w-[110px] "
               onMouseLeave={() => setIsShow(false)}
             >
-              <Popover.Overlay className="z-10  top-8 absolute min-w-[150px] bg-neutral-400/70 rounded ">
+              <Popover.Overlay className="absolute  top-8 z-10 min-w-[150px] rounded bg-neutral-400/70 ">
                 <motion.ul initial="hidden" animate="visible" variants={list}>
                   {buildingList.map((build) => (
                     <motion.li
                       variants={item}
                       key={build.id}
-                      className="hover:bg-slate-400 hover:rounded cursor-pointer px-1"
+                      className="cursor-pointer px-1 hover:rounded hover:bg-slate-400"
                       onClick={() => handleSelectBuilding(build)}
                     >
                       <Link href={`/main/srv/${build.id}`} className="block">

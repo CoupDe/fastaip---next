@@ -11,5 +11,4 @@ route = APIRouter(prefix='/v1/import', tags=['import'])
 async def upload_estimate(file: list[UploadFile], building_id: int):
 
     create_dir(building_id)
-    print(file[0].file)
     return {'fileName': file, 'content_type': file}

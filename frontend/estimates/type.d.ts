@@ -27,3 +27,4 @@ interface ModalFormProps {
   construction?: Construction;
   showForm: FormStatus;
 }
+type SearchFormats = { badFormat: File[]; okFormat: File[] };
