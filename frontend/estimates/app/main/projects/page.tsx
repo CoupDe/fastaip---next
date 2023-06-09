@@ -12,7 +12,7 @@ const Project = async (props: Props) => {
     <>
       {structure.map((construction) => (
         <details key={construction.id} className=" w-full">
-          <summary className="font-medium cursor-pointer list-none ">
+          <summary className="cursor-pointer list-none font-medium ">
             <ConstructionItem construction={construction} />
           </summary>
 

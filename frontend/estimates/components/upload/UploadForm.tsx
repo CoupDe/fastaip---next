@@ -54,7 +54,6 @@ const UploadForm = (props: Props) => {
         onDrop={(e) => dragHandler(e)}
       >
         <label
-        
           className={`dark:hover:bg-bray-800 flex h-28 w-full   flex-col items-center justify-center
            rounded-lg border-2 border-dashed border-gray-400 bg-[#ded0c1]  ${
              !dragActive &&
@@ -90,6 +89,11 @@ const UploadForm = (props: Props) => {
                 </p>
               </>
             )}
+            {!fileFormats?.okFormat.length && fileFormats && (
+              <p className="mt-2 rounded border border-red-400 px-1.5 pt-0.5 text-center text-xs  text-red-800 dark:bg-gray-700 dark:text-red-400">
+                Нет доступных форматов для загрузки
+              </p>
+            )}
           </div>
           {!dragActive && (
             <input
@@ -103,12 +107,13 @@ const UploadForm = (props: Props) => {
           )}
         </label>
       </form>
+
       {showFiles && (
         <div>
           {fileFormats?.badFormat.map((file) => (
             <span
               key={file.name}
-              className="mr-1 h-5 mt-1 inline-block  rounded border border-red-400 bg-red-100 px-1.5 text-xs font-medium text-red-800 dark:bg-gray-700 dark:text-red-400"
+              className="mr-1 mt-1 inline-block h-5  rounded border border-red-400 bg-red-100 px-1.5 text-xs font-medium text-red-800 dark:bg-gray-700 dark:text-red-400"
             >
               {file.name}
             </span>

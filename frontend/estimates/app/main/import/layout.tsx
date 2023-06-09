@@ -2,8 +2,8 @@ import UploadForm from "@/components/upload/UploadForm";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Home",
-  description: "Welcome to Programm",
+  title: "import",
+  description: "import menu",
 };
 export default function ImportLayout({
   children,
