@@ -43,7 +43,7 @@ async def upload_estimate(files: List[UploadFile], building_id: int):
     # Set column
     parseVisr.set_header()
     # chek_stat
-    
+
     parseVisr.set_field_category()
 
     df_visr = get_data_VISR(df_excel)
