@@ -14,10 +14,11 @@ app = FastAPI(title='Parser')
 app.include_router(building_route.route, prefix='/api')
 app.include_router(structure_route.route, prefix='/api')
 app.include_router(upload_route.route, prefix='/api')
-app.add_middleware(CORSMiddleware, allow_origins=origins,
+app.add_middleware(CORSMiddleware,
                    allow_credentials=True,
+                   allow_origins=["*"],
                    allow_methods=["*"],
-                   allow_headers=["*"],)
+                   allow_headers=["X-Temp-Path"],)
 
 
 # @app.on_event("startup")

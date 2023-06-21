@@ -1,36 +1,17 @@
 
-from enum import Enum
-from typing import Tuple
-from fastapi import HTTPException
 from pandas import Series
 from pydantic import BaseModel, ValidationError, confloat, conint, validator
-
+from typing import Tuple
 from const.pandas_template import LaborEnum
 
 
+class ImportDataInfo(BaseModel):
+    filesInfo: list[tuple[str, int]] | str
+    detail: str
+    tempFilePath:str
 
 
-
-class Visr(BaseModel):
-    _name_visr: str
-    _type_work: str
-    _chapter: int | None
-
-    # @validator('_name_visr', '_type_work')
-    # def only_space(cls, general_data):
-
-    #     if general_data.isspace():
-    #         raise HTTPException(
-    #             status_code=422, detail=f"В строке содержатся только пробелы")
-    #     return general_data
-
-    @property
-    def set_chapter(self, dt: Series):
-
-        print(dt)
-
-
-class EstimatedPrice(Visr):
+class EstimatedPrice():
     pos = int
     code = str
     name = str
@@ -52,4 +33,26 @@ class LaborPrice(EstimatedPrice):
     total_cost = float
 
 
+class Visr(BaseModel):
+    name_visr: str
+    type_work: str
+    pricing: list[EstimatedPrice]
 
+    class Config:
+        arbitrary_types_allowed = True
+
+    def __init__(self, general_series: Series) -> None:
+        return super().__init_()
+
+    # @validator('_name_visr', '_type_work')
+    # def only_space(cls, general_data):
+
+    #     if general_data.isspace():
+    #         raise HTTPException(
+    #             status_code=422, detail=f"В строке содержатся только пробелы")
+    #     return general_data
+
+    @property
+    def set_chapter(self, dt: Series):
+
+        print(dt)

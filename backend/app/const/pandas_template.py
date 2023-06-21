@@ -6,14 +6,18 @@ ESTIMATED_PRICE = {0: int, 1: str, 2: str,
 
 
 class LaborEnum(Enum):
-    human_labor = 'ОЗ'
-    machinists_labor = 'ЗМ'
-    machine_labor = 'ЭМ'
-    material = 'МР'
-    
+    OZ = 'ОЗ'
+    MM = 'ЗМ'
+    AM = 'ЭМ'
+    MA = 'МР'
+
+
+class AdditionalEstimatedEnum(Enum):
+    NR = "НР"
+    SP = "СП"
 
 
 class VisrDataEnum(Enum):
     estimated_price = 'E'
-    labor_price = LaborEnum
     local_number = "L"
+    labor_price = LaborEnum

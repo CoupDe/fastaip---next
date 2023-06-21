@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@mui/icons-material";
 import path from "path";
 import React from "react";
 import FormatInfo from "./FormatInfo";
@@ -44,7 +43,7 @@ const UploadForm = (props: Props) => {
       setDragActive(true);
     }
   };
-  console.log(showFiles);
+
   return (
     <>
       <form
