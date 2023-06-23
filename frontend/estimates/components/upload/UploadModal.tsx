@@ -1,13 +1,25 @@
 import React, { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { importData } from "@/lib/api/postImport";
+import { ImportData } from "@/lib/api/postImport";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-const UploadModal: React.FC<importData> = ({
+import { acceptImport } from "@/lib/api/acceptImport";
+import { useAppSelector } from "@/redux/hook";
+import { ActiveBuilding } from "@/redux/slice/buildingSlice";
+const UploadModal: React.FC<ImportData & { onClose: () => void }> = ({
   filesInfo,
   detail,
-  tempFilePath,
+  tempFileId,
+  confirmation,
+  onClose,
 }) => {
-  let [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(true);
+  const { id } = useAppSelector(ActiveBuilding);
+
+  const handleConfirmImport = async (confirmation: boolean) => {
+    const result = await acceptImport(tempFileId, confirmation, id!);
+    onClose();
+  };
+
   return (
     <>
       <Transition show={isOpen} as={Fragment}>
@@ -46,22 +58,31 @@ const UploadModal: React.FC<importData> = ({
                   <div className="my-2 h-32 w-full rounded-md border-[0.5px] border-solid  border-sky-600 dark:border-red-900">
                     {filesInfo.flatMap(([file, count]) => (
                       <Fragment key={file}>
-                        <p className="inline-flex pl-2 align-middle text-gray-900 ">
-                          {file}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;({count})ЕВР
+                        <p className="inline-flex items-center  pl-2 text-lg text-gray-900 ">
+                          {file}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;({count}
+                          )&nbsp;ЕВР
+                          <CheckCircleOutlineIcon
+                            fontSize="small"
+                            className="mb-1 ml-2 text-green-700"
+                          />
                         </p>
-                        <CheckCircleOutlineIcon
-                          fontSize="small"
-                          className="text-green-700"
-                        />
                       </Fragment>
                     ))}
                   </div>
-                  <button
-                    className="  text-gray-900 "
-                    onClick={() => setIsOpen(false)}
-                  >
-                    close
-                  </button>
+                  <div className="mt-4 flex justify-between justify-self-end sm:space-x-4">
+                    <button
+                      className="inline-flex min-w-[100px] justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      onClick={() => handleConfirmImport(false)}
+                    >
+                      close
+                    </button>
+                    <button
+                      className="inline-flex min-w-[100px] justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      onClick={() => handleConfirmImport(true)}
+                    >
+                      загрузить в бд
+                    </button>
+                  </div>
                 </Dialog.Panel>
               </Transition.Child>
             </div>

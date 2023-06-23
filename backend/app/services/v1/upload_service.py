@@ -1,10 +1,15 @@
-
 from datetime import datetime
 from io import BytesIO
 import os
 import tempfile
-from schemas.preparingVisr_schema import PreparingVisr
-import uuid
+import shutil
+from fastapi import HTTPException
+from services.v1.import_sevice import filter_data
+from schemas.upload_schema import PreparingVisr
+
+
+# список созданных каталогов
+temp_folder = []
 
 
 def create_dir(building_id: int) -> str:
@@ -41,7 +46,7 @@ def create_dir(building_id: int) -> str:
 def prepare_to_upload(excel_wb: BytesIO, path: str) -> str:
     """
     :param excel_wb: Активная книга Excel
-    :param path: Путь где будет расположен обработанный временный файл 
+    :param path: Путь где будет расположен обработанный временный файл
     :return str относительный путь к каталогу в котором создан временный файл с DataFrame в формате csv
     """
     evr_count = 0
@@ -59,4 +64,38 @@ def prepare_to_upload(excel_wb: BytesIO, path: str) -> str:
 
     # Получение пути к временному файлу
 
-    return os.path.relpath(temp_file.name)
+    temp_path = os.path.relpath(os.path.dirname(temp_file.name))
+    temp_file_name = os.path.basename(temp_file.name)
+    temp_folder.append({temp_file_name: temp_path})
+
+    return temp_file_name
+
+
+def check_file(tempFileId: str, confirmation: bool) -> None:
+    """
+    Функция поиска пути для удаления или дальнейшей обработки
+
+    :param confirmation: если тру обработать файлы для размещения в бд, иначе удалить
+
+    """
+    # найти путь по ключу ID временного файла
+    tmp_file: dict = next(
+        filter(lambda file: tempFileId in file, temp_folder), None)
+ 
+    if tmp_file is not None:
+        if (confirmation):
+            # Полный путь к файлу для создания DF
+            temp_csv = f'{tmp_file[tempFileId]}\{tempFileId}'
+            filter_data('..\\upload_files\\23-06-2023\\9\\11_35\\tmpb_u9ckd2.csv')
+            
+
+        else:
+            shutil.rmtree(tmp_file[tempFileId])
+            # исключить найденный путь из глобальнго списка объектов
+            temp_folder.remove(tmp_file)
+
+    else:
+        # !!!УБРАТЬ
+        filter_data('..\\upload_files\\23-06-2023\\9\\11_35\\tmpb_u9ckd2.csv')
+        # raise HTTPException(
+        #     status_code=404, detail="Файл обработан или удален")

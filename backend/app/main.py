@@ -18,7 +18,7 @@ app.add_middleware(CORSMiddleware,
                    allow_credentials=True,
                    allow_origins=["*"],
                    allow_methods=["*"],
-                   allow_headers=["X-Temp-Path"],)
+                   allow_headers=["*"],)
 
 
 # @app.on_event("startup")

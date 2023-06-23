@@ -24,7 +24,7 @@ const NavPanel = (props: Props) => {
         {navigetionLink.map((link, i) => (
           <li key={i}>
             <Link
-              className="navLink  text-[0.5rem]  sm:text-[0.7rem]"
+              className="navLink  text-sm  sm:text-lg"
               href={link.link}
             >
               {link.name}

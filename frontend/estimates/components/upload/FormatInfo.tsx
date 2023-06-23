@@ -3,7 +3,7 @@ import FileDownloadDoneIcon from "@mui/icons-material/FileDownloadDone";
 import FileDownloadOffIcon from "@mui/icons-material/FileDownloadOff";
 import { useAppSelector } from "@/redux/hook";
 import { ActiveBuilding } from "@/redux/slice/buildingSlice";
-import postFiles, { importData } from "@/lib/api/postImport";
+import postFiles, { ImportData } from "@/lib/api/postImport";
 import UploadModal from "./UploadModal";
 
 type PropsFormat = {
@@ -14,7 +14,8 @@ const FormatInfo: React.FC<PropsFormat> = ({
   format,
   setShow,
 }: PropsFormat) => {
-  const [importInfo, setImportInfo] = useState<importData>();
+  const [importInfo, setImportInfo] = useState<ImportData>();
+  const [showModal, setShowModal] = useState<boolean>(false);
   const [noFiles, setNoFiles] = useState(false);
   const { id } = useAppSelector(ActiveBuilding);
 
@@ -33,9 +34,11 @@ const FormatInfo: React.FC<PropsFormat> = ({
   ) => {
     event.preventDefault();
     if (okFormat.length !== 0) {
-      const result = await postFiles(okFormat, id);
-      setImportInfo(result);
-      console.log(result);
+      if (!!!importInfo) {
+        const result = await postFiles(okFormat, id);
+        setImportInfo(result);
+      }
+      setShowModal(true);
     }
   };
 
@@ -47,9 +50,7 @@ const FormatInfo: React.FC<PropsFormat> = ({
         className="relative inline-block"
       >
         <svg
-          className={` h-6 w-6 fill-current text-gray-700 dark:text-slate-200  ${
-            !!importInfo && "dark:text-slate-400"
-          }`}
+          className={` h-6 w-6 fill-current text-gray-700 dark:text-slate-200  `}
           viewBox="0 0 20 20"
         >
           <FileDownloadDoneIcon />
@@ -73,7 +74,14 @@ const FormatInfo: React.FC<PropsFormat> = ({
         </span>
       </button>
       {noFiles && <p>Нет доступных файлов для загрузки</p>}
-      {importInfo && <UploadModal {...importInfo} />}
+      {importInfo && showModal && (
+        <UploadModal
+          {...importInfo}
+          onClose={() => {
+            setShowModal(false);
+          }}
+        />
+      )}
     </div>
   );
 };

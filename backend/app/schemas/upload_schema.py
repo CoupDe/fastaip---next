@@ -22,6 +22,8 @@ class EstimateInterface(ABC):
 
 class PreparingVisr(BaseModel, EstimateInterface):
     """
+    Класс получает готовый DataFrame проставляет колонки и проставляет признаки
+    для дальнейшего создания моделей из DF
     ARGS:
       data(Pandas.Dataframe)
     """

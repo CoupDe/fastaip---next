@@ -17,6 +17,7 @@ module.exports = {
         showArrow: "showArrow 0.2s ease-in 3",
       },
       fontFamily: {
+        overpass: "var(--font-overpass)",
         sans: "var(--font-dmMono)",
         sspro: "var(--font-sspro)",
       },

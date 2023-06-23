@@ -13,3 +13,4 @@ export const allConstructionsRout = generateRoute("construction/all");
 export const createConstructionRout = generateRoute("construction/");
 export const patchConstructionRout = generateRoute("construction/");
 export const postImportFiles = generateRoute("import/");
+export const postImportFilesConfirm = generateRoute("import/");

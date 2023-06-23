@@ -1,4 +1,4 @@
-import { DM_Mono, Source_Sans_Pro } from "next/font/google";
+import { DM_Mono, Source_Sans_Pro, Overpass } from "next/font/google";
 import AuthContext from "./providers/AuthProvider";
 import ThemeContext from "./providers/ThemeProvider";
 import "./globals.css";
@@ -16,7 +16,11 @@ export const dmMono = DM_Mono({
   weight: "500",
   variable: "--font-dmMono",
 });
-
+const overpass = Overpass({
+  subsets: ["cyrillic"],
+  weight: "500",
+  variable: "--font-overpass",
+});
 const SSPro = Source_Sans_Pro({
   subsets: ["cyrillic"],
   weight: "400",
@@ -29,9 +33,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ru" className={` ${dmMono.variable} ${SSPro.variable}`}>
+    <html
+      lang="ru"
+      className={` ${dmMono.variable} ${SSPro.variable} ${overpass.variable}`}
+    >
       <body
-        className={`bg-[#fbf0e4] dark:bg-slate-600 h-screen w-screen  flex flex-col font-dmMono`}
+        className={`flex h-screen w-screen flex-col  bg-[#fbf0e4] font-overpass dark:bg-slate-600`}
       >
         <StoreProvider>
           <PersistorContext>
