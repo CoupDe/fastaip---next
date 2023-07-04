@@ -8,7 +8,6 @@ class User(BaseModel):
 
 
 class GetUser(BaseModel):
-
     name: str
     password: str
 

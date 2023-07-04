@@ -1,2 +1,6 @@
 *.csv
 *.xlsx
+C:\Users\Вадим\Desktop\VSCProject\STNG\backend\app\alembic\versions\*.py
+
+backend/app/alembic/*
+

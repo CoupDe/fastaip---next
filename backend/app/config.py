@@ -7,7 +7,6 @@ import os
 # DB_NAME = 'estimates'
 origins = [
     "http://localhost:3000",
-
 ]
 
 
@@ -17,6 +16,8 @@ class Config:
     DB_NAME = os.getenv("DB_NAME", "estimates")
     DB_HOST = os.getenv("DB_HOST", "localhost")
     DB_PORT = os.getenv("DB_PORT", "5433")
-    DB_CONFIG = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    DB_CONFIG = (
+        f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    )
 
     # 127.0.0.1
