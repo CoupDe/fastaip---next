@@ -1,7 +1,8 @@
 import pandas as pd
 from pandas import DataFrame
 
-from schemas.visr_schema import Visr
+
+from schemas.visr_schema import VisrImpl
 
 
 def get_visr_range(position_gn: list[int], last_row: int) -> list[range]:
@@ -15,17 +16,24 @@ def get_visr_range(position_gn: list[int], last_row: int) -> list[range]:
 
 
 def filter_data(temp_path_df: str) -> None:
+    """Сбор общих данных для ВИСР
+
+    Args:
+        temp_path_df (str): _description_
+    """
     df = pd.read_csv(temp_path_df)
+    # Привести тип индекса к int
+    df = df.set_index(pd.Index(range(len(df))))
 
     general_data = df[df.loc[:, "temp"] == "GN"].index.to_list()
     last_row = df.shape[0] + 1
 
-    # Создание списка диапозонов ВИСР
+    # Создание списка диапазонов ВИСР
 
     visr_ranges = get_visr_range(general_data, last_row)
-    ss: list[Visr] = []
+    ss: list[VisrImpl] = []
     for visr in visr_ranges:
-        visr_slice: DataFrame = (df.loc[visr, :]).reset_index(drop=True)
-        visr_instance = Visr(visr_slice)
+        visr_slice: DataFrame = (df.loc[list(visr), :]).reset_index(drop=True)
+        visr_instance = VisrImpl(visr_slice)
         ss.append(visr_instance)
     ss[0].merging_structure()

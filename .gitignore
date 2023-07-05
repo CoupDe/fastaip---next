@@ -4,3 +4,20 @@ C:\Users\Вадим\Desktop\VSCProject\STNG\backend\app\alembic\versions\*.py
 
 backend/app/alembic/*
 
+backend/app/alembic/versions/00ec545a23c4_rev.py
+backend/app/alembic/versions/2d3432c7f4a4_first.py
+backend/app/alembic/versions/5a0b57942629_del_addtest_3.py
+backend/app/alembic/versions/9de09ae33688_del_addtest_4.py
+backend/app/alembic/versions/48fdc78f2e8f_migr.py
+backend/app/alembic/versions/062a8fb1bf34_del_addtest_3.py
+backend/app/alembic/versions/73c971839003_del_addtest_1.py
+backend/app/alembic/versions/87d1fa8d8c1c_del_addtest_2.py
+backend/app/alembic/versions/736bae831523_del_addtest_4.py
+backend/app/alembic/versions/467209e653f6_addtest_1.py
+backend/app/alembic/versions/d9c10444b199_start.py
+backend/app/alembic/versions/da414172fd3f_del_addtest_2.py
+backend/app/alembic/versions/db06f160ebe1_first.py
+backend/app/alembic/versions/df6ac493068d_addtest.py
+backend/app/alembic/versions/f82a15ce19c7_addtest_3.py
+backend/app/const/pandas_template.py
+backend/app/alembic/versions/00ec545a23c4_rev.py
