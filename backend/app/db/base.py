@@ -1,9 +1,6 @@
 from typing import AsyncGenerator
 
-from dotenv import load_dotenv
-from sqlalchemy import MetaData
-from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
-                                    create_async_engine)
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from config import Config
 
@@ -26,3 +23,4 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 async def create_db_and_tables():
     async with async_engine.begin() as conn:
         await conn.run_sync(ModelBase.metadata.create_all)
+

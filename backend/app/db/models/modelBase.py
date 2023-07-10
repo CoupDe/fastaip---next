@@ -1,5 +1,4 @@
-from sqlalchemy import TIMESTAMP, DateTime, func
-from sqlalchemy.ext.declarative import AbstractConcreteBase
+from sqlalchemy import DateTime, String, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -17,3 +16,21 @@ class CommonAbstractBase(ModelBase):
     updated_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True), server_onupdate=func.now(), nullable=True
     )
+
+
+class AbstractEstimate(CommonAbstractBase):
+    __abstract__ = True
+    pos: Mapped[int | None] = mapped_column(nullable=True)
+    name: Mapped[str] = mapped_column(String(300))
+    unit: Mapped[str] = mapped_column(String(10))
+    quantity: Mapped[float]
+    unit_cost: Mapped[float]
+    total_cost: Mapped[float]
+
+    def __repr__(self) -> str:
+        return f"<Visr(name={self.name!r}, type_work={self.unit!r})"
+
+
+class AbstractPriceComponent(AbstractEstimate):
+    __abstract__ = True
+    code: Mapped[str] = mapped_column(String(300))

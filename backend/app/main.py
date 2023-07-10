@@ -1,6 +1,8 @@
+import asyncio
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
+from db.base import create_db_and_tables
 
 from controllers.v1 import building_route, structure_route, upload_route
 from db.base import get_async_session

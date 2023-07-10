@@ -1,10 +1,10 @@
 from typing import List
 
-from sqlalchemy import Enum, ForeignKey, String
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .building_model import Building
-from .modelBase import CommonAbstractBase, ModelBase
+from .modelBase import CommonAbstractBase
 
 
 class Structure(CommonAbstractBase):

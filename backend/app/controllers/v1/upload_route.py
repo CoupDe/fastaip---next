@@ -2,9 +2,12 @@ import io
 from typing import List
 
 import pandas as pd
-from fastapi import APIRouter, Response, UploadFile
-
-from schemas.visr_schema import ConfirmImport, ImportDataInfo
+from fastapi import APIRouter, Depends, Response, UploadFile
+from fastapi.responses import JSONResponse
+from sqlalchemy.ext.asyncio import AsyncSession
+from services.v1.import_sevice import create_visr
+from db.base import get_async_session
+from schemas.visr_schema import ConfirmImport, ImportDataInfo, VisrDataDB
 from services.v1.upload_service import check_file, create_dir, prepare_to_upload
 
 route = APIRouter(prefix="/v1/import", tags=["import"])
@@ -16,8 +19,7 @@ async def upload_estimate(files: List[UploadFile], building_id: int) -> ImportDa
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     df_excel = pd.read_excel(excel_WB, sheet_name=None, header=None)
     evr_path = create_dir(building_id)
-  
-   
+
     temp_df_path = prepare_to_upload(df_excel, evr_path)
     response = {
         "filesInfo": [(files[0].filename, len(df_excel))],
@@ -32,9 +34,21 @@ async def upload_estimate(files: List[UploadFile], building_id: int) -> ImportDa
     return response
 
 
-@route.post("/{building_id}/confirm/")
-async def confirm_import(confirmationInfo: ConfirmImport, building_id: int):
+@route.post("/{building_id}/confirm/", response_model=VisrDataDB)
+async def confirm_import(
+    confirmationInfo: ConfirmImport,
+    building_id: int,
+    session: AsyncSession = Depends(get_async_session),
+) -> VisrDataDB:
     """Подтверждение импорта файлов, принимает путь
     к временному документу(Исправить подход)"""
-    check_file(**confirmationInfo.__dict__)
-    return confirmationInfo
+    visrs = check_file(**confirmationInfo.__dict__)
+    change = VisrDataDB(**visrs[0].dict())
+
+    ss = await create_visr(
+        building_id,
+        change,
+        session,
+    )
+
+    return visrs[0]

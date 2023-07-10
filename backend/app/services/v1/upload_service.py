@@ -3,11 +3,13 @@ import shutil
 import tempfile
 from datetime import datetime
 from io import BytesIO
+from typing import Any, Optional
 
 from pandas import DataFrame
+from schemas.visr_schema import VisrImpl
 
 from schemas.upload_schema import PreparingVisr
-from services.v1.import_sevice import filter_data
+from services.v1.import_sevice import get_visr
 
 # список созданных каталогов
 temp_folder = []
@@ -75,7 +77,7 @@ def prepare_to_upload(excel_wb: DataFrame, path: str) -> str:
     return temp_file_name
 
 
-def check_file(tempFileId: str, confirmation: bool) -> None:
+def check_file(tempFileId: str, confirmation: bool) -> list[VisrImpl]:
     """
     Функция поиска пути для удаления или дальнейшей обработки
 
@@ -83,14 +85,19 @@ def check_file(tempFileId: str, confirmation: bool) -> None:
     размещения в бд, иначе удалить
 
     """
+    # Надо разобраться, есть решения но я их не понимаю, связанны с typeGuard MyPy
     # найти путь по ключу ID временного файла
-    tmp_file: dict = next(filter(lambda file: tempFileId in file, temp_folder), None)
+    tmp_file: dict[Any, Any] = next(
+        filter(lambda file: tempFileId in file, temp_folder), None
+    )
 
     if tmp_file is not None:
         if confirmation:
             # Полный путь к файлу для создания DF
             temp_csv = f"{tmp_file[tempFileId]}\{tempFileId}"  # noqa Потом Убрать
-            filter_data("..\\upload_files\\23-06-2023\\9\\11_35\\tmpb_u9ckd2.csv")
+            parsed_visrs = get_visr(
+                "..\\upload_files\\23-06-2023\\9\\11_35\\tmpb_u9ckd2.csv"
+            )
 
         else:
             shutil.rmtree(tmp_file[tempFileId])
@@ -99,6 +106,9 @@ def check_file(tempFileId: str, confirmation: bool) -> None:
 
     else:
         # !!!УБРАТЬ
-        filter_data("..\\upload_files\\23-06-2023\\9\\11_35\\tmpb_u9ckd2.csv")
+        parsed_visrs = get_visr(
+            "..\\upload_files\\23-06-2023\\9\\11_35\\tmpb_u9ckd2.csv"
+        )
         # raise HTTPException(
         #     status_code=404, detail="Файл обработан или удален")
+    return parsed_visrs

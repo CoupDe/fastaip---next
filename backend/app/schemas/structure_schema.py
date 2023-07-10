@@ -4,8 +4,8 @@ from schemas.building_schema import Building
 
 
 class StructureBase(BaseModel):
-    name: str
-    code_structure: str
+    name: str | None = None
+    code_structure: str | None = None
 
     class Config:
         orm_mode = True

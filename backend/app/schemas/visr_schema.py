@@ -5,16 +5,18 @@ from pandas import DataFrame
 import pandas as pd
 from pydantic import BaseModel
 
-from const.enums import LaborEnum, VisrDataEnum
+
+from const.enums import LaborEnum, VisrDataEnum, AdditionalEstimatedEnum
 
 
-# Abstract class
+# Abstract class Visr
 class Visr(ABC, BaseModel):
     @abstractmethod
     def get_estimates_ranges(self, criteria: tuple[str, str]) -> list[range]:
         pass
 
 
+# Abstract class Estimate
 class Estimate(ABC, BaseModel):
     @abstractmethod
     def get_estimated_price_ranges(
@@ -27,24 +29,6 @@ class Estimate(ABC, BaseModel):
         pass
 
 
-class ImportDataInfo(BaseModel):
-    """aaaa
-
-    Args:
-        BaseModel (_type_): _description_
-    """
-
-    filesInfo: list[tuple[str, int]] | str
-    detail: str
-    tempFileId: str
-    confirmation: bool
-
-
-class ConfirmImport(BaseModel):
-    tempFileId: str
-    confirmation: bool
-
-
 class AbstractEstimate(ABC, BaseModel):
     pos: int | None
     name: str
@@ -54,26 +38,10 @@ class AbstractEstimate(ABC, BaseModel):
     total_cost: float
 
 
-# Класс трудозатрат
-class LaborPrice(BaseModel):
-    category: LaborEnum
-    code: str
-    name: str
-    unit: str
-    quantity: float
-    unit_cost: float
-    total_cost: float
-
-    def __init__(self, **kwargs):
-        super().__init__()
-        print(**kwargs)
-
-    def __str__(self) -> str:
-        return f"{self.code}#{self.total_cost}"
+# Abstract class LaborPrice, EstimatedPrice
 
 
-# Класс рассценки
-class EstimatedPrice(BaseModel):
+class PriceComponent(ABC, BaseModel):
     pos: int
     code: str
     name: str
@@ -81,10 +49,53 @@ class EstimatedPrice(BaseModel):
     quantity: float
     unit_cost: float
     total_cost: float
-    labors: list[LaborPrice] = []
-    labor_df: DataFrame = pd.DataFrame()
+
+
+# Класс накладных расходов
+class AdditionalPrice(BaseModel):
+    pos_nr: int | None = None
+    pos_sp: int | None = None
+    overhead_name: str | None = None
+    overhead_price: float | None = None
+    profit_name: str | None = None
+    profit_price: float | None = None
+
+    @staticmethod
+    def set_NR(pos_nr, overhead_name, overhead_price) -> "AdditionalPrice":
+        additional_price = AdditionalPrice()
+        additional_price.pos_nr = pos_nr
+        additional_price.overhead_name = overhead_name
+        additional_price.overhead_price = overhead_price
+        return additional_price
+
+    @staticmethod
+    def set_SP(pos_sp, profit_name, profit_price) -> "AdditionalPrice":
+        additional_price = AdditionalPrice()
+        additional_price.pos_sp = pos_sp
+        additional_price.profit_name = profit_name
+        additional_price.profit_price = profit_price
+        return additional_price
+
+
+# Класс трудозатрат
+class LaborPrice(PriceComponent):
+    category: str
+    temp: LaborEnum | AdditionalEstimatedEnum
 
     def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.code}#{self.total_cost}"
+
+
+# Класс рассценки
+class EstimatedPrice(PriceComponent):
+    labors: list[LaborPrice] = []
+    additional_prices: list[AdditionalPrice] = []
+    labor_df: DataFrame = pd.DataFrame()
+
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self.create_labor_price()
 
@@ -93,9 +104,27 @@ class EstimatedPrice(BaseModel):
 
     def create_labor_price(self):
         self.labor_df.index
-        for row in self.labor_df.itertuples(name="Labor"):
-            data = row
-            print(row)
+        for row in self.labor_df.itertuples():
+            data = row._asdict()
+            data["category"] = data["pos"]
+            data["pos"] = data["Index"]
+            data.pop("Index")
+            match data["temp"]:
+                case "NR":
+                    self.additional_prices.append(
+                        AdditionalPrice.set_NR(
+                            data["pos"], data["name"], data["total_cost"]
+                        )
+                    )
+                case "SP":
+                    self.additional_prices.append(
+                        AdditionalPrice.set_SP(
+                            data["pos"], data["name"], data["total_cost"]
+                        )
+                    )
+                case _:
+                    self.labors.append(LaborPrice(**data))
+
         # self.labors.append(LaborPrice(self.labor_df))
 
     class Config:
@@ -219,8 +248,6 @@ class EstimateImpl(Estimate):
 
             self.estimated_prices.append(EstimatedPrice(**estimate_price_data))
 
-        pass
-
     class Config:
         arbitrary_types_allowed = True
 
@@ -229,7 +256,7 @@ class VisrImpl(Visr):
     estimate_price_criteria = (VisrDataEnum.L.value, VisrDataEnum.T.value)
     name_visr: str = ""
     type_work: str = ""
-    total_price: float = 0
+    total_cost: float = 0
     estimates: list[EstimateImpl] = []
 
     visr_df: DataFrame = DataFrame()
@@ -240,7 +267,7 @@ class VisrImpl(Visr):
             self.name_visr = df.at[0, "pos"]
         if df.at[1, "temp"] == "GW":
             self.type_work = df.at[1, "pos"]
-        self.total_price = df.at[df.index[-1], "total_cost"]
+        self.total_cost = float(df.at[df.index[-1], "total_cost"])
         self.visr_df = df
 
     def __str__(self) -> str:
@@ -285,25 +312,53 @@ class VisrImpl(Visr):
                     str(name), local_num, machine_num, self.visr_df.loc[list(estimate)]
                 )
             )
-        for s in self.estimates:
-            print("s.estimate_error", s.estimate_error)
+        # print(self.estimates[0].estimated_prices[3].labors)
 
     class Config:
         arbitrary_types_allowed = True
 
 
-# @property
-# def name_visr(self):
-#     return self._name_visr
+# post Model route.post("/{building_id}", response_model=ImportDataInfo)
+class ImportDataInfo(BaseModel):
+    """aaaa
 
-# @name_visr.setter
-# def name_visr(self, value: str):
-#     self._name_visr = value
+    Args:
+        BaseModel (_type_): _description_
+    """
 
-# @property
-# def type_work(self):
-#     return self.type_work
+    filesInfo: list[tuple[str, int]] | str
+    detail: str
+    tempFileId: str
+    confirmation: bool
 
-# @type_work.setter
-# def type_work(self, value: str):
-#     self._type_work = value
+
+# post Model route.post("/{building_id}/confirm/",
+class ConfirmImport(BaseModel):
+    tempFileId: str
+    confirmation: bool
+
+
+# return Model route.post("/{building_id}/confirm/"
+class EstimateResponse(BaseModel):
+    name: str
+    local_num: str | None
+    machine_num: str
+    chapter: int | None = None
+
+    class Config:
+        orm_mode = True
+
+
+class VisrSchema(BaseModel):
+    id: int
+    name_visr: str
+    type_work: str
+    total_cost: float
+
+
+class VisrDataDB(BaseModel):
+    building_id: int | None = None
+    name_visr: str
+    type_work: str
+    total_cost: float
+    estimates: list[EstimateResponse]
