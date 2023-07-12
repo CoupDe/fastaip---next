@@ -4,7 +4,7 @@ from typing import List
 from sqlalchemy import TIMESTAMP, DateTime, Enum, ForeignKey, String, func
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from .visr_models import Visr
+from .visr_models import VisrModel
 
 
 from schemas.structure_schema import Structure
@@ -14,7 +14,7 @@ from .modelBase import CommonAbstractBase
 
 
 class Building(CommonAbstractBase):
-    __tablename__ = "building_table"
+    __tablename__ = "buildings_table"
     # id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(100), unique=True)
     code_building: Mapped[str] = mapped_column(String(100), unique=True)
@@ -23,7 +23,7 @@ class Building(CommonAbstractBase):
     )
     structure_id: Mapped[int] = mapped_column(ForeignKey("structure_table.id"))
     structure: Mapped["Structure"] = relationship(back_populates="buildings")
-    visrs: Mapped[list["Visr"]] = relationship(back_populates="building")
+    visrs: Mapped[list["VisrModel"]] = relationship(back_populates="building")
     # updated_at = Mapped[DateTime] = mapped_column(
     # default=func.now(), onupdate=func.now())
 

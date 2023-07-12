@@ -4,20 +4,27 @@ from fastapi import HTTPException
 from pandas import DataFrame
 import pandas as pd
 from pydantic import BaseModel
+from db.models.visr_models import (
+    VisrModel,
+    EstimateModel,
+    EstimatedPriceModel,
+    AdditionalPriceModel,
+    LaborPriceModel,
+)
 
 
 from const.enums import LaborEnum, VisrDataEnum, AdditionalEstimatedEnum
 
 
 # Abstract class Visr
-class Visr(ABC, BaseModel):
+class AbstractVisr(ABC, BaseModel):
     @abstractmethod
     def get_estimates_ranges(self, criteria: tuple[str, str]) -> list[range]:
         pass
 
 
 # Abstract class Estimate
-class Estimate(ABC, BaseModel):
+class AbstractEstimate(ABC, BaseModel):
     @abstractmethod
     def get_estimated_price_ranges(
         self, criteria: tuple[str, str], estimated_range: range
@@ -29,13 +36,13 @@ class Estimate(ABC, BaseModel):
         pass
 
 
-class AbstractEstimate(ABC, BaseModel):
-    pos: int | None
-    name: str
-    unit: str
-    quantity: float
-    unit_cost: float
-    total_cost: float
+# class AbstractEstimate(ABC, BaseModel):
+#     pos: int | None
+#     name: str
+#     unit: str
+#     quantity: float
+#     unit_cost: float
+#     total_cost: float
 
 
 # Abstract class LaborPrice, EstimatedPrice
@@ -51,30 +58,13 @@ class PriceComponent(ABC, BaseModel):
     total_cost: float
 
 
-# Класс накладных расходов
 class AdditionalPrice(BaseModel):
-    pos_nr: int | None = None
-    pos_sp: int | None = None
-    overhead_name: str | None = None
-    overhead_price: float | None = None
-    profit_name: str | None = None
-    profit_price: float | None = None
+    pos: int
+    name: AdditionalEstimatedEnum
+    total_cost: float
 
-    @staticmethod
-    def set_NR(pos_nr, overhead_name, overhead_price) -> "AdditionalPrice":
-        additional_price = AdditionalPrice()
-        additional_price.pos_nr = pos_nr
-        additional_price.overhead_name = overhead_name
-        additional_price.overhead_price = overhead_price
-        return additional_price
-
-    @staticmethod
-    def set_SP(pos_sp, profit_name, profit_price) -> "AdditionalPrice":
-        additional_price = AdditionalPrice()
-        additional_price.pos_sp = pos_sp
-        additional_price.profit_name = profit_name
-        additional_price.profit_price = profit_price
-        return additional_price
+    class Config:
+        arbitrary_types_allowed = True
 
 
 # Класс трудозатрат
@@ -112,14 +102,18 @@ class EstimatedPrice(PriceComponent):
             match data["temp"]:
                 case "NR":
                     self.additional_prices.append(
-                        AdditionalPrice.set_NR(
-                            data["pos"], data["name"], data["total_cost"]
+                        AdditionalPrice(
+                            pos=data["pos"],
+                            name=AdditionalEstimatedEnum.NR,
+                            total_cost=data["total_cost"],
                         )
                     )
                 case "SP":
                     self.additional_prices.append(
-                        AdditionalPrice.set_SP(
-                            data["pos"], data["name"], data["total_cost"]
+                        AdditionalPrice(
+                            pos=data["pos"],
+                            name=AdditionalEstimatedEnum.SP,
+                            total_cost=data["total_cost"],
                         )
                     )
                 case _:
@@ -127,18 +121,37 @@ class EstimatedPrice(PriceComponent):
 
         # self.labors.append(LaborPrice(self.labor_df))
 
+    def _data_to_db(self) -> EstimatedPriceModel:
+        new_estimated_price = EstimatedPriceModel(
+            pos=self.pos,
+            name=self.name,
+            unit=self.unit,
+            quantity=self.quantity,
+            unit_cost=self.unit_cost,
+            total_cost=self.total_cost,
+            labors=[
+                LaborPriceModel(**labor.dict(exclude={"temp"})) for labor in self.labors
+            ],
+            additional_prices=[
+                AdditionalPriceModel(**additional_price.dict())
+                for additional_price in self.additional_prices
+            ],
+        )
+
+        return new_estimated_price
+
     class Config:
         arbitrary_types_allowed = True
 
 
 # Класс локальной сметы
-class EstimateImpl(Estimate):
+class EstimateImpl(AbstractEstimate):
     estimate_price_criteria = (
         VisrDataEnum.E.value,
         VisrDataEnum.ADDITIONAL.value.SP.value,
     )
 
-    name: str = ""
+    name_estimate: str = ""
     local_num: str | None
     machine_num: str = ""
     chapter: int | None = None
@@ -150,7 +163,7 @@ class EstimateImpl(Estimate):
         self, name: str, local_num: str, machine_num: str, estimate_df: DataFrame
     ):
         super().__init__()
-        self.name = name
+        self.name_estimate = name
         self.local_num = local_num
         self.machine_num = machine_num
         self.estimate_df = estimate_df
@@ -248,11 +261,34 @@ class EstimateImpl(Estimate):
 
             self.estimated_prices.append(EstimatedPrice(**estimate_price_data))
 
+    def _data_to_db(self) -> EstimateModel:
+        new_estimate = EstimateModel(
+            name_estimate=self.name_estimate,
+            local_num=self.local_num,
+            machine_num=self.machine_num,
+            chapter=self.chapter,
+            estimated_prices=[
+                estimated_price._data_to_db()
+                for estimated_price in self.estimated_prices
+            ],
+        )
+        return new_estimate
+
     class Config:
         arbitrary_types_allowed = True
 
 
-class VisrImpl(Visr):
+class VisrImpl(AbstractVisr):
+    """Класс для создания Dataframe, сбор данных стоимостных состовляющих,
+      объединение структуры в ВИСР преобразование данных для имопрта в БД
+
+    Args:
+        AbstractVisr (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     estimate_price_criteria = (VisrDataEnum.L.value, VisrDataEnum.T.value)
     name_visr: str = ""
     type_work: str = ""
@@ -314,6 +350,20 @@ class VisrImpl(Visr):
             )
         # print(self.estimates[0].estimated_prices[3].labors)
 
+    def _data_to_db(self) -> VisrModel:
+        """Преобразование данных для импорта в БД
+
+        Returns:
+            VisrModel: SQLAlchemy Model
+        """
+        transform_visr = VisrModel(
+            name_visr=self.name_visr,
+            type_work=self.type_work,
+            total_cost=self.total_cost,
+            estimates=[estimates._data_to_db() for estimates in self.estimates],
+        )
+        return transform_visr
+
     class Config:
         arbitrary_types_allowed = True
 
@@ -339,26 +389,41 @@ class ConfirmImport(BaseModel):
 
 
 # return Model route.post("/{building_id}/confirm/"
-class EstimateResponse(BaseModel):
-    name: str
+
+
+class AdditionalPriceSchema(BaseModel):
+    pos: int
+    name: AdditionalEstimatedEnum
+    total_cost: float
+
+
+class LaborPriceSchema(PriceComponent):
+    category: str
+    temp: LaborEnum | AdditionalEstimatedEnum
+
+
+class EsimatedPriceSchema(PriceComponent):
+    labors: list[LaborPriceSchema]
+    additional_prices: list[AdditionalPriceSchema]
+
+
+class EstimateSchema(BaseModel):
+    name_estimate: str
     local_num: str | None
     machine_num: str
     chapter: int | None = None
+    estimated_prices: list[EsimatedPriceSchema]
 
     class Config:
         orm_mode = True
 
 
 class VisrSchema(BaseModel):
-    id: int
-    name_visr: str
-    type_work: str
-    total_cost: float
-
-
-class VisrDataDB(BaseModel):
     building_id: int | None = None
     name_visr: str
     type_work: str
     total_cost: float
-    estimates: list[EstimateResponse]
+    estimates: list[EstimateSchema]
+
+    class Config:
+        orm_mode = True

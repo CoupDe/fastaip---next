@@ -27,9 +27,6 @@ class AbstractEstimate(CommonAbstractBase):
     unit_cost: Mapped[float]
     total_cost: Mapped[float]
 
-    def __repr__(self) -> str:
-        return f"<Visr(name={self.name!r}, type_work={self.unit!r})"
-
 
 class AbstractPriceComponent(AbstractEstimate):
     __abstract__ = True
