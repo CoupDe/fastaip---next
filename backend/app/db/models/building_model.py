@@ -23,7 +23,9 @@ class Building(CommonAbstractBase):
     )
     structure_id: Mapped[int] = mapped_column(ForeignKey("structure_table.id"))
     structure: Mapped["Structure"] = relationship(back_populates="buildings")
-    visrs: Mapped[list["VisrModel"]] = relationship(back_populates="building")
+    visrs: Mapped[list["VisrModel"]] = relationship(
+        back_populates="building", cascade="all, delete"
+    )
     # updated_at = Mapped[DateTime] = mapped_column(
     # default=func.now(), onupdate=func.now())
 

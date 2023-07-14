@@ -124,13 +124,17 @@ class EstimatedPrice(PriceComponent):
     def _data_to_db(self) -> EstimatedPriceModel:
         new_estimated_price = EstimatedPriceModel(
             pos=self.pos,
+            code=self.code,
             name=self.name,
             unit=self.unit,
             quantity=self.quantity,
             unit_cost=self.unit_cost,
             total_cost=self.total_cost,
             labors=[
-                LaborPriceModel(**labor.dict(exclude={"temp"})) for labor in self.labors
+                LaborPriceModel(
+                    category=labor.category, **labor.dict(exclude={"temp", "category"})
+                )
+                for labor in self.labors
             ],
             additional_prices=[
                 AdditionalPriceModel(**additional_price.dict())
@@ -289,6 +293,8 @@ class VisrImpl(AbstractVisr):
         _type_: _description_
     """
 
+    #!!!!!!!!!!!!
+    building_id: int | None = None
     estimate_price_criteria = (VisrDataEnum.L.value, VisrDataEnum.T.value)
     name_visr: str = ""
     type_work: str = ""
@@ -304,6 +310,7 @@ class VisrImpl(AbstractVisr):
         if df.at[1, "temp"] == "GW":
             self.type_work = df.at[1, "pos"]
         self.total_cost = float(df.at[df.index[-1], "total_cost"])
+        
         self.visr_df = df
 
     def __str__(self) -> str:
@@ -357,6 +364,7 @@ class VisrImpl(AbstractVisr):
             VisrModel: SQLAlchemy Model
         """
         transform_visr = VisrModel(
+            building_id=VisrImpl.building_id,
             name_visr=self.name_visr,
             type_work=self.type_work,
             total_cost=self.total_cost,
@@ -424,6 +432,16 @@ class VisrSchema(BaseModel):
     type_work: str
     total_cost: float
     estimates: list[EstimateSchema]
+
+    class Config:
+        orm_mode = True
+
+
+class TestVisrSchema(BaseModel):
+    building_id: int | None = None
+    name_visr: str
+    type_work: str
+    total_cost: float
 
     class Config:
         orm_mode = True

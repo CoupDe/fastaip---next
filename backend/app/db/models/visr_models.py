@@ -17,7 +17,9 @@ class VisrModel(CommonAbstractBase):
     name_visr: Mapped[str] = mapped_column(String(300))
     type_work: Mapped[str] = mapped_column(String(300))
     total_cost: Mapped[float] = mapped_column()
-    estimates: Mapped[list["EstimateModel"]] = relationship(back_populates="visr")
+    estimates: Mapped[list["EstimateModel"]] = relationship(
+        back_populates="visr", cascade="all, delete"
+    )
     building_id: Mapped[int] = mapped_column(
         ForeignKey("buildings_table.id"), nullable=False
     )
@@ -33,6 +35,18 @@ class VisrModel(CommonAbstractBase):
     def __repr__(self) -> str:
         return f"<Visr(name={self.name_visr!r}, type_work={self.type_work!r})"
 
+    def __eq__(self, other: object) -> bool:
+        print("Wow in EQ")
+        if isinstance(other, VisrModel):
+            return (
+                self.name_visr == other.name_visr
+                and self.type_work == other.type_work
+                and self.total_cost == other.total_cost
+                and self.building_id == other.building_id
+            )
+
+        return False
+
 
 class EstimateModel(CommonAbstractBase):
     __tablename__ = "estimates_table"
@@ -43,7 +57,7 @@ class EstimateModel(CommonAbstractBase):
     visr_id: Mapped[int] = mapped_column(ForeignKey("visrs_table.id"), nullable=False)
     visr: Mapped["VisrModel"] = relationship(back_populates="estimates")
     estimated_prices: Mapped[list["EstimatedPriceModel"]] = relationship(
-        back_populates="estimate"
+        back_populates="estimate", cascade="all, delete"
     )
 
     def __repr__(self) -> str:
@@ -53,10 +67,10 @@ class EstimateModel(CommonAbstractBase):
 class EstimatedPriceModel(AbstractPriceComponent):
     __tablename__ = "estimated_prices_table"
     labors: Mapped[list["LaborPriceModel"]] = relationship(
-        back_populates="estimated_price"
+        back_populates="estimated_price", cascade="all, delete"
     )
     additional_prices: Mapped[list["AdditionalPriceModel"]] = relationship(
-        back_populates="estimated_price"
+        back_populates="estimated_price", cascade="all, delete"
     )
     estimate: Mapped["EstimateModel"] = relationship(back_populates="estimated_prices")
     estimate_id: Mapped[int] = mapped_column(
@@ -70,7 +84,7 @@ class EstimatedPriceModel(AbstractPriceComponent):
 class LaborPriceModel(AbstractPriceComponent):
     __tablename__ = "labor_prices_table"
     category: Mapped[postgresql.ENUM] = mapped_column(
-        postgresql.ENUM(LaborEnum, name="LABORENUM", create_type=False),
+        postgresql.ENUM(LaborEnum, name="LABORENUM", create_type=True),
         nullable=True,
     )
     estimated_price_id: Mapped[int] = mapped_column(
@@ -79,6 +93,22 @@ class LaborPriceModel(AbstractPriceComponent):
     estimated_price: Mapped["EstimatedPriceModel"] = relationship(
         back_populates="labors"
     )
+
+    def __init__(self, category, **kwargs):
+        super().__init__(**kwargs)
+
+        match category:
+            case "ОЗ":
+                self.category = LaborEnum.OZ
+            case "ЗМ":
+                self.category = LaborEnum.MM
+            case "ЭМ":
+                self.category = LaborEnum.AM
+            case "МР":
+                self.category = LaborEnum.MA
+
+    def __repr__(self) -> str:
+        return f"<LaborPriceModel(name={self.name!r}, code={self.code!r},category={self.category!r})"
 
 
 class AdditionalPriceModel(CommonAbstractBase):

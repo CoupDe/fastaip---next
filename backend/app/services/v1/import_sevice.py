@@ -3,7 +3,7 @@ from pandas import DataFrame
 from sqlalchemy import insert, select
 from db.models.visr_models import VisrModel, EstimateModel, EstimatedPriceModel
 from sqlalchemy.ext.asyncio import AsyncSession
-from schemas.visr_schema import VisrImpl, VisrSchema
+from schemas.visr_schema import VisrImpl, VisrSchema, TestVisrSchema
 
 
 def get_visr_range(position_gn: list[int], last_row: int) -> list[range]:
@@ -16,15 +16,15 @@ def get_visr_range(position_gn: list[int], last_row: int) -> list[range]:
     return [range(start, end - 1) for start, end in zip(position_gn, ofset_position)]
 
 
-def get_visr(temp_path_df: str) -> list[VisrImpl]:
+def get_visr(visrs_df: DataFrame, building_id: int) -> list[VisrImpl]:
     """Сбор общих данных для ВИСР
 
     Args:
         temp_path_df (str): _description_
     """
-    df = pd.read_csv(temp_path_df)
+
     # Привести тип индекса к int
-    df = df.set_index(pd.Index(range(len(df))))
+    df = visrs_df.set_index(pd.Index(range(len(visrs_df))))
 
     general_data = df[df.loc[:, "temp"] == "GN"].index.to_list()
     last_row = df.shape[0] + 1
@@ -32,28 +32,64 @@ def get_visr(temp_path_df: str) -> list[VisrImpl]:
     # Создание списка диапазонов ВИСР
 
     visr_ranges = get_visr_range(general_data, last_row)
-
-    visrs: list[VisrImpl] = []
+    VisrImpl.building_id = building_id
+    visrs: list[VisrModel] = []
     for visr in visr_ranges:
         visr_slice: DataFrame = (df.loc[list(visr), :]).reset_index(drop=True)
         visr_instance = VisrImpl(visr_slice)
         visr_instance.merging_structure()
-        visrs.append(visr_instance)
+        visrs.append(visr_instance._data_to_db())
     return visrs
 
 
 # !!!!!!!!!!!!!!!ДОБАВИТЬ ПРОВЕРКУ НА СУЩЕСТВОВАНИЕ ВИСР
-async def check_visr(check_data: VisrSchema, session: AsyncSession) -> VisrSchema:
-    query = select(VisrModel).where(
-        VisrModel.building_id == check_data.building_id,
-        VisrModel.name_visr == check_data.name_visr,
-        VisrModel.type_work == check_data.type_work,
-        VisrModel.total_cost == check_data.total_cost,
+async def check_visr_BD(
+    check_data: list[VisrModel], building_id: int, session: AsyncSession
+) -> VisrSchema:
+    """Проверка на существование ВИСР-ов в бд, уходит одни SQL запрос
+
+    Args:
+        check_data (list[VisrSchema]): _description_
+        session (AsyncSession): _description_
+
+    Returns:
+        VisrSchema: _description_
+    """
+
+    query = select(VisrModel).filter(
+        VisrModel.name_visr.in_([visr.name_visr for visr in check_data]),
+        VisrModel.total_cost.in_([visr.total_cost for visr in check_data]),
+        VisrModel.type_work.in_([visr.type_work for visr in check_data]),
+        VisrModel.building_id == building_id,
     )
 
-    result = await session.scalar(query)
+    result = await session.execute(query)
+    result_records = result.all()
+    lutten_list1 = [result[0] for result in result_records]
+    print("result[0][0]", lutten_list1[0], "type", type(lutten_list1[0]))
+    print("check_data", check_data[0], "check_data", type(check_data[0]))
+    ss = check_data[0]
+    ss.building_id = 2
 
-    return result
+    print("ss", ss)
+    print(lutten_list1[0] == ss)
+    # Если совпадения по полям найдены, выпрямить список и исключить совпадения
+    if result_records:
+        list_to_eq = [
+            TestVisrSchema(**obj.__dict__, building_id=building_id)
+            for obj in check_data
+        ]
+        flutten_list = [
+            TestVisrSchema.from_orm(result[0])
+            for result in result_records
+            if result_records
+        ]
+
+        non_existing_objects = [
+            VisrModel(**obj.__dict__) for obj in list_to_eq if obj not in flutten_list
+        ]
+
+    # return result
 
 
 async def create_visr(
@@ -70,37 +106,7 @@ async def create_visr(
         VisrResponse: _description_
     """
     visr.building_id = building_id
-    print(visr.estimates[0].estimated_prices[0])
-    # Деструктуризация схемы в модель SQL
-    ss = []
-    for estimate in visr.estimates:
-        ss.append(
-            EstimateModel(
-                name_estimate=estimate.name_estimate,
-                local_num=estimate.local_num,
-                machine_num=estimate.machine_num,
-                chapter=estimate.chapter,
-                estimated_prices=[
-                    EstimatedPriceModel(**estimate_price.dict())
-                    for estimate_price in estimate.estimated_prices
-                ],
-            )
-        )
 
-    estimates = [EstimateModel(**estimate.dict()) for estimate in visr.estimates]
-    print(estimates[0])
+    session.add(visr)
 
-    test_model = VisrModel(
-        name_visr=visr.name_visr,
-        type_work=visr.type_work,
-        total_cost=visr.total_cost,
-        building_id=visr.building_id,
-        estimates=estimates,
-    )
-    await check_visr(visr, session)
-
-    session.add(test_model)
-    # result = await session.execute(
-    #     insert(VisrModel).values(**visr.dict()).returning(VisrModel)
-    # )
     await session.commit()

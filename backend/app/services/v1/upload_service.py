@@ -4,8 +4,11 @@ import tempfile
 from datetime import datetime
 from io import BytesIO
 from typing import Any, Optional
+from fastapi import HTTPException
 
 from pandas import DataFrame
+import pandas as pd
+from db.models.visr_models import VisrModel
 from schemas.visr_schema import VisrImpl
 
 from schemas.upload_schema import PreparingVisr
@@ -77,7 +80,7 @@ def prepare_to_upload(excel_wb: DataFrame, path: str) -> str:
     return temp_file_name
 
 
-def check_file(tempFileId: str, confirmation: bool) -> list[VisrImpl]:
+def check_file(tempFileId: str, confirmation: bool) -> DataFrame | HTTPException:
     """
     Функция поиска пути для удаления или дальнейшей обработки
 
@@ -95,20 +98,22 @@ def check_file(tempFileId: str, confirmation: bool) -> list[VisrImpl]:
         if confirmation:
             # Полный путь к файлу для создания DF
             temp_csv = f"{tmp_file[tempFileId]}\{tempFileId}"  # noqa Потом Убрать
-            parsed_visrs = get_visr(
+            visrs_df = pd.read_csv(
                 "..\\upload_files\\23-06-2023\\9\\11_35\\tmpb_u9ckd2.csv"
             )
+            return visrs_df
 
         else:
             shutil.rmtree(tmp_file[tempFileId])
             # исключить найденный путь из глобальнго списка объектов
             temp_folder.remove(tmp_file)
+            raise HTTPException(status_code=200, detail="Каталог удален")
 
     else:
         # !!!УБРАТЬ
-        parsed_visrs = get_visr(
+        visrs_df = pd.read_csv(
             "..\\upload_files\\23-06-2023\\9\\11_35\\tmpb_u9ckd2.csv"
         )
-        # raise HTTPException(
-        #     status_code=404, detail="Файл обработан или удален")
-    return parsed_visrs
+        return visrs_df
+        # !!!УБРАТЬ
+        # raise HTTPException(status_code=404, detail="Файл обработан или удален")

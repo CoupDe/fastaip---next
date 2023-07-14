@@ -30,4 +30,4 @@ class AbstractEstimate(CommonAbstractBase):
 
 class AbstractPriceComponent(AbstractEstimate):
     __abstract__ = True
-    code: Mapped[str] = mapped_column(String(300))
+    code: Mapped[str] = mapped_column(String(300),nullable=True)

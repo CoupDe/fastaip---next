@@ -5,6 +5,8 @@ import pandas as pd
 from fastapi import APIRouter, Depends, Response, UploadFile
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
+from services.v1.import_sevice import get_visr
+from services.v1.import_sevice import check_visr_BD
 
 from db.models.visr_models import VisrModel, AdditionalPriceModel
 from services.v1.import_sevice import create_visr
@@ -41,32 +43,22 @@ async def upload_estimate(files: List[UploadFile], building_id: int) -> ImportDa
     return response
 
 
-def change_class(change: EstimateSchema):
-    def ss():
-        for s in change:
-            print(s.local_num)
-
-    return ss()
-
-
-@route.post("/{building_id}/confirm/", response_model=VisrSchema)
+@route.post("/{building_id}/confirm/", response_model=None)
 async def confirm_import(
     confirmationInfo: ConfirmImport,
     building_id: int,
     session: AsyncSession = Depends(get_async_session),
-) -> VisrSchema:
+) -> None:
     """Подтверждение импорта файлов, принимает путь
     к временному документу(Исправить подход)"""
-    visrs = check_file(**confirmationInfo.dict())
-
-    change = VisrSchema(**visrs[0].dict())
-    new = visrs[0]._data_to_db()
-    print(new.estimates[0].estimated_prices)
+    visrs_dataframe = check_file(**confirmationInfo.dict())
+    if not visrs_dataframe.empty:
+        visrs = get_visr(visrs_dataframe, building_id)
+        await check_visr_BD(visrs, building_id, session)
+    # Добавить id к данным объекта VisrModel
 
     # ss = await create_visr(
     #     building_id,
-    #     change,
+    #     visrs[3],
     #     session,
     # )
-
-    return visrs[0]
