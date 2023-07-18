@@ -36,7 +36,6 @@ class VisrModel(CommonAbstractBase):
         return f"<Visr(name={self.name_visr!r}, type_work={self.type_work!r})"
 
     def __eq__(self, other: object) -> bool:
-        print("Wow in EQ")
         if isinstance(other, VisrModel):
             return (
                 self.name_visr == other.name_visr

@@ -1,22 +1,16 @@
 import io
-from typing import List
+from typing import List, Optional
 
 import pandas as pd
-from fastapi import APIRouter, Depends, Response, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from services.v1.import_sevice import get_visr
-from services.v1.import_sevice import check_visr_BD
+
 
 from db.models.visr_models import VisrModel, AdditionalPriceModel
-from services.v1.import_sevice import create_visr
+from services.v1.import_sevice import create_visr_obj, check_visr_BD, create_visr
 from db.base import get_async_session
-from schemas.visr_schema import (
-    ConfirmImport,
-    ImportDataInfo,
-    VisrSchema,
-    EstimateSchema,
-)
+from schemas.visr_schema import ConfirmImport, ImportDataInfo, VisrBaseSchema
 from services.v1.upload_service import check_file, create_dir, prepare_to_upload
 
 route = APIRouter(prefix="/v1/import", tags=["import"])
@@ -43,22 +37,36 @@ async def upload_estimate(files: List[UploadFile], building_id: int) -> ImportDa
     return response
 
 
-@route.post("/{building_id}/confirm/", response_model=None)
+@route.post(
+    "/{building_id}/confirm/", response_model=None | dict[str, list[VisrBaseSchema]]
+)
 async def confirm_import(
     confirmationInfo: ConfirmImport,
     building_id: int,
     session: AsyncSession = Depends(get_async_session),
-) -> None:
+) -> Optional[dict[str, list[VisrBaseSchema]] | Response]:
     """Подтверждение импорта файлов, принимает путь
-    к временному документу(Исправить подход)"""
+    к временному документу"""
+    # Удалени или создание Dataframe
     visrs_dataframe = check_file(**confirmationInfo.dict())
     if not visrs_dataframe.empty:
-        visrs = get_visr(visrs_dataframe, building_id)
-        await check_visr_BD(visrs, building_id, session)
-    # Добавить id к данным объекта VisrModel
+        # Получение списка ВИСР
+        visrs = create_visr_obj(visrs_dataframe, building_id)
+        # Исклчение дублирование ВИСР в БД
+        visr_to_import = await check_visr_BD(visrs, building_id, session)
+        if visr_to_import:
+            # Создание записей в БД
+            created_visrs = await create_visr(
+                building_id,
+                visr_to_import,
+                session,
+            )
 
-    # ss = await create_visr(
-    #     building_id,
-    #     visrs[3],
-    #     session,
-    # )
+            return {"detail": created_visrs}
+        else:
+            return JSONResponse(
+                content={"detail": "Импортируемые ВИСР уже присутствуют в БД"},
+                status_code=status.HTTP_409_CONFLICT,
+            )
+    else:
+        raise HTTPException(status_code=500, detail="Данные не обработаны")

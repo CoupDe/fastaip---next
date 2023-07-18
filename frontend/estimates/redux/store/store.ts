@@ -11,15 +11,20 @@ import {
   REGISTER,
 } from "redux-persist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import uploadSlice from "../slice/uploadSlice";
 // import storage from 'redux-persist/lib/storage'
 
 //Объединение редюсеров из слайсов
 
-const rootReducer = combineReducers({ building: buildingSlice });
+const rootReducer = combineReducers({
+  building: buildingSlice,
+  uploadVisr: uploadSlice,
+});
 const buildingPersistConfig = {
   key: "building",
   storage: AsyncStorage,
-  whiteList: ["building, buildings"],
+  whiteList: ["building"],
+  blacklist: ["uploadVisr"],
 };
 //
 

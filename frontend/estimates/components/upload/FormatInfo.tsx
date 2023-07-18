@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import FileDownloadDoneIcon from "@mui/icons-material/FileDownloadDone";
 import FileDownloadOffIcon from "@mui/icons-material/FileDownloadOff";
-import { useAppSelector } from "@/redux/hook";
+import { useAppSelector, useAppDispatch } from "@/redux/hook";
 import { ActiveBuilding } from "@/redux/slice/buildingSlice";
 import postFiles, { ImportData } from "@/lib/api/postImport";
 import UploadModal from "./UploadModal";
+import { SelectImportError } from "@/redux/slice/uploadSlice";
+import { PopupImport } from "./PopupImport";
+import { setImportError } from "@/redux/slice/uploadSlice";
 
 type PropsFormat = {
   format: SearchFormats;
@@ -17,6 +20,8 @@ const FormatInfo: React.FC<PropsFormat> = ({
   const [importInfo, setImportInfo] = useState<ImportData>();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [noFiles, setNoFiles] = useState(false);
+  const importError = useAppSelector(SelectImportError);
+  const dispatch = useAppDispatch();
   const { id } = useAppSelector(ActiveBuilding);
 
   if (!id) return <h1>Выберите объект</h1>;
@@ -80,6 +85,12 @@ const FormatInfo: React.FC<PropsFormat> = ({
           onClose={() => {
             setShowModal(false);
           }}
+        />
+      )}
+      {importError && (
+        <PopupImport
+          importError={importError}
+          onClose={() => dispatch(setImportError(null))}
         />
       )}
     </div>

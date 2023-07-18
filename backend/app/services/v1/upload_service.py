@@ -12,7 +12,7 @@ from db.models.visr_models import VisrModel
 from schemas.visr_schema import VisrImpl
 
 from schemas.upload_schema import PreparingVisr
-from services.v1.import_sevice import get_visr
+from services.v1.import_sevice import create_visr_obj
 
 # список созданных каталогов
 temp_folder = []

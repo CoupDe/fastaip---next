@@ -1,9 +1,11 @@
+from fastapi import HTTPException, Response
 import pandas as pd
 from pandas import DataFrame
 from sqlalchemy import insert, select
+
 from db.models.visr_models import VisrModel, EstimateModel, EstimatedPriceModel
 from sqlalchemy.ext.asyncio import AsyncSession
-from schemas.visr_schema import VisrImpl, VisrSchema, TestVisrSchema
+from schemas.visr_schema import VisrImpl, VisrSchema, VisrBaseSchema
 
 
 def get_visr_range(position_gn: list[int], last_row: int) -> list[range]:
@@ -16,7 +18,7 @@ def get_visr_range(position_gn: list[int], last_row: int) -> list[range]:
     return [range(start, end - 1) for start, end in zip(position_gn, ofset_position)]
 
 
-def get_visr(visrs_df: DataFrame, building_id: int) -> list[VisrImpl]:
+def create_visr_obj(visrs_df: DataFrame, building_id: int) -> list[VisrModel]:
     """Сбор общих данных для ВИСР
 
     Args:
@@ -42,10 +44,9 @@ def get_visr(visrs_df: DataFrame, building_id: int) -> list[VisrImpl]:
     return visrs
 
 
-# !!!!!!!!!!!!!!!ДОБАВИТЬ ПРОВЕРКУ НА СУЩЕСТВОВАНИЕ ВИСР
 async def check_visr_BD(
     check_data: list[VisrModel], building_id: int, session: AsyncSession
-) -> VisrSchema:
+) -> list[VisrModel]:
     """Проверка на существование ВИСР-ов в бд, уходит одни SQL запрос
 
     Args:
@@ -53,7 +54,7 @@ async def check_visr_BD(
         session (AsyncSession): _description_
 
     Returns:
-        VisrSchema: _description_
+        list[VisrModel]: Список
     """
 
     query = select(VisrModel).filter(
@@ -65,36 +66,21 @@ async def check_visr_BD(
 
     result = await session.execute(query)
     result_records = result.all()
-    lutten_list1 = [result[0] for result in result_records]
-    print("result[0][0]", lutten_list1[0], "type", type(lutten_list1[0]))
-    print("check_data", check_data[0], "check_data", type(check_data[0]))
-    ss = check_data[0]
-    ss.building_id = 2
 
-    print("ss", ss)
-    print(lutten_list1[0] == ss)
     # Если совпадения по полям найдены, выпрямить список и исключить совпадения
     if result_records:
-        list_to_eq = [
-            TestVisrSchema(**obj.__dict__, building_id=building_id)
-            for obj in check_data
-        ]
-        flutten_list = [
-            TestVisrSchema.from_orm(result[0])
-            for result in result_records
-            if result_records
-        ]
-
+        flutten_list_visrs_bd = [result[0] for result in result_records]
         non_existing_objects = [
-            VisrModel(**obj.__dict__) for obj in list_to_eq if obj not in flutten_list
+            obj for obj in check_data if obj not in flutten_list_visrs_bd
         ]
-
+        return non_existing_objects
     # return result
+    return check_data
 
 
 async def create_visr(
-    building_id: int, visr: VisrSchema, session: AsyncSession
-) -> VisrSchema:
+    building_id: int, visrs: list[VisrModel], session: AsyncSession
+) -> VisrBaseSchema:
     """Добавление записи структы в таблицы
 
     Args:
@@ -105,8 +91,11 @@ async def create_visr(
     Returns:
         VisrResponse: _description_
     """
-    visr.building_id = building_id
 
-    session.add(visr)
+    try:
+        session.add_all(visrs)
 
-    await session.commit()
+        await session.commit()
+        return [VisrBaseSchema(**visr.__dict__) for visr in visrs]
+    except:
+        raise HTTPException(status_code=500, detail="Something went wrong in BD")

@@ -310,7 +310,7 @@ class VisrImpl(AbstractVisr):
         if df.at[1, "temp"] == "GW":
             self.type_work = df.at[1, "pos"]
         self.total_cost = float(df.at[df.index[-1], "total_cost"])
-        
+
         self.visr_df = df
 
     def __str__(self) -> str:
@@ -426,22 +426,21 @@ class EstimateSchema(BaseModel):
         orm_mode = True
 
 
-class VisrSchema(BaseModel):
-    building_id: int | None = None
+class VisrBaseSchema(BaseModel):
+    
     name_visr: str
     type_work: str
     total_cost: float
+
+
+class VisrSchema(VisrBaseSchema):
+    building_id: int 
     estimates: list[EstimateSchema]
 
     class Config:
         orm_mode = True
 
 
-class TestVisrSchema(BaseModel):
-    building_id: int | None = None
-    name_visr: str
-    type_work: str
-    total_cost: float
 
-    class Config:
-        orm_mode = True
+
+

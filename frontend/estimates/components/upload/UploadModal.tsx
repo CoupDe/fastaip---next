@@ -1,10 +1,19 @@
-import React, { Fragment, useState } from "react";
-import { Dialog, Transition } from "@headlessui/react";
+import { isErrorImportResponse } from "@/const/typegurads";
+import {
+  ErrorImportResponse,
+  acceptImport,
+  ImportVisrResponse,
+} from "@/lib/api/acceptImport";
 import { ImportData } from "@/lib/api/postImport";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import { acceptImport } from "@/lib/api/acceptImport";
-import { useAppSelector } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { ActiveBuilding } from "@/redux/slice/buildingSlice";
+import {
+  setImportDataResponse,
+  setImportError,
+} from "@/redux/slice/uploadSlice";
+import { Dialog, Transition } from "@headlessui/react";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import React, { Fragment, useState } from "react";
 const UploadModal: React.FC<ImportData & { onClose: () => void }> = ({
   filesInfo,
   detail,
@@ -13,10 +22,24 @@ const UploadModal: React.FC<ImportData & { onClose: () => void }> = ({
   onClose,
 }) => {
   const [isOpen, setIsOpen] = useState(true);
+  const dispatch = useAppDispatch();
   const { id } = useAppSelector(ActiveBuilding);
 
   const handleConfirmImport = async (confirmation: boolean) => {
-    const result = await acceptImport(tempFileId, confirmation, id!);
+    try {
+      const result = await acceptImport(tempFileId, confirmation, id!);
+      if (Array.isArray(result.detail)) {
+        const data = result.detail as unknown as ImportVisrResponse[];
+        dispatch(setImportDataResponse(data));
+      }
+    } catch (error: unknown) {
+      if (isErrorImportResponse(error)) {
+        const errorResponse = error as ErrorImportResponse;
+        dispatch(setImportError(error.detail));
+      } else {
+        throw new Error("Unknow Error in Import");
+      }
+    }
     onClose();
   };
 

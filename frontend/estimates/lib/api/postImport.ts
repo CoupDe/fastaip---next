@@ -1,11 +1,12 @@
 import { postImportFiles } from "@/const/apiRout";
-export type ImportData = {
+export interface ImportData {
   filesInfo: [string, number][];
   detail: string;
   tempFileId: string;
   confirmation: boolean;
-};
-const postFiles = async (data: File[], id: string): Promise<ImportData> => {
+}
+
+const postFiles = async (data: File[], id: string): Promise<any> => {
   //  Передача формата файлов должна быть преобразована в FormData
   const formData = new FormData();
   for (let i = 0; i < data.length; i++) {
