@@ -1,4 +1,4 @@
-import { postImportFiles } from "@/const/apiRout";
+import { postImportFilesRout } from "@/const/apiRout";
 export interface ImportData {
   filesInfo: [string, number][];
   detail: string;
@@ -13,7 +13,7 @@ const postFiles = async (data: File[], id: string): Promise<any> => {
     formData.append(`files`, data[i]);
   }
   //  Странно, но с передачей header сервер выдает ошибку
-  const response = await fetch(postImportFiles + `${id}`, {
+  const response = await fetch(postImportFilesRout + `${id}`, {
     method: "POST",
     body: formData,
   });

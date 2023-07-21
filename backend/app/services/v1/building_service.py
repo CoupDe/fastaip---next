@@ -21,7 +21,8 @@ async def read_all_buildings(session: AsyncSession) -> list[Building]:
         .options(selectinload(Building.structure))
         .order_by(asc(Building.name))
     )
-    return (await session.scalars(stmt)).all()
+    result = await session.scalars(stmt)
+    return list(result.all())
 
 
 """session.get(Structure,id)->чем отличается от нижеуказанного """

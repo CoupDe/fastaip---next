@@ -404,15 +404,24 @@ class AdditionalPriceSchema(BaseModel):
     name: AdditionalEstimatedEnum
     total_cost: float
 
+    class Config:
+        orm_mode = True
+
 
 class LaborPriceSchema(PriceComponent):
-    category: str
-    temp: LaborEnum | AdditionalEstimatedEnum
+    category: LaborEnum
+    # temp: LaborEnum | AdditionalEstimatedEnum
+
+    class Config:
+        orm_mode = True
 
 
 class EsimatedPriceSchema(PriceComponent):
     labors: list[LaborPriceSchema]
     additional_prices: list[AdditionalPriceSchema]
+
+    class Config:
+        orm_mode = True
 
 
 class EstimateSchema(BaseModel):
@@ -427,20 +436,14 @@ class EstimateSchema(BaseModel):
 
 
 class VisrBaseSchema(BaseModel):
-    
     name_visr: str
     type_work: str
     total_cost: float
 
 
 class VisrSchema(VisrBaseSchema):
-    building_id: int 
+    building_id: int
     estimates: list[EstimateSchema]
 
     class Config:
         orm_mode = True
-
-
-
-
-

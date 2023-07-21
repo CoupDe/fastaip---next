@@ -1,9 +1,16 @@
+import UploadForm from "@/components/upload/UploadForm";
 import React from "react";
 
 type Props = {};
 
 const Import = (props: Props) => {
-  return <div>Import</div>;
+
+  return (
+    <>
+      <UploadForm />
+      <div>Import</div>
+    </>
+  );
 };
 
-export default Import
+export default Import;

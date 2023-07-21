@@ -12,7 +12,7 @@ export default function ImportLayout({
 }) {
   return (
     <>
-      <UploadForm />
+      
       <section className={`cantainer`}>{children}</section>
     </>
   );

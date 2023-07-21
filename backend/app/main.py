@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.base import create_db_and_tables
 
-from controllers.v1 import building_route, structure_route, upload_route
+from controllers.v1 import building_route, structure_route, upload_route, visr_route
 from db.base import get_async_session
 from schemas.userTest_schema import GetUser, User
 
@@ -14,6 +14,7 @@ app = FastAPI(title="Parser")
 app.include_router(building_route.route, prefix="/api")
 app.include_router(structure_route.route, prefix="/api")
 app.include_router(upload_route.route, prefix="/api")
+app.include_router(visr_route.route, prefix="/api")
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
