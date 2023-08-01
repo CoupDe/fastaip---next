@@ -1,3 +1,4 @@
+"use client";
 import { createConstruction } from "@/lib/api/createConstruction";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -76,10 +77,10 @@ const ConstructionFormCreate: React.FC<FormProps> = ({
       onSubmit={handleSubmit(onSubmit)}
       autoComplete="off"
       id="constructionForm"
-      className="bg-white shadow-md rounded pt-6  mb-4 flex flex-col"
+      className="mb-4 flex flex-col rounded  bg-white pt-6 shadow-md"
     >
       {/* register your input into the hook by invoking the "register" function */}
-      <label className="block text-gray-700 text-sm " htmlFor="name">
+      <label className="block text-sm text-gray-700 " htmlFor="name">
         Название стройки
       </label>
       <input
@@ -90,12 +91,12 @@ const ConstructionFormCreate: React.FC<FormProps> = ({
         }
         {...register("name")}
         id="name"
-        className="shadow appearance-none border rounded border-sky-600 dark:border-red-900 w-full py-2 px-3 bg-inherit text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        className="focus:shadow-outline w-full appearance-none rounded border border-sky-600 bg-inherit px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none dark:border-red-900"
       />
       {errors.name && <span>This field is required</span>}
       {/* include validation with required or other standard HTML validation rules */}
       <label
-        className=" text-gray-700 text-sm mt-4"
+        className=" mt-4 text-sm text-gray-700"
         htmlFor={`${
           modalProps.showForm === "newBuilding"
             ? "code_building"
@@ -106,7 +107,7 @@ const ConstructionFormCreate: React.FC<FormProps> = ({
           modalProps.showForm === "newBuilding" ? "Код объекта" : "Код стройки"
         }`}
         {errors && (
-          <span className="text-xs text-orange-700 leading-[2px] mt-3 float-right">
+          <span className="float-right mt-3 text-xs leading-[2px] text-orange-700">
             Обязательное поле<sup>*</sup>
           </span>
         )}
@@ -121,7 +122,7 @@ const ConstructionFormCreate: React.FC<FormProps> = ({
           }`,
           { required: true }
         )}
-        className="shadow appearance-none border rounded border-sky-600 dark:border-red-900 w-full py-2 px-3 text-gray-700 bg-inherit leading-tight focus:outline-none focus:shadow-outline"
+        className="focus:shadow-outline w-full appearance-none rounded border border-sky-600 bg-inherit px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none dark:border-red-900"
         placeholder={"192.168.55"}
         defaultValue={
           modalProps.showForm === "editConstruction"
@@ -135,10 +136,10 @@ const ConstructionFormCreate: React.FC<FormProps> = ({
         }`}
       />
       {/* errors will return when field validation fails  */}
-      <div className="mt-4 sm:space-x-4 flex justify-between justify-self-end">
+      <div className="mt-4 flex justify-between justify-self-end sm:space-x-4">
         <button
           type="button"
-          className="inline-flex justify-center rounded-md border  min-w-[100px] border-transparent bg-blue-100  py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+          className="inline-flex min-w-[100px] justify-center rounded-md  border border-transparent bg-blue-100  py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           onClick={closeModal}
         >
           Закрыть
@@ -146,7 +147,7 @@ const ConstructionFormCreate: React.FC<FormProps> = ({
         <button
           form="constructionForm"
           type="submit"
-          className="inline-flex justify-center rounded-md border min-w-[100px] border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+          className="inline-flex min-w-[100px] justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           onClick={() => {}}
         >
           Создать

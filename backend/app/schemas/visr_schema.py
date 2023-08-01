@@ -417,6 +417,7 @@ class LaborPriceSchema(PriceComponent):
 
 
 class EsimatedPriceSchema(PriceComponent):
+    id: int
     labors: list[LaborPriceSchema]
     additional_prices: list[AdditionalPriceSchema]
 
@@ -425,10 +426,12 @@ class EsimatedPriceSchema(PriceComponent):
 
 
 class EstimateSchema(BaseModel):
+    id: int
     name_estimate: str
     local_num: str | None
     machine_num: str
     chapter: int | None = None
+
     estimated_prices: list[EsimatedPriceSchema]
 
     class Config:
@@ -443,6 +446,7 @@ class VisrBaseSchema(BaseModel):
 
 class VisrSchema(VisrBaseSchema):
     building_id: int
+    id: int
     estimates: list[EstimateSchema]
 
     class Config:

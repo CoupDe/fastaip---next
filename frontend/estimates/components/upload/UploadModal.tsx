@@ -3,7 +3,7 @@ import {
   ErrorImportResponse,
   acceptImport,
   ImportVisrResponse,
-} from "@/lib/api/acceptImport";
+} from "@/lib/api/postAcceptImport";
 import { ImportData } from "@/lib/api/postImport";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { ActiveBuilding } from "@/redux/slice/buildingSlice";
@@ -13,6 +13,7 @@ import {
 } from "@/redux/slice/uploadSlice";
 import { Dialog, Transition } from "@headlessui/react";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { useRouter } from "next/navigation";
 import React, { Fragment, useState } from "react";
 const UploadModal: React.FC<ImportData & { onClose: () => void }> = ({
   filesInfo,
@@ -22,6 +23,7 @@ const UploadModal: React.FC<ImportData & { onClose: () => void }> = ({
   onClose,
 }) => {
   const [isOpen, setIsOpen] = useState(true);
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const { id } = useAppSelector(ActiveBuilding);
 
@@ -31,13 +33,15 @@ const UploadModal: React.FC<ImportData & { onClose: () => void }> = ({
       if (Array.isArray(result.detail)) {
         const data = result.detail as unknown as ImportVisrResponse[];
         dispatch(setImportDataResponse(data));
+        router.prefetch(`/main/srv/${id}`);
       }
     } catch (error: unknown) {
       if (isErrorImportResponse(error)) {
         const errorResponse = error as ErrorImportResponse;
-        dispatch(setImportError(error.detail));
+        dispatch(setImportError(errorResponse.detail));
       } else {
-        throw new Error("Unknow Error in Import");
+        console.log(error);
+        throw "Unknow Error in Import";
       }
     }
     onClose();

@@ -1,6 +1,5 @@
 import { getAllBuildingsVisrRout } from "@/const/apiRout";
 import { StructureVisrResponse } from "@/const/interfaces";
-import { error } from "console";
 
 export const getAllBuildingsVisr = async (
   building_id: string
@@ -10,7 +9,7 @@ export const getAllBuildingsVisr = async (
     { cache: "no-store" }
   );
   if (!result.ok) {
-    throw error("Failed");
+    throw Error("Failed");
   }
   return result.json();
 };

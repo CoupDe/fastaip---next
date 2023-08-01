@@ -1,5 +1,5 @@
 import { postImportFilesConfirmRout } from "@/const/apiRout";
-import { ImportData } from "./postImport";
+import { revalidatePath } from "next/cache";
 
 export interface ImportVisrResponse {
   name_visr: string;
@@ -19,18 +19,22 @@ export const acceptImport = async (
 ): Promise<IDetailResponseImport | ErrorImportResponse> => {
   const data = { tempFileId, confirmation, id };
 
-  const response = await fetch(postImportFilesConfirmRout + `${id}` + "/confirm/", {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await fetch(
+    postImportFilesConfirmRout + `${id}` + "/confirm/",
+    {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
   if (!response.ok) {
     const errorImportResponse: ErrorImportResponse = await response.json();
     throw errorImportResponse;
   } else {
     const response_data: IDetailResponseImport = await response.json();
+
     return response_data;
   }
 };

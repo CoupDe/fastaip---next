@@ -1,4 +1,5 @@
 import { postImportFilesRout } from "@/const/apiRout";
+import { revalidatePath } from "next/cache";
 export interface ImportData {
   filesInfo: [string, number][];
   detail: string;
@@ -20,7 +21,8 @@ const postFiles = async (data: File[], id: string): Promise<any> => {
   if (!response.ok) {
     throw new Error("Failed fetch data");
   }
-
+  // Функция обновления структуры после импорта
+ 
   return response.json();
 };
 

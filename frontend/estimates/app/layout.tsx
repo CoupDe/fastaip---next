@@ -1,4 +1,4 @@
-import { DM_Mono, Source_Sans_Pro, Overpass } from "next/font/google";
+import { DM_Mono, Source_Sans_3, Overpass } from "next/font/google";
 import AuthContext from "./providers/AuthProvider";
 import ThemeContext from "./providers/ThemeProvider";
 import "./globals.css";
@@ -21,7 +21,7 @@ const overpass = Overpass({
   weight: "500",
   variable: "--font-overpass",
 });
-const SSPro = Source_Sans_Pro({
+const SSPro = Source_Sans_3({
   subsets: ["cyrillic"],
   weight: "400",
   variable: "--font-sspro",

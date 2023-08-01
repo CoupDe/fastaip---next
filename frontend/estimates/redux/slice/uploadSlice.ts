@@ -4,7 +4,7 @@ import {
   ErrorImportResponse,
   IDetailResponseImport,
   ImportVisrResponse,
-} from "@/lib/api/acceptImport";
+} from "@/lib/api/postAcceptImport";
 
 interface ImportState {
   error: string | null;
