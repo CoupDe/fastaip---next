@@ -1,8 +1,8 @@
 import { isErrorImportResponse } from "@/const/typegurads";
 import {
   ErrorImportResponse,
-  acceptImport,
   ImportVisrResponse,
+  acceptImport,
 } from "@/lib/api/postAcceptImport";
 import { ImportData } from "@/lib/api/postImport";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";

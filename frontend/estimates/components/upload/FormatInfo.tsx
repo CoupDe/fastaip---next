@@ -3,11 +3,15 @@ import FileDownloadDoneIcon from "@mui/icons-material/FileDownloadDone";
 import FileDownloadOffIcon from "@mui/icons-material/FileDownloadOff";
 import { useAppSelector, useAppDispatch } from "@/redux/hook";
 import { ActiveBuilding } from "@/redux/slice/buildingSlice";
-import postFiles, { ImportData } from "@/lib/api/postImport";
+import postVisrFiles, { ImportData } from "@/lib/api/postImport";
 import UploadModal from "./UploadModal";
-import { SelectImportError } from "@/redux/slice/uploadSlice";
+import {
+  SelectImportError,
+  SelectedImportType,
+} from "@/redux/slice/uploadSlice";
 import { PopupImport } from "./PopupImport";
 import { setImportError } from "@/redux/slice/uploadSlice";
+import postImportFormFile from "@/lib/api/postImportForm";
 
 type PropsFormat = {
   format: SearchFormats;
@@ -21,6 +25,7 @@ const FormatInfo: React.FC<PropsFormat> = ({
   const [showModal, setShowModal] = useState<boolean>(false);
   const [noFiles, setNoFiles] = useState(false);
   const importError = useAppSelector(SelectImportError);
+  const importType = useAppSelector(SelectedImportType);
   const dispatch = useAppDispatch();
   const { id } = useAppSelector(ActiveBuilding);
 
@@ -40,10 +45,30 @@ const FormatInfo: React.FC<PropsFormat> = ({
     event.preventDefault();
     if (okFormat.length !== 0) {
       if (!!!importInfo) {
-        const result = await postFiles(okFormat, id);
-        setImportInfo(result);
+        switch (importType) {
+          case "ВИСР":
+            try {
+              const resultVisr = await postVisrFiles(okFormat, id);
+
+              setImportInfo(resultVisr);
+              console.log("in Visr", resultVisr);
+              setShowModal(true);
+            } catch (error) {
+              console.log(error);
+            }
+
+          case "Формы":
+            try {
+              const resultForm = await postImportFormFile(okFormat, id);
+
+              setImportInfo(resultForm);
+              console.log("in Формы", resultForm);
+              setShowModal(true);
+            } catch (error) {
+              console.log(error);
+            }
+        }
       }
-      setShowModal(true);
     }
   };
 
