@@ -12,7 +12,6 @@ export default function ImportLayout({
 }) {
   return (
     <>
-      
       <section className={`cantainer`}>{children}</section>
     </>
   );

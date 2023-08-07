@@ -23,9 +23,7 @@ module.exports = {
         sans: "var(--font-dmMono)",
         sspro: "var(--font-sspro)",
       },
-      fontSize: {
-        xs: ["0.6rem", "1.35rem"],
-      },
+    
       // that is actual animation
       keyframes: (theme) => ({
         fadeOut: {

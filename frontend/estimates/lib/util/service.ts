@@ -13,6 +13,8 @@ export function capitalize(val: string): string {
 // Конвертация типов для создания строки таблицы
 export function convertToDataRow(data: RowData): RowData {
   return {
+    id: data.id,
+    parentId: data.parentId,
     pos: data.pos,
     code: data.code || "",
     name: data.name?.trim() || "",
@@ -22,4 +24,16 @@ export function convertToDataRow(data: RowData): RowData {
     total_cost: data.total_cost,
     type_work: data.type_work?.trim(),
   };
+}
+
+export function checkNumberofPercent(percent: string): number | null {
+  let value = percent.replace(",", "."); // заменяем запятую на точку
+  const numberValue = parseFloat(value);
+
+  if (numberValue === 0) return null;
+  if (!isNaN(numberValue) && numberValue >= 0 && numberValue <= 100) {
+    return numberValue;
+  } else {
+    return null;
+  }
 }

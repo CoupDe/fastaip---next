@@ -14,9 +14,9 @@ const searchFormats = function (files: FileList): SearchFormats {
   return { badFormat, okFormat };
 };
 
-type Props = {};
+
 const formats = [".xls", ".xlsx", ".xlsm"];
-const UploadForm = (props: Props) => {
+const UploadForm = () => {
   const [dragActive, setDragActive] = React.useState(false);
   const [showFiles, setShowFiles] = React.useState(false);
   const [fileFormats, setFileFormats] = React.useState<SearchFormats>();
@@ -80,8 +80,8 @@ const UploadForm = (props: Props) => {
                   ></path>
                 </svg>
                 <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                  <span className="font-semibold">Click to upload</span> or drag
-                  and drop
+                  <span className="font-semibold">Нажмите для загрузки</span>
+                  или перетащите файл
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   *.XLS, *.XLSX, *.XLSM

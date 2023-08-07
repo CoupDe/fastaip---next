@@ -4,9 +4,10 @@ import {
   CommonPriceVisr,
   RowData,
 } from "@/const/interfaces";
-import React from "react";
+import React, { useState } from "react";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import { checkNumberofPercent } from "@/lib/util/service";
 type RowProps = {
   visrData: Visr | EstimateVisr;
   depth: number;
@@ -14,7 +15,7 @@ type RowProps = {
 type TableData = {
   dataRow: RowData;
   depth: number;
-  children: React.ReactNode[];
+  children?: React.ReactNode[];
 };
 const bgColorLevel = (depth: number): string => {
   switch (depth) {
@@ -22,48 +23,102 @@ const bgColorLevel = (depth: number): string => {
       return "bg-gray-600";
     case 2:
       return "bg-slate-500";
+    case 3:
+      return "bg-slate-400 text-stone-900";
     default:
       return "bg-gray-800";
   }
 };
 const RowTable: React.FC<TableData> = ({ dataRow, depth, children }) => {
   const [show, setShow] = React.useState<boolean>(false);
-  console.log(depth, children);
+  const [isEditing, setIsEditing] = useState(false);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const [percentField, setPercentField] = useState<number | string | null>(
+    null
+  );
+  const [dataCell, setDataCells] = React.useState<number | string | undefined>(
+    dataRow.total_cost
+  );
+
+  function handleTotalCostChange(
+    e: React.ChangeEvent<HTMLInputElement>
+    // id: number | undefined
+  ) {
+    let value = e.target.value;
+    value = value.replace(/[^0-9,.]/g, ""); // разрешаем только цифры и запятую
+    setPercentField(value); // устанавливаем значение
+  }
+
+  function handleKeyPress(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      let cellValue = checkNumberofPercent(String(percentField));
+      if (percentField === 0) setPercentField(null);
+      setPercentField(cellValue);
+      setIsEditing(false);
+    }
+  }
+  function handleBlur() {
+    let cellValue = checkNumberofPercent(String(percentField));
+    setPercentField(cellValue);
+    setIsEditing(false);
+  }
   return (
     <>
-      <tr className={`${bgColorLevel(depth)} dark:text-white`}>
+      <tr className={`${bgColorLevel(depth)} text-white`}>
         <td className="p-1">
           <div className="align-items-center flex items-center">
-            <button onClick={() => setShow(!show)}>
-              {!show ? <KeyboardArrowRightIcon /> : <KeyboardArrowDownIcon />}
-            </button>
-            <div className="ml-3 mt-1">
-              <div className="">Appple</div>
+            {depth < 3 && (
+              <button
+                className="hover:text-zinc-400"
+                onClick={() => setShow(!show)}
+              >
+                {!show ? <KeyboardArrowRightIcon /> : <KeyboardArrowDownIcon />}
+              </button>
+            )}
+            <div className={`${depth < 3 ? "mx-2 mt-1" : "mx-4"} text-xs`}>
+              <div className="">{dataRow.pos}</div>
             </div>
           </div>
         </td>
-        <td className="p-1">{dataRow.code}</td>
-        <td className="p-1 text-xs font-bold">{dataRow.name}</td>
-        <td className="p-1">
-          <span className=" text-xs font-bold">{dataRow.type_work}</span>
+        <td className="p-1 text-xs">{dataRow.code}</td>
+        <td className="p-1 text-xs font-bold ">{dataRow.name}</td>
+        <td className="text-xs" align="center">
+          <span className=" text-xs "> {dataRow.unit}</span>
         </td>
-        <td className="p-1 ">
-          <a href="#" className="mr-2 text-gray-400 hover:text-gray-100">
-            <i className="material-icons-outlined text-base">visibility</i>
-          </a>
-          <a href="#" className="mx-2 text-gray-400  hover:text-gray-100">
-            <i className="material-icons-outlined text-base">edit</i>
-          </a>
-          <a href="#" className="ml-2 text-gray-400  hover:text-gray-100">
-            <i className="material-icons-round text-base">delete_outline</i>
-          </a>
-        </td>
-        <td className="p-1">Technology</td>
-        <td className="p-1">Technology</td>
-        <td className="p-1 ">
-          <i className="material-icons-outlined text-base">
-            {dataRow.total_cost}
+        <td className="p-1 " align="center">
+          <i className="material-icons-outlined cursor-pointer">
+            {dataRow.quantity}
           </i>
+        </td>
+        <td className="p-1" align="center">
+          {dataRow.unit_cost?.toLocaleString("ru-RU")}
+        </td>
+        <td
+          className="p-1 "
+          align="center"
+          onDoubleClick={(e) => {
+            setIsEditing(true);
+          }}
+        >
+          {isEditing && depth === 2 ? (
+            <input
+              ref={inputRef}
+              autoFocus
+              className="w-14 bg-slate-600 px-1 border-none"
+              placeholder="%"
+              type="text"
+              max="4"
+              value={percentField === null ? "" : percentField}
+              onBlur={() => handleBlur()}
+              onChange={handleTotalCostChange}
+              onKeyDown={(e) => handleKeyPress(e)}
+            />
+          ) : (
+            <>{percentField ? percentField + " %" : null}</>
+          )}
+        </td>
+        <td className="p-1 " align="center">
+          {dataRow.total_cost?.toLocaleString("ru-RU")}
         </td>
       </tr>
       {show && children}

@@ -18,9 +18,8 @@ const TheadTable = (props: Props) => {
         <th className="">Код</th>
         <th className="">Номер</th>
         <th className="">Наименование работ</th>
-        <th className="">Вид работ</th>
+        <th className="">Ед. измерения</th>
         <th className="">Количество</th>
-        <th className="">Объем</th>
         <th className="">Ст. единицы</th>
         <th className="">Стоимость всего</th>
       </tr>

@@ -15,6 +15,10 @@ const NavPanel = (props: Props) => {
       name: "Структура",
       link: `/main/srv/${selectedBuilding.id ? selectedBuilding.id : ""}`,
     },
+    {
+      name: "формы КС-6",
+      link: `/main/form/${selectedBuilding.id ? selectedBuilding.id : ""}`,
+    },
     { name: "Импорт", link: "/main/import" },
     { name: "Отчеты", link: "/reports" },
   ];

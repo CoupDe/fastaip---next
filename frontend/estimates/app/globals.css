@@ -2,10 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 /* italic transition ease-in-out delay-75 hover:text-neutral-300 hover:after:-translate-x-6 after:transition-all after:opacity-0 hover:after:opacity-100 after:delay-50 after:absolute after:-right-[35%] md:after:-right-[50%] sm:hover:after:content-['\2190']; */
-body {
- 
-}
 
+input::placeholder {
+  text-align: center;
+  vertical-align: middle;
+  line-height: 0px;
+}
 h3 {
   font-size: 30px;
 }
@@ -26,7 +28,7 @@ h3 {
     @apply relative tracking-wider hover:text-neutral-400;
   }
   .navLink::after {
-    @apply content-[''] absolute rounded-sm dark:bg-red-900 bg-sky-600 h-[3px] w-[0]  left-0 -bottom-2 duration-500;
+    @apply absolute -bottom-2 left-0 h-[3px] w-[0] rounded-sm bg-sky-600  duration-500 content-[''] dark:bg-red-900;
   }
 
   .navLink:hover::after {

@@ -4,6 +4,8 @@ export interface ILoginRequest {
 }
 
 export interface CommonPriceVisr {
+  id: number;
+
   pos: number;
   code: string;
   name: string;
@@ -15,7 +17,7 @@ export interface CommonPriceVisr {
 
 type Addition = "NR" | "SP";
 type Category = "OZ" | "MM" | "AM" | "MA";
-interface LaborPrice extends CommonPriceVisr {
+export interface LaborPrice extends CommonPriceVisr {
   category: Category;
 }
 export interface AdditionPrice {
@@ -26,7 +28,6 @@ export interface AdditionPrice {
 }
 
 export interface EstimatedPrice extends CommonPriceVisr {
-  id: number;
   labors: LaborPrice[];
   additional_prices: AdditionPrice[];
 }
@@ -51,7 +52,10 @@ export interface StructureVisrResponse extends Visr {
   estimates: EstimateVisr[];
 }
 
-export interface RowData extends Partial<CommonPriceVisr> {
-  type_work?: string;
+export type OmitPos<T> = Omit<T, "pos">;
 
+export interface RowData extends OmitPos<Partial<CommonPriceVisr>> {
+  parentId: number | null;
+  type_work?: string;
+  pos?: number | string;
 }

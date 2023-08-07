@@ -400,6 +400,7 @@ class ConfirmImport(BaseModel):
 
 
 class AdditionalPriceSchema(BaseModel):
+    id: int
     pos: int
     name: AdditionalEstimatedEnum
     total_cost: float
@@ -409,6 +410,7 @@ class AdditionalPriceSchema(BaseModel):
 
 
 class LaborPriceSchema(PriceComponent):
+    id: int
     category: LaborEnum
     # temp: LaborEnum | AdditionalEstimatedEnum
 

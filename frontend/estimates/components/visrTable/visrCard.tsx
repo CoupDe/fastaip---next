@@ -1,70 +1,86 @@
 "use client";
 import {
-  CommonPriceVisr,
+  AdditionPrice,
   EstimateVisr,
   EstimatedPrice,
+  LaborPrice,
   StructureVisrResponse,
   Visr,
 } from "@/const/interfaces";
-import React, { FC } from "react";
-import TheadTable from "./TheadTable";
-import { isEstimate, isEstimatedPrice, isVisr } from "@/const/typegurads";
-import RowTable from "./RowTable";
+import {
+  isAdditionPrice,
+  isEstimate,
+  isEstimatedPrice,
+  isLaborPrice,
+  isVisr,
+} from "@/const/typegurads";
 import { convertToDataRow } from "@/lib/util/service";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { getAllVisrs, setVisr } from "@/redux/slice/structureVisrData";
+import React, { FC } from "react";
+import RowTable from "./RowTable";
+import TheadTable from "./TheadTable";
 
 type VisrProp = {
   visrs: StructureVisrResponse[];
 };
-
-function createTable(visr: any[], depth: number = 0): React.ReactNode[] {
+//Рекусривная функция по созданию строк таблицыы
+function createTable(
+  visr: any[],
+  parentId: number | null,
+  depth: number = 0
+): React.ReactNode[] {
   const levelVisr: React.ReactNode[] = [];
-  const dataRow: Partial<CommonPriceVisr> & { type_work?: string } = {};
 
+  // Перебор массива
   for (let index in visr) {
+    // Определение ВИСР
     if (isVisr(visr[index])) {
       const dt = visr[index] as Visr;
 
       const dtRow = convertToDataRow({
-        name: dt.name_visr,
-        type_work: dt.type_work,
+        id: dt.id,
+        parentId: parentId,
+        name: dt.type_work,
+        code: dt.name_visr,
         total_cost: dt.total_cost,
       });
-      const children = createTable(visr[index]["estimates"], depth + 1);
+      const children = createTable(visr[index]["estimates"], dt.id, depth + 1);
       levelVisr.push(
-        <RowTable
-          key={dt.id}
-          depth={depth}
-          dataRow={dtRow}
-          children={children}
-        />
+        <RowTable key={dt.id} depth={depth} dataRow={dtRow}>
+          {children}
+        </RowTable>
       );
     }
+    // Определение сметы
     if (isEstimate(visr[index])) {
-      console.log("depth in Estimate", depth);
       const dt = visr[index] as EstimateVisr;
       const dtRow = convertToDataRow({
+        id: dt.id,
+        parentId: parentId,
         code: dt.local_num + "/" + dt.machine_num,
         name: dt.name_estimate,
       });
-      console.log(
-        'visr[index]["estimated_price"]',
-        visr[index]["estimated_prices"]
+
+      const children = createTable(
+        visr[index]["estimated_prices"],
+        dt.id,
+        depth + 1
       );
-      const children = createTable(visr[index]["estimated_prices"], depth + 1);
-      console.log("children", children);
+
       levelVisr.push(
-        <RowTable
-          key={dt.id}
-          depth={depth}
-          dataRow={dtRow}
-          children={children}
-        />
+        <RowTable key={dt.id} depth={depth} dataRow={dtRow}>
+          {children}
+        </RowTable>
       );
     }
+    // Определение расценки
     if (isEstimatedPrice(visr[index])) {
-      console.log("depth in Estimated Price", depth);
       const dt = visr[index] as EstimatedPrice;
+
       const dtRow = convertToDataRow({
+        id: dt.id,
+        parentId: parentId,
         code: dt.code,
         name: dt.name,
         unit: dt.unit,
@@ -74,13 +90,62 @@ function createTable(visr: any[], depth: number = 0): React.ReactNode[] {
         pos: dt.pos,
       });
 
-      const children = createTable(visr[index]["estimates"], depth + 1);
+      const children = createTable(visr[index]["labors"], dt.id, depth + 1);
+      const children2 = createTable(
+        visr[index]["additional_prices"],
+        dt.id,
+        depth + 1
+      );
+      children.push(children2);
+      levelVisr.push(
+        <RowTable key={dt.id} depth={depth} dataRow={dtRow}>
+          {children}
+        </RowTable>
+      );
+    }
+    // Определение трудозатрат
+    if (isLaborPrice(visr[index])) {
+      const dt = visr[index] as LaborPrice;
+
+      const dtRow = convertToDataRow({
+        id: dt.id,
+        code: dt.code,
+        parentId: parentId,
+        name: dt.name,
+        unit: dt.unit,
+        unit_cost: dt.unit_cost,
+        type_work: dt.category,
+        total_cost: dt.total_cost,
+        quantity: dt.quantity,
+        pos: dt.category,
+      });
+
       levelVisr.push(
         <RowTable
           key={dt.id}
           depth={depth}
           dataRow={dtRow}
-          children={children}
+          // children={children}
+        />
+      );
+    }
+    // Определение НР, СП
+    if (isAdditionPrice(visr[index])) {
+      const dt = visr[index] as AdditionPrice;
+
+      const dtRow = convertToDataRow({
+        id: dt.id,
+        parentId: parentId,
+        name: dt.name,
+        total_cost: dt.total_cost,
+      });
+
+      levelVisr.push(
+        <RowTable
+          key={dt.id}
+          depth={depth}
+          dataRow={dtRow}
+          // children={children}
         />
       );
     }
@@ -88,48 +153,16 @@ function createTable(visr: any[], depth: number = 0): React.ReactNode[] {
   return levelVisr;
 }
 const VisrCard: FC<VisrProp> = ({ visrs }) => {
-  const [data, setDataVisr] = React.useState(visrs);
-
+  const dispatch = useAppDispatch();
+  dispatch(setVisr(visrs));
+  const data = useAppSelector(getAllVisrs);
+  console.log(data);
   return (
     <div className=" w-full">
       <div className="w-full overflow-auto">
         <table className="table w-full border-separate space-y-6 text-sm text-gray-400">
           <TheadTable />
-          <tbody>
-            <tr className="bg-gray-800">
-              <td className="p-3">
-                <div className="align-items-center flex">
-                  <div className="ml-3">
-                    <div className="">Appple</div>
-                    <div className="text-gray-500">mail@rgmail.com</div>
-                  </div>
-                </div>
-              </td>
-              <td className="p-3">Technology</td>
-              <td className="p-3 font-bold">200.00$</td>
-              <td className="p-3">
-                <span className="rounded-md bg-green-400 px-2 text-gray-50">
-                  available
-                </span>
-              </td>
-              <td className="p-3 ">
-                <a href="#" className="mr-2 text-gray-400 hover:text-gray-100">
-                  <i className="material-icons-outlined text-base">
-                    visibility
-                  </i>
-                </a>
-                <a href="#" className="mx-2 text-gray-400  hover:text-gray-100">
-                  <i className="material-icons-outlined text-base">edit</i>
-                </a>
-                <a href="#" className="ml-2 text-gray-400  hover:text-gray-100">
-                  <i className="material-icons-round text-base">
-                    delete_outline
-                  </i>
-                </a>
-              </td>
-            </tr>
-            {createTable(data)}
-          </tbody>
+          <tbody>{createTable(data, null)}</tbody>
         </table>
       </div>
     </div>

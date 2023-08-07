@@ -10,6 +10,10 @@ module.exports = {
     return config;
   },
   images: {
-    domains: ["sun1-92.userapi.com",'sun6-23.userapi.com', "avatars.githubusercontent.com"],
+    domains: [
+      "sun1-92.userapi.com",
+      "sun6-23.userapi.com",
+      "avatars.githubusercontent.com",
+    ],
   },
 };

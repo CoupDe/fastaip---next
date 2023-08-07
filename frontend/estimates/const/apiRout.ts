@@ -19,7 +19,8 @@ export const allConstructionsRout = generateRoute("construction/all");
 export const createConstructionRout = generateRoute("construction/");
 export const patchConstructionRout = generateRoute("construction/");
 //-------------------//-Import_VISR-//---------//--------------------
-export const postImportFilesRout = generateRoute("import/");
+export const postImportVIsrRout = generateRoute("import/");
 export const postImportFilesConfirmRout = generateRoute("import/");
+export const postImportFormRout = generateRoute;
 //-------------------//-Structure_VISR-//---------//-----------------
 export const getAllBuildingsVisrRout = generateRoute;

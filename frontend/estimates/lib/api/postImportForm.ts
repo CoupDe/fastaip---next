@@ -1,4 +1,4 @@
-import { postImportVIsrRout } from "@/const/apiRout";
+import { postImportFormRout } from "@/const/apiRout";
 import { revalidatePath } from "next/cache";
 export interface ImportData {
   filesInfo: [string, number][];
@@ -7,14 +7,14 @@ export interface ImportData {
   confirmation: boolean;
 }
 
-const postVisrFiles = async (data: File[], id: string): Promise<any> => {
+const postImportFormFile = async (data: File[], id: string): Promise<any> => {
   //  Передача формата файлов должна быть преобразована в FormData
   const formData = new FormData();
   for (let i = 0; i < data.length; i++) {
     formData.append(`files`, data[i]);
   }
   //  Странно, но с передачей header сервер выдает ошибку
-  const response = await fetch(postImportVIsrRout + `${id}`, {
+  const response = await fetch(postImportFormRout(`import/${id}` + "/form"), {
     method: "POST",
     body: formData,
   });
@@ -25,4 +25,4 @@ const postVisrFiles = async (data: File[], id: string): Promise<any> => {
   return response.json();
 };
 
-export default postVisrFiles;
+export default postImportFormFile;

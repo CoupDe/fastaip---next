@@ -1,19 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store/store";
-import {
-  ErrorImportResponse,
-  IDetailResponseImport,
-  ImportVisrResponse,
-} from "@/lib/api/postAcceptImport";
-
+import { ImportVisrResponse } from "@/lib/api/postAcceptImport";
+export type UploadType = "ВИСР" | "ЕВР" | "Формы";
 interface ImportState {
   error: string | null;
   detail: ImportVisrResponse[] | null;
+  uploadType: UploadType;
 }
 
 const initialState: ImportState = {
   error: null,
   detail: null,
+  uploadType: "ВИСР",
 };
 
 const importSlice = createSlice({
@@ -22,6 +20,10 @@ const importSlice = createSlice({
   reducers: {
     setImportError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
+    },
+    setImportType: (state, action: PayloadAction<UploadType>) => {
+    
+      state.uploadType = action.payload;
     },
     setImportDataResponse: (
       state,
@@ -32,9 +34,11 @@ const importSlice = createSlice({
   },
 });
 
-export const { setImportDataResponse, setImportError } = importSlice.actions;
+export const { setImportDataResponse, setImportError, setImportType } =
+  importSlice.actions;
 
 export const SelectImportData = (state: RootState) => state.uploadVisr.detail;
 export const SelectImportError = (state: RootState) => state.uploadVisr.error;
-
+export const SelectedImportType = (state: RootState) =>
+  state.uploadVisr.uploadType;
 export default importSlice.reducer;
