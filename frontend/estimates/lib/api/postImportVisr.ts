@@ -14,7 +14,7 @@ const postVisrFiles = async (data: File[], id: string): Promise<any> => {
     formData.append(`files`, data[i]);
   }
   //  Странно, но с передачей header сервер выдает ошибку
-  const response = await fetch(postImportVIsrRout + `${id}`, {
+  const response = await fetch(postImportVIsrRout(id), {
     method: "POST",
     body: formData,
   });

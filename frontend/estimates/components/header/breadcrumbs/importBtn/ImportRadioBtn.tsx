@@ -6,7 +6,7 @@ import {
 } from "@/redux/slice/uploadSlice";
 import { RadioGroup } from "@headlessui/react";
 import React, { Fragment, useState } from "react";
-const radioLabel = ["ВИСР", "ЕВР", "Формы"];
+const radioLabel = ["ВИСР", "Формы", "ЕВР"];
 type Props = {};
 
 const ImportRadioBtn = (props: Props) => {
@@ -22,6 +22,7 @@ const ImportRadioBtn = (props: Props) => {
         <React.Fragment key={_}>
           <input
             checked={selectedImportType === label}
+            disabled={label === "ЕВР"}
             id={`{bordered-radio-${label}}`}
             type="radio"
             value={`${label}`}

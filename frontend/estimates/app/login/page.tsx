@@ -21,7 +21,7 @@ export default function LoginPage() {
 
   const onFormSubmit = (data: FormValuesLogin) => console.log(data);
   const onErrors = (errors: any) => console.error(errors);
-  console.log(session);
+
   return (
     <div className="w-full h-full md:mx-auto flex flex-col justify-center items-center">
       {/* 1 */}

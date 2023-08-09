@@ -156,7 +156,7 @@ const VisrCard: FC<VisrProp> = ({ visrs }) => {
   const dispatch = useAppDispatch();
   dispatch(setVisr(visrs));
   const data = useAppSelector(getAllVisrs);
-  console.log(data);
+
   return (
     <div className=" w-full">
       <div className="w-full overflow-auto">

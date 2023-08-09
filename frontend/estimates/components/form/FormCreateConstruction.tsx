@@ -38,7 +38,7 @@ const ConstructionFormCreate: React.FC<FormProps> = ({
     let sendData: Building | Construction;
     let res: Building | Construction | FetchError;
     if ("code_building" in data) {
-      console.log("building HERE");
+     
 
       sendData = {
         ...data,
@@ -49,15 +49,15 @@ const ConstructionFormCreate: React.FC<FormProps> = ({
     }
     switch (modalProps.showForm) {
       case "newConstruction":
-        console.log("newConstruction", sendData);
+   
         res = await createConstruction(sendData as Construction);
         break;
       case "editConstruction":
-        console.log("editConstruction", sendData);
+       
         res = await patchConstruction(sendData as Construction);
         break;
       case "newBuilding":
-        console.log("newBuilding", sendData);
+     
 
         res = await createBuilding(sendData as Building);
 

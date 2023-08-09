@@ -7,7 +7,7 @@ const customError = (status: number, detail: string): FetchError => {
 const createBuilding = async (
   data: Building
 ): Promise<Building | FetchError> => {
-  const response = await fetch(createBuildingRout, {
+  const response = await fetch(createBuildingRout(), {
     method: "POST",
     body: JSON.stringify(data),
     headers: {

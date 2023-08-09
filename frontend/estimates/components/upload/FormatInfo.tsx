@@ -3,7 +3,7 @@ import FileDownloadDoneIcon from "@mui/icons-material/FileDownloadDone";
 import FileDownloadOffIcon from "@mui/icons-material/FileDownloadOff";
 import { useAppSelector, useAppDispatch } from "@/redux/hook";
 import { ActiveBuilding } from "@/redux/slice/buildingSlice";
-import postVisrFiles, { ImportData } from "@/lib/api/postImport";
+import postVisrFiles, { ImportData } from "@/lib/api/postImportVisr";
 import UploadModal from "./UploadModal";
 import {
   SelectImportError,
@@ -45,28 +45,30 @@ const FormatInfo: React.FC<PropsFormat> = ({
     event.preventDefault();
     if (okFormat.length !== 0) {
       if (!!!importInfo) {
+        console.log("importType", importType);
         switch (importType) {
           case "ВИСР":
             try {
               const resultVisr = await postVisrFiles(okFormat, id);
-
+              console.log("in ВИСР", resultVisr);
               setImportInfo(resultVisr);
-              console.log("in Visr", resultVisr);
+
               setShowModal(true);
             } catch (error) {
               console.log(error);
             }
-
+            break;
           case "Формы":
             try {
               const resultForm = await postImportFormFile(okFormat, id);
 
               setImportInfo(resultForm);
-              console.log("in Формы", resultForm);
+             
               setShowModal(true);
             } catch (error) {
               console.log(error);
             }
+            break;
         }
       }
     }

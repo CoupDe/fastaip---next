@@ -14,7 +14,7 @@ const postImportFormFile = async (data: File[], id: string): Promise<any> => {
     formData.append(`files`, data[i]);
   }
   //  Странно, но с передачей header сервер выдает ошибку
-  const response = await fetch(postImportFormRout(`import/${id}` + "/form"), {
+  const response = await fetch(postImportFormRout(id), {
     method: "POST",
     body: formData,
   });

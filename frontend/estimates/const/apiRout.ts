@@ -1,14 +1,16 @@
 const BASEURL = "http://127.0.0.1:8000";
 const apiVersion = "/api/v1/";
 // Все стройки
-function generateRoute(
-  endpoint: string,
-  url = BASEURL,
-  id?: string,
-  version = apiVersion
-) {
-  const fullUrl = url + version + endpoint;
-  return fullUrl;
+function generateRoute(endpoint: string) {
+  return (id?: string, param?: string) => {
+    return (
+      BASEURL +
+      apiVersion +
+      endpoint +
+      (id ? `${id}` : "") +
+      (param ? `/${param}` : "")
+    );
+  };
 }
 //-------------------//-building-//---------//-----------------------
 export const allBuildingsRout = generateRoute("building/all");
@@ -18,9 +20,9 @@ export const createBuildingRout = generateRoute("building/");
 export const allConstructionsRout = generateRoute("construction/all");
 export const createConstructionRout = generateRoute("construction/");
 export const patchConstructionRout = generateRoute("construction/");
-//-------------------//-Import_VISR-//---------//--------------------
-export const postImportVIsrRout = generateRoute("import/");
-export const postImportFilesConfirmRout = generateRoute("import/");
-export const postImportFormRout = generateRoute;
+//-------------------//-Import-//---------//--------------------
+export const postImportVIsrRout = generateRoute("import/visr/");
+export const postImportFilesConfirmRout = generateRoute("import/visr/");
+export const postImportFormRout = generateRoute("import/form/");
 //-------------------//-Structure_VISR-//---------//-----------------
-export const getAllBuildingsVisrRout = generateRoute;
+export const getAllBuildingsVisrRout = generateRoute("building/");

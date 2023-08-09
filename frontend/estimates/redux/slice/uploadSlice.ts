@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store/store";
-import { ImportVisrResponse } from "@/lib/api/postAcceptImport";
+import { ImportVisrResponse } from "@/lib/api/postConfirmImportVisr";
 export type UploadType = "ВИСР" | "ЕВР" | "Формы";
 interface ImportState {
   error: string | null;

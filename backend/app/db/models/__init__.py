@@ -7,3 +7,6 @@ from .visr_models import (
     LaborPriceModel,
     AdditionalPriceModel,
 )
+from .form_ks_model import (
+    FormKS,
+)

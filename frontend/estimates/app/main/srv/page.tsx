@@ -8,12 +8,3 @@ export default async function page() {
 
   return <div>Building /srv </div>;
 }
-
-// export async function generateStaticParams() {
-//   const buildingData: Promise<Building[]> = getAllBuildings();
-//   const buildings = await buildingData;
-//   console.log("static");
-//   return buildings.map((building) => ({
-//     id: building.id.toString(),
-//   }));
-// }

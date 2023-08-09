@@ -3,8 +3,8 @@ import {
   ErrorImportResponse,
   ImportVisrResponse,
   acceptImport,
-} from "@/lib/api/postAcceptImport";
-import { ImportData } from "@/lib/api/postImport";
+} from "@/lib/api/postConfirmImportVisr";
+import { ImportData } from "@/lib/api/postImportVisr";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { ActiveBuilding } from "@/redux/slice/buildingSlice";
 import {

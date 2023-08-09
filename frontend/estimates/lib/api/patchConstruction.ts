@@ -1,7 +1,7 @@
 import { patchConstructionRout } from "@/const/apiRout";
 
 const patchConstruction = async (data: Construction): Promise<Construction> => {
-  const response = await fetch(patchConstructionRout + `${data.id}`, {
+  const response = await fetch(patchConstructionRout(data.id), {
     method: "PATCH",
     body: JSON.stringify(data),
     headers: {

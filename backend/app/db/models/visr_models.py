@@ -1,8 +1,8 @@
 from sqlalchemy import ForeignKey, String
 
+from .building_model import Building
+from .form_ks_model import FormKS
 from const.enums import AdditionalEstimatedEnum, LaborEnum
-from schemas.building_schema import Building
-
 from sqlalchemy.dialects import postgresql
 from db.models.modelBase import (
     AbstractPriceComponent,
@@ -20,17 +20,13 @@ class VisrModel(CommonAbstractBase):
     estimates: Mapped[list["EstimateModel"]] = relationship(
         back_populates="visr", cascade="all, delete"
     )
+    formks_id: Mapped[int] = mapped_column(ForeignKey("formks_table.id"), nullable=True)
+
+    formks: Mapped["FormKS"] = relationship(back_populates="visr")
     building_id: Mapped[int] = mapped_column(
         ForeignKey("buildings_table.id"), nullable=False
     )
     building: Mapped["Building"] = relationship(back_populates="visrs")
-    # estimates_prices: Mapped[list["EstimatedPrice"]] = relationship(
-    # back_populates="visr"
-    # )
-    # laborprice: Mapped[list["LaborPrice"]] = relationship(back_populates="visr")
-    # additionalprice: Mapped[list["AdditionalPrice"]] = relationship(
-    # back_populates="visr"
-    # )
 
     def __repr__(self) -> str:
         return f"<Visr(name={self.name_visr!r}, type_work={self.type_work!r})"

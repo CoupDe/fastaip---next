@@ -5,6 +5,7 @@ import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
+from services.v1.upload_form_service import get_for_data
 
 
 from db.models.visr_models import VisrModel, AdditionalPriceModel
@@ -16,7 +17,7 @@ from services.v1.upload_service import check_file, create_dir, prepare_to_upload
 route = APIRouter(prefix="/v1/import", tags=["import"])
 
 
-@route.post("/{building_id}", response_model=ImportDataInfo)
+@route.post("/visr/{building_id}", response_model=ImportDataInfo)
 async def upload_estimate(files: List[UploadFile], building_id: int) -> ImportDataInfo:
     excel_WB = io.BytesIO(files[0].file.read())
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -38,7 +39,7 @@ async def upload_estimate(files: List[UploadFile], building_id: int) -> ImportDa
 
 
 @route.post(
-    "/{building_id}/confirm/", response_model=None | dict[str, list[VisrBaseSchema]]
+    "/visr/{building_id}/confirm", response_model=None | dict[str, list[VisrBaseSchema]]
 )
 async def confirm_import(
     confirmationInfo: ConfirmImport,
@@ -70,3 +71,18 @@ async def confirm_import(
             )
     else:
         raise HTTPException(status_code=500, detail="Данные не обработаны")
+
+
+# Загрузка формы КС-6
+@route.post(
+    "/form/{building_id}",
+)
+async def upload_form(files: List[UploadFile], building_id: int):
+    print("in import form")
+    excel_WB = io.BytesIO(files[0].file.read())
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    df_excel = pd.read_excel(excel_WB, sheet_name=0)
+    ss = get_for_data(df_excel)
+
+    ss.to_excel("form.xlsx")
+    return

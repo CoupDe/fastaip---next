@@ -1,4 +1,4 @@
-import { ErrorImportResponse } from "@/lib/api/postAcceptImport";
+import { ErrorImportResponse } from "@/lib/api/postConfirmImportVisr";
 import {
   AdditionPrice,
   EstimateVisr,

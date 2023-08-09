@@ -39,6 +39,7 @@ export default function Breadcrumbs() {
   const buildingName = useAppSelector(ActiveBuilding);
   const dispatch = useAppDispatch();
   const segment = useSelectedLayoutSegment() as ActiveLink;
+
   const buildingList = useAppSelector(ReverseBuildingList);
   const handleSelectBuilding = (building: Building) => {
     setIsShow(false);
@@ -53,6 +54,7 @@ export default function Breadcrumbs() {
     >
       {segment === "projects" && <AddConstructionBtn />}
       {segment === "import" && <ImportRadioBtn />}
+      {segment==='form' && <p>addVisrButton</p>}
       <motion.nav
         layout="position"
         transition={{ duration: 0.7 }}
