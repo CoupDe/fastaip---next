@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import ConfigDict, BaseModel
 
 
 class BuildingBase(BaseModel):
@@ -14,6 +14,4 @@ class Building(BuildingBase):
     id: int
     name: str
     code_building: str
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)

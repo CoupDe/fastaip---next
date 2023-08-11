@@ -5,11 +5,11 @@ import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from services.v1.upload_form_service import get_for_data
+from services.v1.upload_form_service import get_form_data
 
 
 from db.models.visr_models import VisrModel, AdditionalPriceModel
-from services.v1.import_sevice import create_visr_obj, check_visr_BD, create_visr
+from services.v1.import_service import create_visr_obj, check_visr_BD, create_visr
 from db.base import get_async_session
 from schemas.visr_schema import ConfirmImport, ImportDataInfo, VisrBaseSchema
 from services.v1.upload_service import check_file, create_dir, prepare_to_upload
@@ -77,12 +77,16 @@ async def confirm_import(
 @route.post(
     "/form/{building_id}",
 )
-async def upload_form(files: List[UploadFile], building_id: int):
-    print("in import form")
-    excel_WB = io.BytesIO(files[0].file.read())
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    df_excel = pd.read_excel(excel_WB, sheet_name=0)
-    ss = get_for_data(df_excel)
+def upload_form(files: List[UploadFile], building_id: int):
+    print("In from Import")
+    try:
+        excel_WB = io.BytesIO(files[0].file.read())
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        df_raw_form = pd.read_excel(excel_WB, sheet_name=0)
+    except Exception as e:
+        print(f"In Export excel {e}")
 
-    ss.to_excel("form.xlsx")
+    df_normalized_form = get_form_data(df_raw_form)
+
+    df_normalized_form.to_excel("form.xlsx")
     return

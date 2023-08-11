@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
+from typing_extensions import Annotated
 
 import pandas as pd
 from fastapi import HTTPException
 from pandas import DataFrame
-from pydantic import BaseModel
+from pydantic import ConfigDict, BaseModel
 
 from const.enums import AdditionalEstimatedEnum, LaborEnum, VisrDataEnum
 
@@ -30,14 +31,13 @@ class PreparingVisr(BaseModel, EstimateInterface):
       data(Pandas.Dataframe)
     """
 
-    data: DataFrame = DataFrame()
+    data: DataFrame = pd.DataFrame()
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def __init__(self, dt: DataFrame):
         super().__init__()
         self.data = dt
-
-    class Config:
-        arbitrary_types_allowed = True
 
     @property
     def get_estimate(self) -> DataFrame:
@@ -95,8 +95,8 @@ class PreparingVisr(BaseModel, EstimateInterface):
             _temp_dt["pos"], errors="coerce", downcast="integer"
         )
         # Исключить шапку из возможного типа расценки 'E'
-
-        _head_index = convert_toFloat.first_valid_index()
+        # Разобраться с преобразованием
+        _head_index: int = convert_toFloat.first_valid_index()
         if _temp_dt.loc[_head_index - 1, "pos":"quantity"].isna().all():
             convert_toFloat.loc[_head_index] = pd.NA
         # Создается условие для конвертации в float

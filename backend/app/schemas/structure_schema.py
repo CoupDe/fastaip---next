@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import ConfigDict, BaseModel
 
 from schemas.building_schema import Building
 
@@ -6,9 +6,7 @@ from schemas.building_schema import Building
 class StructureBase(BaseModel):
     name: str | None = None
     code_structure: str | None = None
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CreateStructure(StructureBase):

@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
+from enum import Enum
+from typing import Optional
 from fastapi import HTTPException
 
 from pandas import DataFrame
 import pandas as pd
-from pydantic import BaseModel
+from pydantic import ConfigDict, BaseModel, validator
 from db.models.visr_models import (
     VisrModel,
     EstimateModel,
@@ -62,9 +64,7 @@ class AdditionalPrice(BaseModel):
     pos: int
     name: AdditionalEstimatedEnum
     total_cost: float
-
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 # Класс трудозатрат
@@ -83,7 +83,9 @@ class LaborPrice(PriceComponent):
 class EstimatedPrice(PriceComponent):
     labors: list[LaborPrice] = []
     additional_prices: list[AdditionalPrice] = []
-    labor_df: DataFrame = pd.DataFrame()
+    labor_df: DataFrame = DataFrame()
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -144,24 +146,23 @@ class EstimatedPrice(PriceComponent):
 
         return new_estimated_price
 
-    class Config:
-        arbitrary_types_allowed = True
-
 
 # Класс локальной сметы
 class EstimateImpl(AbstractEstimate):
-    estimate_price_criteria = (
+    estimate_price_criteria: VisrDataEnum = (
         VisrDataEnum.E.value,
         VisrDataEnum.ADDITIONAL.value.SP.value,
     )
 
     name_estimate: str = ""
-    local_num: str | None
+    local_num: str | None = None
     machine_num: str = ""
     chapter: int | None = None
     estimated_prices: list[EstimatedPrice] = []
     estimate_error: list[dict[str, str]] = []
     estimate_df: DataFrame = pd.DataFrame()
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def __init__(
         self, name: str, local_num: str, machine_num: str, estimate_df: DataFrame
@@ -278,9 +279,6 @@ class EstimateImpl(AbstractEstimate):
         )
         return new_estimate
 
-    class Config:
-        arbitrary_types_allowed = True
-
 
 class VisrImpl(AbstractVisr):
     """Класс для создания Dataframe, сбор данных стоимостных состовляющих,
@@ -295,7 +293,10 @@ class VisrImpl(AbstractVisr):
 
     #!!!!!!!!!!!!
     building_id: int | None = None
-    estimate_price_criteria = (VisrDataEnum.L.value, VisrDataEnum.T.value)
+    estimate_price_criteria: tuple[Enum, Enum] = (
+        VisrDataEnum.L.value,
+        VisrDataEnum.T.value,
+    )
     name_visr: str = ""
     type_work: str = ""
     total_cost: float = 0
@@ -372,8 +373,7 @@ class VisrImpl(AbstractVisr):
         )
         return transform_visr
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 # post Model route.post("/{building_id}", response_model=ImportDataInfo)
@@ -404,40 +404,31 @@ class AdditionalPriceSchema(BaseModel):
     pos: int
     name: AdditionalEstimatedEnum
     total_cost: float
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class LaborPriceSchema(PriceComponent):
     id: int
     category: LaborEnum
-    # temp: LaborEnum | AdditionalEstimatedEnum
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class EsimatedPriceSchema(PriceComponent):
     id: int
     labors: list[LaborPriceSchema]
     additional_prices: list[AdditionalPriceSchema]
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class EstimateSchema(BaseModel):
     id: int
     name_estimate: str
-    local_num: str | None
+    local_num: str | None = None
     machine_num: str
     chapter: int | None = None
 
     estimated_prices: list[EsimatedPriceSchema]
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class VisrBaseSchema(BaseModel):
@@ -450,6 +441,4 @@ class VisrSchema(VisrBaseSchema):
     building_id: int
     id: int
     estimates: list[EstimateSchema]
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
