@@ -1,5 +1,4 @@
 import { postImportFilesConfirmRout } from "@/const/apiRout";
-import { revalidatePath } from "next/cache";
 
 export interface ImportVisrResponse {
   name_visr: string;
@@ -24,7 +23,7 @@ export const acceptImport = async (
     body: JSON.stringify(data),
     headers: {
       "Content-Type": "application/json",
-    },
+    }
   });
   if (!response.ok) {
     const errorImportResponse: ErrorImportResponse = await response.json();

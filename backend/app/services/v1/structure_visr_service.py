@@ -26,6 +26,6 @@ async def get_all_building_visr(
             .selectinload(EstimatedPriceModel.additional_prices),
         )
     )
-    print("stmt", stmt)
+
     result = await session.execute(stmt)
     return list(result.scalars().all())

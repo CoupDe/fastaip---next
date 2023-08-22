@@ -11,7 +11,7 @@ from .models.modelBase import ModelBase
 DB_URL = Config.DB_CONFIG
 
 # Создание асинхронного движка | echo-выводит sql запрос в терминал
-async_engine = create_async_engine(DB_URL, echo=True)
+async_engine = create_async_engine(DB_URL, echo=False)
 async_session_maker = async_sessionmaker(async_engine, expire_on_commit=False)
 
 
@@ -23,4 +23,3 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 async def create_db_and_tables():
     async with async_engine.begin() as conn:
         await conn.run_sync(ModelBase.metadata.create_all)
-

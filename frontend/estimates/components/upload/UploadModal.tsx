@@ -4,6 +4,7 @@ import {
   ImportVisrResponse,
   acceptImport,
 } from "@/lib/api/postConfirmImportVisr";
+
 import { ImportData } from "@/lib/api/postImportVisr";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { ActiveBuilding } from "@/redux/slice/buildingSlice";
@@ -11,7 +12,7 @@ import {
   setImportDataResponse,
   setImportError,
 } from "@/redux/slice/uploadSlice";
-import { Dialog, Transition } from "@headlessui/react";
+import { Dialog } from "@headlessui/react";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useRouter } from "next/navigation";
 import React, { Fragment, useState } from "react";
@@ -23,17 +24,21 @@ const UploadModal: React.FC<ImportData & { onClose: () => void }> = ({
   onClose,
 }) => {
   const [isOpen, setIsOpen] = useState(true);
+
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { id } = useAppSelector(ActiveBuilding);
 
   const handleConfirmImport = async (confirmation: boolean) => {
     try {
+
       const result = await acceptImport(tempFileId, confirmation, id!);
       if (Array.isArray(result.detail)) {
         const data = result.detail as unknown as ImportVisrResponse[];
+
+        console.log('data in modal', data)
         dispatch(setImportDataResponse(data));
-        router.prefetch(`/main/srv/${id}`);
+        router.refresh();
       }
     } catch (error: unknown) {
       if (isErrorImportResponse(error)) {
@@ -49,31 +54,15 @@ const UploadModal: React.FC<ImportData & { onClose: () => void }> = ({
 
   return (
     <>
-      <Transition show={isOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={() => {}}>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
+      {isOpen &&
+        <Dialog as="div" open={isOpen} className="relative z-10" onClose={() => { }}>
+          <>
             <div className="fixed inset-0 bg-black bg-opacity-25" />
-          </Transition.Child>
+          </>
 
           <div className="fixed inset-0 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
+              <>
                 <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
@@ -111,12 +100,12 @@ const UploadModal: React.FC<ImportData & { onClose: () => void }> = ({
                     </button>
                   </div>
                 </Dialog.Panel>
-              </Transition.Child>
+              </>
             </div>
           </div>
         </Dialog>
-      </Transition>
-    </>
+
+      }</>
   );
 };
 

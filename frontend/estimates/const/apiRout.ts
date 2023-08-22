@@ -26,3 +26,5 @@ export const postImportFilesConfirmRout = generateRoute("import/visr/");
 export const postImportFormRout = generateRoute("import/form/");
 //-------------------//-Structure_VISR-//---------//-----------------
 export const getAllBuildingsVisrRout = generateRoute("building/");
+//-------------------//-Form-data-//---------//-----------------
+export const getAllFormDataRout = generateRoute("form/");

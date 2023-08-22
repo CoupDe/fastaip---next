@@ -5,7 +5,7 @@ import {
   ReverseBuildingList,
   setBuilding,
 } from "@/redux/slice/buildingSlice";
-import { Popover, Transition } from "@headlessui/react";
+import { Popover } from "@headlessui/react";
 import HomeWorkIcon from "@mui/icons-material/HomeWork";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -13,6 +13,9 @@ import { Fragment, useState } from "react";
 import AddConstructionBtn from "./constructionBtn/AddConstructionBtn";
 import { useSelectedLayoutSegment } from "next/navigation";
 import ImportRadioBtn from "./importBtn/ImportRadioBtn";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { getAllFormData } from "@/lib/api/getAllFormData";
+
 
 const list = {
   visible: {
@@ -45,16 +48,19 @@ export default function Breadcrumbs() {
     setIsShow(false);
     dispatch(setBuilding(building));
   };
+  const test = async (building_id: string) => {
+    const result = await getAllFormData(buildingName.id!)
+    console.log('result', result)
+  }
 
   return (
     <div
-      className={`flex ${
-        segment ? "justify-between" : "justify-end"
-      } mx-3 mt-2  min-h-[39px] items-center opacity-70`}
+      className={`flex ${segment ? "justify-between" : "justify-end"
+        } mx-3 mt-2  min-h-[39px] items-center opacity-70`}
     >
       {segment === "projects" && <AddConstructionBtn />}
       {segment === "import" && <ImportRadioBtn />}
-      {segment==='form' && <p>addVisrButton</p>}
+      {segment === 'form' && <button onClick={() => test('3')}>addVisrButton</button>}
       <motion.nav
         layout="position"
         transition={{ duration: 0.7 }}
@@ -67,41 +73,31 @@ export default function Breadcrumbs() {
               onMouseEnter={() => buildingList.length && setIsShow(true)}
             />
           </Popover.Button>
-          <Transition
-            as={Fragment}
-            show={isShow}
-            enter="transition ease-out duration-200"
-            enterFrom="opacity-0 translate-y-1"
-            enterTo="opacity-100 translate-y-0"
-            leave="transition ease-in duration-150"
-            leaveFrom="opacity-100 translate-y-0"
-            leaveTo="opacity-0 translate-y-1"
-          >
-            {/* Бред */}
+          {isShow &&
+            <>
+              <div
 
-            <Popover.Panel
-              static
-              className="  absolute   -left-20 -top-2 h-20 min-w-[110px] "
-              onMouseLeave={() => setIsShow(false)}
-            >
-              <Popover.Overlay className="absolute  top-8 z-10 min-w-[150px] rounded bg-neutral-400/70 ">
-                <motion.ul initial="hidden" animate="visible" variants={list}>
-                  {buildingList.map((build) => (
-                    <motion.li
-                      variants={item}
-                      key={build.id}
-                      className="cursor-pointer px-1 hover:rounded hover:bg-slate-400"
-                      onClick={() => handleSelectBuilding(build)}
-                    >
-                      <Link href={`/main/srv/${build.id}`} className="block">
-                        {build.name}
-                      </Link>
-                    </motion.li>
-                  ))}
-                </motion.ul>
-              </Popover.Overlay>
-            </Popover.Panel>
-          </Transition>
+                className="absolute -left-20 -top-2 h-20 min-w-[110px] "
+                onMouseLeave={() => setIsShow(false)}
+              >
+                <div className="absolute  top-8 z-10 min-w-[150px] rounded bg-neutral-400/70 ">
+                  <motion.ul initial="hidden" animate="visible" variants={list}>
+                    {buildingList.map((build) => (
+                      <motion.li
+                        variants={item}
+                        key={build.id}
+                        className="cursor-pointer px-1 hover:rounded hover:bg-slate-400"
+                        onClick={() => handleSelectBuilding(build)}
+                      >
+                        <Link href={`/main/srv/${build.id}`} className="block">
+                          {build.name}
+                        </Link>
+                      </motion.li>
+                    ))}
+                  </motion.ul>
+                </div>
+              </div>
+            </>}
         </Popover>
 
         <Link
@@ -113,6 +109,6 @@ export default function Breadcrumbs() {
           {buildingName.name}
         </Link>
       </motion.nav>
-    </div>
+    </div >
   );
 }

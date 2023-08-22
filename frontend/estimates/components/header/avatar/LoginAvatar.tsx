@@ -3,12 +3,12 @@ import React, { Fragment } from "react";
 import Image from "next/image";
 import avatar from "../../../public/avatar.svg";
 import { signOut } from "next-auth/react";
-import { Menu, Transition } from "@headlessui/react";
+import { Menu } from "@headlessui/react";
 type Props = { image: string | null | undefined };
 
 function LoginAvatar({ image }: Props) {
   return (
-    <Menu as="div" className="relative inline-block text-left z-50">
+    <Menu as="div" className="relative z-50 inline-block text-left">
       <div>
         <Menu.Button className="inline-flex w-full justify-center text-sm font-semibold  ">
           <Image
@@ -21,23 +21,15 @@ function LoginAvatar({ image }: Props) {
           />
         </Menu.Button>
       </div>
-      <Transition
-        as={Fragment}
-        enter="transition ease-out duration-100"
-        enterFrom="transform opacity-0 scale-95"
-        enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
-        leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95"
-      >
+      <>
         <Menu.Items
-          className="absolute right-0 mt-2 w-36 origin-top-right rounded-md bg-neutral-400/70 overflow-hidden  shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+          className="absolute right-0 mt-2 w-36 origin-top-right overflow-hidden rounded-md bg-neutral-400/70  shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
           aria-orientation="vertical"
           aria-labelledby="menu-button"
         >
           <Menu.Item>
             <button
-              className="text-gray-700 px-2 py-2 text-xs hover:bg-slate-300 w-full text-left hover:line-through hover:cursor-not-allowed"
+              className="w-full px-2 py-2 text-left text-xs text-gray-700 hover:cursor-not-allowed hover:bg-slate-300 hover:line-through"
               disabled
               role="menuitem"
               id="menu-item-1"
@@ -47,7 +39,7 @@ function LoginAvatar({ image }: Props) {
           </Menu.Item>
           <Menu.Item>
             <button
-              className="text-gray-700 px-2 py-2 text-xs hover:bg-slate-300 w-full text-left"
+              className="w-full px-2 py-2 text-left text-xs text-gray-700 hover:bg-slate-300"
               role="menuitem"
               id="menu-item-2"
               onClick={() =>
@@ -58,7 +50,7 @@ function LoginAvatar({ image }: Props) {
             </button>
           </Menu.Item>
         </Menu.Items>
-      </Transition>
+      </>
     </Menu>
   );
 }

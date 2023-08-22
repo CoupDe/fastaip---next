@@ -356,7 +356,6 @@ class VisrImpl(AbstractVisr):
                     str(name), local_num, machine_num, self.visr_df.loc[list(estimate)]
                 )
             )
-        # print(self.estimates[0].estimated_prices[3].labors)
 
     def _data_to_db(self) -> VisrModel:
         """Преобразование данных для импорта в БД

@@ -48,7 +48,7 @@ async def create_building(
     building: building_schema.CreateBuilding, session: AsyncSession
 ) -> Building | None:
     result = await session.scalar(
-        insert(Building).values(**building.dict()).returning(Building)
+        insert(Building).values(**building.model_dump()).returning(Building)
     )
     await session.commit()
     return result

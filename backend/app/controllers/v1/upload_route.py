@@ -5,7 +5,13 @@ import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from services.v1.upload_form_service import get_form_data
+
+
+from services.v1.upload_form_service import (
+    get_form_data,
+    insert_form_data,
+    create_form,
+)
 
 
 from db.models.visr_models import VisrModel, AdditionalPriceModel
@@ -73,20 +79,30 @@ async def confirm_import(
         raise HTTPException(status_code=500, detail="Данные не обработаны")
 
 
-# Загрузка формы КС-6
+# Загрузка формы КС-6f
+
+
 @route.post(
     "/form/{building_id}",
 )
-def upload_form(files: List[UploadFile], building_id: int):
+async def upload_form(
+    files: List[UploadFile],
+    building_id: int,
+    session: AsyncSession = Depends(get_async_session),
+):
     print("In from Import")
     try:
         excel_WB = io.BytesIO(files[0].file.read())
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        df_raw_form = pd.read_excel(excel_WB, sheet_name=0)
+        df_raw_data_form = pd.read_excel(excel_WB, sheet_name=0)
     except Exception as e:
         print(f"In Export excel {e}")
 
-    df_normalized_form = get_form_data(df_raw_form)
-
-    df_normalized_form.to_excel("form.xlsx")
+    df_normalized_data_form = get_form_data(df_raw_data_form)
+    transform_data, errors_list = create_form(df_normalized_data_form)
+    # await test_insert(building_id, transform_data[1:3500], session=session)
+    try:
+        test = await insert_form_data(building_id, transform_data, session=session)
+    except Exception as e:
+        print(f"{e} ошибка при добавлении в БД")
+    df_normalized_data_form.to_excel("form.xlsx")
     return

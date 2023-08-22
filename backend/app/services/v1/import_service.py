@@ -1,7 +1,7 @@
 from fastapi import HTTPException, Response
 import pandas as pd
 from pandas import DataFrame
-from sqlalchemy import insert, select
+from sqlalchemy import select
 
 from db.models.visr_models import VisrModel, EstimateModel, EstimatedPriceModel
 from sqlalchemy.ext.asyncio import AsyncSession
