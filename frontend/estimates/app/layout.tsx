@@ -37,13 +37,11 @@ export default function RootLayout({
       lang="ru"
       className={` ${dmMono.variable} ${SSPro.variable} ${overpass.variable}`}
     >
-      <body
-        className={`flex h-screen w-screen flex-col  bg-[#fbf0e4] font-overpass dark:bg-slate-600`}
-      >
+      <body className={` bg-[#fbf0e4] font-overpass dark:bg-slate-600`}>
         <StoreProvider>
           <PersistorContext>
             <ThemeContext>
-              <main>
+              <main className="flex h-full w-full flex-col ">
                 <AuthContext>{children}</AuthContext>
               </main>
             </ThemeContext>

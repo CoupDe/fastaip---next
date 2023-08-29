@@ -1,12 +1,27 @@
-import { FormKS } from '@/lib/api/getAllFormData'
-import React from 'react'
+"use client";
+import { FormKS } from "@/lib/api/getAllFormData";
+import React, { useState } from "react";
 
-type Props = { dataForm: FormKS[] }
+import FormTableRow from "./FormTableRow";
+
+type Props = { dataForm: FormKS[] };
 
 const FormTable = (props: Props) => {
-    return (
-        <div>{props.dataForm[0].local_num}</div>
-    )
-}
+  const [selectedId, setSelectedId] = React.useState<string | null>(null);
 
-export default FormTable
+  return (
+    <>
+      {props.dataForm.map((row) => (
+        <FormTableRow
+          key={row.visr_identifier}
+          row={row}
+          setSelectedId={setSelectedId}
+          selectedId={selectedId}
+          isBlocked={!!selectedId}
+        />
+      ))}
+    </>
+  );
+};
+
+export default FormTable;

@@ -12,5 +12,5 @@ async def get_all_data(
     stmt = select(FormKS).where(FormKS.building_id == bulding_id)
     result = await session.scalars(stmt)
     formks_list = list(result.all())
-    print(formks_list[:10])
+    print(len(formks_list))
     return formks_list

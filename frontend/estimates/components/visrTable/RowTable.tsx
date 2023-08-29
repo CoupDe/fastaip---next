@@ -1,13 +1,12 @@
 import {
-  Visr,
   EstimateVisr,
-  CommonPriceVisr,
   RowData,
+  Visr
 } from "@/const/interfaces";
-import React, { useState } from "react";
-import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { checkNumberofPercent } from "@/lib/util/service";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import React, { useState } from "react";
 type RowProps = {
   visrData: Visr | EstimateVisr;
   depth: number;

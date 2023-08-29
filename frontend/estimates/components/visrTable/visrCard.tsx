@@ -17,7 +17,7 @@ import {
 import { convertToDataRow } from "@/lib/util/service";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { getAllVisrs, setVisr } from "@/redux/slice/structureVisrData";
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import RowTable from "./RowTable";
 import TheadTable from "./TheadTable";
 
@@ -125,7 +125,7 @@ function createTable(
           key={dt.id}
           depth={depth}
           dataRow={dtRow}
-          // children={children}
+        // children={children}
         />
       );
     }
@@ -145,7 +145,7 @@ function createTable(
           key={dt.id}
           depth={depth}
           dataRow={dtRow}
-          // children={children}
+        // children={children}
         />
       );
     }
@@ -154,11 +154,14 @@ function createTable(
 }
 const VisrCard: FC<VisrProp> = ({ visrs }) => {
   const dispatch = useAppDispatch();
-  dispatch(setVisr(visrs));
-  const data = useAppSelector(getAllVisrs);
 
+
+  useEffect(() => {
+    dispatch(setVisr(visrs));
+  }, [dispatch, visrs]);
+  const data = useAppSelector(getAllVisrs);
   return (
-    <div className=" w-full">
+    <div className="w-full">
       <div className="w-full overflow-auto">
         <table className="table w-full border-separate space-y-6 text-sm text-gray-400">
           <TheadTable />

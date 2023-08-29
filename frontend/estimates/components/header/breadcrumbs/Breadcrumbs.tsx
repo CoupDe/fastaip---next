@@ -16,7 +16,6 @@ import ImportRadioBtn from "./importBtn/ImportRadioBtn";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { getAllFormData } from "@/lib/api/getAllFormData";
 
-
 const list = {
   visible: {
     opacity: 1,
@@ -49,18 +48,21 @@ export default function Breadcrumbs() {
     dispatch(setBuilding(building));
   };
   const test = async (building_id: string) => {
-    const result = await getAllFormData(buildingName.id!)
-    console.log('result', result)
-  }
+    const result = await getAllFormData(buildingName.id!);
+    console.log("result", result);
+  };
 
   return (
     <div
-      className={`flex ${segment ? "justify-between" : "justify-end"
-        } mx-3 mt-2  min-h-[39px] items-center opacity-70`}
+      className={`flex ${
+        segment ? "justify-between" : "justify-end"
+      } mx-3 mt-2  min-h-[39px] items-center opacity-70`}
     >
       {segment === "projects" && <AddConstructionBtn />}
       {segment === "import" && <ImportRadioBtn />}
-      {segment === 'form' && <button onClick={() => test('3')}>addVisrButton</button>}
+      {segment === "form" && (
+        <button onClick={() => test("3")}>addVisrButton</button>
+      )}
       <motion.nav
         layout="position"
         transition={{ duration: 0.7 }}
@@ -73,14 +75,13 @@ export default function Breadcrumbs() {
               onMouseEnter={() => buildingList.length && setIsShow(true)}
             />
           </Popover.Button>
-          {isShow &&
+          {isShow && (
             <>
               <div
-
-                className="absolute -left-20 -top-2 h-20 min-w-[110px] "
+                className="absolute z-20 -left-20 -top-2 h-20 min-w-[110px] "
                 onMouseLeave={() => setIsShow(false)}
               >
-                <div className="absolute  top-8 z-10 min-w-[150px] rounded bg-neutral-400/70 ">
+                <div className="absolute  top-8 z-20 min-w-[150px] rounded bg-neutral-400/70 ">
                   <motion.ul initial="hidden" animate="visible" variants={list}>
                     {buildingList.map((build) => (
                       <motion.li
@@ -97,7 +98,8 @@ export default function Breadcrumbs() {
                   </motion.ul>
                 </div>
               </div>
-            </>}
+            </>
+          )}
         </Popover>
 
         <Link
@@ -109,6 +111,6 @@ export default function Breadcrumbs() {
           {buildingName.name}
         </Link>
       </motion.nav>
-    </div >
+    </div>
   );
 }

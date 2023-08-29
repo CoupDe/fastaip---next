@@ -16,4 +16,5 @@ async def get_all_formData(
     building_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     result = await get_all_data(building_id, session)
-    return result[:50]
+    print(len(result))
+    return result[:100]
