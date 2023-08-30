@@ -1,8 +1,4 @@
-import {
-  EstimateVisr,
-  RowData,
-  Visr
-} from "@/const/interfaces";
+import { EstimateVisr, RowData, Visr } from "@/const/interfaces";
 import { checkNumberofPercent } from "@/lib/util/service";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
@@ -80,42 +76,17 @@ const RowTable: React.FC<TableData> = ({ dataRow, depth, children }) => {
           </div>
         </td>
         <td className="p-1 text-xs">{dataRow.code}</td>
-        <td className="p-1 text-xs font-bold ">{dataRow.name}</td>
+        <td className="p-1 text-xs font-semibold ">{dataRow.name}</td>
         <td className="text-xs" align="center">
           <span className=" text-xs "> {dataRow.unit}</span>
         </td>
         <td className="p-1 " align="center">
-          <i className="material-icons-outlined cursor-pointer">
-            {dataRow.quantity}
-          </i>
+          {dataRow.quantity}
         </td>
         <td className="p-1" align="center">
           {dataRow.unit_cost?.toLocaleString("ru-RU")}
         </td>
-        <td
-          className="p-1 "
-          align="center"
-          onDoubleClick={(e) => {
-            setIsEditing(true);
-          }}
-        >
-          {isEditing && depth === 2 ? (
-            <input
-              ref={inputRef}
-              autoFocus
-              className="w-14 bg-slate-600 px-1 border-none"
-              placeholder="%"
-              type="text"
-              max="4"
-              value={percentField === null ? "" : percentField}
-              onBlur={() => handleBlur()}
-              onChange={handleTotalCostChange}
-              onKeyDown={(e) => handleKeyPress(e)}
-            />
-          ) : (
-            <>{percentField ? percentField + " %" : null}</>
-          )}
-        </td>
+
         <td className="p-1 " align="center">
           {dataRow.total_cost?.toLocaleString("ru-RU")}
         </td>

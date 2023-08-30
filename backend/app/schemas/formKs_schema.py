@@ -6,6 +6,7 @@ from pydantic import (
     computed_field,
     ConfigDict,
     TypeAdapter,
+    field_validator,
 )
 
 from typing_extensions import Annotated, Any
@@ -45,6 +46,24 @@ class FormKS(BaseModel):
     quantity: float | None
     unit_cost: float | None
     total_cost: float | None
+
+    @field_validator("unit")
+    @classmethod
+    def remove_space(cls, val: str) -> str | None:
+        return val.replace(" ", "") if val else val
+
+    @field_validator("unit_cost", "quantity", "total_cost")
+    @classmethod
+    def remove_zero(cls, num: float) -> float | None:
+        """Убрать нули
+
+        Args:
+            num (float | None): _description_
+
+        Returns:
+            float | None: _description_
+        """
+        return num if num and num != 0 else None
 
     @computed_field
     def chapter(self) -> int | None:

@@ -41,9 +41,9 @@ export default function RootLayout({
         <StoreProvider>
           <PersistorContext>
             <ThemeContext>
-              <main className="flex h-full w-full flex-col ">
+              <div className="flex h-full w-full flex-col ">
                 <AuthContext>{children}</AuthContext>
-              </main>
+              </div>
             </ThemeContext>
           </PersistorContext>
         </StoreProvider>

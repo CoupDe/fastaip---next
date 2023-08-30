@@ -5,7 +5,7 @@ from numpy import NaN
 from pandas import DataFrame
 from pydantic import ValidationError
 import numpy as np
-from sqlalchemy import insert, select
+
 from db.models.form_ks_model import FormKS
 from schemas import formKs_schema
 from sqlalchemy.dialects import postgresql
@@ -15,13 +15,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 # Удаляет все строки где в колнке 'позиции по Виду и стоимости работ' пусто, так как не привяжется ВИСР
 
 
-fillNa_values = {
-    "type_work": "",
-    "unit": "",
-    "quantity": np.nan,
-    "unit_cost": np.NaN,
-    "total_cost": np.NaN,
-}
 
 
 def get_form_data(df_excel: DataFrame) -> DataFrame:
@@ -82,18 +75,6 @@ def create_form(
     return (created_objects, validation_errors)
 
 
-def transaction_range(max: int):
-    ss = 0
-
-    def inner() -> slice:
-        nonlocal ss
-        res = slice(ss, ss + 1000)
-        ss += 1000
-        return res
-
-    return inner
-
-
 def chunks(formKs, chunk_size=1000):
     """Генератор чанков для данных из FormKs."""
     for i in range(0, len(formKs), chunk_size):
@@ -125,6 +106,6 @@ async def insert_form_data(
             await session.execute(stmt)
             await session.commit()
 
-    # !!! При проверка существующиз данных игнорируются столбцы с NULL т.к. NULL != NULL так и не решил эту пролему
+    # !!! При проверке существующих данных игнорируются столбцы с NULL т.к. NULL != NULL так и не решил эту пролему
 
     return len(data_to_db)

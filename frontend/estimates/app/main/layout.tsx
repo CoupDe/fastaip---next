@@ -16,9 +16,9 @@ export default function MainLayout({
       {/* @ts-expect-error Async Server Component */}
       <Header />
       <Breadcrumbs />
-      <section className={`mt-3 font-dmMono`}>
+      <main className={`mt-3 font-dmMono`}>
         {children}
-      </section>
+      </main>
     </>
   );
 }

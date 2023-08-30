@@ -17,7 +17,7 @@ export interface FormKS {
 }
 
 export async function getAllFormData(building_id: string): Promise<FormKS[]> {
-  await new Promise((res, rej) => setTimeout(res, 2000));
+  await new Promise((res, rej) => setTimeout(res, 12000));
   const result = await fetch(getAllFormDataRout(building_id), {
     cache: "no-store",
   });

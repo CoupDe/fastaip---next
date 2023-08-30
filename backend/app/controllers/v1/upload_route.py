@@ -79,7 +79,7 @@ async def confirm_import(
         raise HTTPException(status_code=500, detail="Данные не обработаны")
 
 
-# Загрузка формы КС-6f
+# Загрузка формы КС-6
 
 
 @route.post(
