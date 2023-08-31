@@ -5,6 +5,7 @@ import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
+from services.v1.excel_visr_stats_service import ExcelAnalyzer
 
 
 from services.v1.upload_form_service import (
@@ -25,11 +26,15 @@ route = APIRouter(prefix="/v1/import", tags=["import"])
 
 @route.post("/visr/{building_id}", response_model=ImportDataInfo)
 async def upload_estimate(files: List[UploadFile], building_id: int) -> ImportDataInfo:
-    excel_WB = io.BytesIO(files[0].file.read())
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    df_excel = pd.read_excel(excel_WB, sheet_name=None, header=None)
+    # Реализовано пока на одном файле
+    excel_WB = io.BytesIO(files[0].file.read())  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    df_excel = pd.read_excel(
+        excel_WB, index_col=None, sheet_name=None, header=None
+    )  # Чтение файла excel Потом обернуть Try/Except
+    df_excel_stats = ExcelAnalyzer(df_excel)
+    print(df_excel_stats)
+   
     evr_path = create_dir(building_id)
-
     temp_df_path = prepare_to_upload(df_excel, evr_path)
     response = {
         "filesInfo": [(files[0].filename, len(df_excel))],

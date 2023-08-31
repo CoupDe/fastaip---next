@@ -28,6 +28,7 @@ def create_dir(building_id: int) -> str:
     каталога в рамках одной минуты
 
     """
+  
     upload_dir = os.path.dirname(os.getcwd()) + "/upload_files"
     relative_path = os.path.relpath(upload_dir)
     today = datetime.date(datetime.today()).strftime("%d-%m-%Y")
