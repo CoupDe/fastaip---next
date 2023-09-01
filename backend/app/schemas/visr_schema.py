@@ -377,7 +377,7 @@ class VisrImpl(AbstractVisr):
 
 # post Model route.post("/{building_id}", response_model=ImportDataInfo)
 class ImportDataInfo(BaseModel):
-    """aaaa
+    """
 
     Args:
         BaseModel (_type_): _description_

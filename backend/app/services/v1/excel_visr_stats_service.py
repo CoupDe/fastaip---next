@@ -9,9 +9,9 @@ class StatsData(BaseModel):
 
     def __str__(self) -> str:
         return (
-            f"Пустых листов {self.empty_dfs_count}:"
-            f"ВСИР-ов с идентификатором {self.visr_df_id}"
-            f"ВСИР-ов без идентификатора {self.visr_non_id}"
+            f"Пустых листов: {self.empty_dfs_count}\n"
+            f"ВИСР-ов с идентификатором: {self.visr_df_id}\n"
+            f"ВИСР-ов без идентификатора: {self.visr_non_id}"
         )
 
 
@@ -37,6 +37,7 @@ class ExcelAnalyzer:
         """
         result = {k: v for (k, v) in data.items() if not v.empty}
         empty_count = len(data) - len(result)
+
         return result, empty_count
 
     def _search_id_visr(self) -> tuple[dict[str, DataFrame], dict[str, DataFrame]]:
@@ -51,7 +52,17 @@ class ExcelAnalyzer:
                 visr_without_id |= {sheets_name: df}
         return visr_with_id, visr_without_id
 
+    def set_header(self):
+        ss = list(self.visr_df_id.keys())
+
+        print(self.visr_df_id[ss[0]])
+
     def get_stats(self) -> StatsData:
+        """Предоставляет статистику по импорту
+
+        Returns:
+            StatsData: _description_
+        """
         data = StatsData(
             empty_dfs_count=self.empty_dfs_count,
             visr_df_id=len(self.visr_df_id),
