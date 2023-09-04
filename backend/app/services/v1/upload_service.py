@@ -23,10 +23,13 @@ class TempFileManager:
     ВИСР и в случае отсутсвия, файл без кодировки ВИСР
     """
 
-    temp_folder: list[str] = []
+    temp_base_folder: str | None = None
+
+    def __init__(self) -> None:
+        pass
 
     @staticmethod
-    def create_dir(building_id: int) -> str:
+    def create_dir(building_id: int):
         """
         :param building_id: id объекта строительства для создания директории
         с указанием id объекта
@@ -47,7 +50,7 @@ class TempFileManager:
 
         if not os.path.exists(full_path):
             os.makedirs(full_path)
-            return full_path
+            evr_path = full_path
         else:
             counter: int = 1
             evr_path = full_path + f"#{counter}"
@@ -55,7 +58,10 @@ class TempFileManager:
                 counter += 1
                 evr_path = full_path + f"#{counter}"
             os.makedirs(evr_path)
-        return evr_path
+        TempFileManager.temp_base_folder = evr_path
+
+    def save_temp_file(self):
+        pass
 
 
 def prepare_to_upload(excel_wb: DataFrame, path: str) -> str:

@@ -7,4 +7,5 @@ VISRCOLNAMES = [
     "quantity",
     "unit_cost",
     "total_cost",
+    "temp",
 ]

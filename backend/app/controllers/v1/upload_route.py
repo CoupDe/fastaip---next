@@ -7,7 +7,6 @@ from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, sta
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from services.v1.upload_service import TempFileManager
-from const.pandas_const import SKIPROWS, VISRCOLNAMES
 from services.v1.excel_visr_stats_service import ExcelAnalyzer
 
 
@@ -16,43 +15,35 @@ from services.v1.upload_form_service import (
     insert_form_data,
     create_form,
 )
-
-
-from db.models.visr_models import VisrModel, AdditionalPriceModel
 from services.v1.import_service import create_visr_obj, check_visr_BD, create_visr
 from db.base import get_async_session
 from schemas.visr_schema import ConfirmImport, ImportDataInfo, VisrBaseSchema
-from services.v1.upload_service import check_file,  prepare_to_upload
+from services.v1.upload_service import check_file, prepare_to_upload
 
 route = APIRouter(prefix="/v1/import", tags=["import"])
 
 
-@route.post("/visr/{building_id}", response_model=ImportDataInfo)
-async def upload_estimate(files: List[UploadFile], building_id: int) -> ImportDataInfo:
+@route.post("/visr/{building_id}", response_model=ImportDataInfo | dict[str, str])
+async def upload_estimate(files: list[UploadFile], building_id: int) -> ImportDataInfo:
     # Реализовано пока на одном файле
     excel_WB = io.BytesIO(files[0].file.read())  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    df_excel = pd.read_excel(
-        excel_WB,
-        sheet_name=None,
-        header=None,
-        skiprows=lambda x: x in SKIPROWS,
-        thousands=" ",
-        decimal=",",
-        names=VISRCOLNAMES,
-    )  # Чтение файла excel Потом обернуть Try/Except
     try:
-        df_excel_stats = ExcelAnalyzer(df_excel)
+        df_excel_stats = ExcelAnalyzer(excel_WB)
     except Exception as Err:
         print("eeeeeeeeeeee", Err)
-    evr_path = TempFileManager.create_dir(building_id)
-    print(evr_path)
-    temp_df_path = prepare_to_upload(df_excel, evr_path)
-    response = {
-        "filesInfo": [(files[0].filename, len(df_excel))],
-        "detail": f"обработано {len(df_excel)} ЕВР",
-        "tempFileId": temp_df_path,
-        "confirmation": False,
-    }
+    TempFileManager.create_dir(building_id)
+    if df_excel_stats.isNotEmpty:
+        ss = df_excel_stats.pre_save_processing_data()
+    else:
+        response = {"detail": "Данные не определены"}
+    # print(TempFileManager.temp_base_folder)
+    # temp_df_path = prepare_to_upload(df_excel, evr_path)
+    # response = {
+    #     "filesInfo": [(files[0].filename, len(df_excel))],
+    #     "detail": f"обработано {len(df_excel)} ЕВР",
+    #     "tempFileId": temp_df_path,
+    #     "confirmation": False,
+    # }
     # Возвращает header с содержанием пути к временному файлу
 
     # response.headers['X-Temp-Path'] = temp_df_path
