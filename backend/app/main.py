@@ -8,10 +8,10 @@ from db.base import create_db_and_tables
 from controllers.v1 import (
     building_route,
     structure_route,
-    upload_route,
     visr_route,
     formks_route,
 )
+from microservice.upload_visr import upload_route
 from db.base import get_async_session
 from schemas.userTest_schema import GetUser, User
 

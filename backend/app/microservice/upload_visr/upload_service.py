@@ -2,34 +2,33 @@ import os
 import shutil
 import tempfile
 from datetime import datetime
-from io import BytesIO
-from typing import Any, Optional
+from typing import Any
 from fastapi import HTTPException
-
 from pandas import DataFrame
 import pandas as pd
-from db.models.visr_models import VisrModel
-from schemas.visr_schema import VisrImpl
+from pydantic import BaseModel, ConfigDict
+from .prepare_visr_data_service import PreparingVisr
 
-from schemas.upload_schema import PreparingVisr
-from services.v1.import_service import create_visr_obj
 
 # список созданных каталогов
 temp_folder = []
 
 
-class TempFileManager:
+class TempFileManager(BaseModel):
     """Класс для создания временного каталога для файлами с кодировкой
     ВИСР и в случае отсутсвия, файл без кодировки ВИСР
     """
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    building_id: int
     temp_base_folder: str | None = None
+    processed_data_with_id: list[DataFrame]
+    processed_data_non_id: list[DataFrame]
+    path_to_visr_id: str | None = None
+    path_to_visr_non_id: str | None = None
 
-    def __init__(self) -> None:
-        pass
-
-    @staticmethod
-    def create_dir(building_id: int):
+    def create_dir(self) -> None:
         """
         :param building_id: id объекта строительства для создания директории
         с указанием id объекта
@@ -45,7 +44,7 @@ class TempFileManager:
         today = datetime.date(datetime.today()).strftime("%d-%m-%Y")
         current_time = datetime.now().strftime("%H_%M")
         full_path = os.path.join(
-            relative_path, today, str(building_id), f"{current_time}"
+            relative_path, today, str(self.building_id), f"{current_time}"
         )
 
         if not os.path.exists(full_path):
@@ -58,10 +57,31 @@ class TempFileManager:
                 counter += 1
                 evr_path = full_path + f"#{counter}"
             os.makedirs(evr_path)
-        TempFileManager.temp_base_folder = evr_path
+        self.temp_base_folder = evr_path
 
-    def save_temp_file(self):
-        pass
+    def save_temp_file(self, id: bool) -> str:
+        file_name = "_id.csv" if id else "_no_id.csv"
+        data_to_write = (
+            self.processed_data_with_id if id else self.processed_data_non_id
+        )
+        with tempfile.NamedTemporaryFile(
+            suffix=file_name, delete=False, dir=self.temp_base_folder
+        ) as temp_file:
+            # Сохранение списка DataFrame в файл CSV
+            for df in data_to_write:
+                df.to_csv(temp_file, mode="a", index=False)
+        return os.path.basename(temp_file.name)
+
+    def create_temp_file(self):
+        """Создание временного файла и присвоение пути к веременному файлу с ид и без"""
+        if self.processed_data_with_id:
+            temp_file_name = self.save_temp_file(id=True)
+            self.path_to_visr_id = os.path.join(self.temp_base_folder, temp_file_name)
+        if self.processed_data_with_id:
+            temp_file_name = self.save_temp_file(id=False)
+            self.path_to_visr_non_id = os.path.join(
+                self.temp_base_folder, temp_file_name
+            )
 
 
 def prepare_to_upload(excel_wb: DataFrame, path: str) -> str:

@@ -1,13 +1,11 @@
 import io
 from typing import List, Optional
-import numpy as np
-
 import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from services.v1.upload_service import TempFileManager
-from services.v1.excel_visr_stats_service import ExcelAnalyzer
+from .upload_service import TempFileManager
+from .excel_visr_stats_service import ExcelAnalyzer
 
 
 from services.v1.upload_form_service import (
@@ -18,7 +16,7 @@ from services.v1.upload_form_service import (
 from services.v1.import_service import create_visr_obj, check_visr_BD, create_visr
 from db.base import get_async_session
 from schemas.visr_schema import ConfirmImport, ImportDataInfo, VisrBaseSchema
-from services.v1.upload_service import check_file, prepare_to_upload
+
 
 route = APIRouter(prefix="/v1/import", tags=["import"])
 
@@ -28,14 +26,25 @@ async def upload_estimate(files: list[UploadFile], building_id: int) -> ImportDa
     # Реализовано пока на одном файле
     excel_WB = io.BytesIO(files[0].file.read())  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     try:
-        df_excel_stats = ExcelAnalyzer(excel_WB)
-    except Exception as Err:
-        print("eeeeeeeeeeee", Err)
-    TempFileManager.create_dir(building_id)
-    if df_excel_stats.isNotEmpty:
-        ss = df_excel_stats.pre_save_processing_data()
-    else:
-        response = {"detail": "Данные не определены"}
+        df_visr = ExcelAnalyzer(excel_WB)
+        if df_visr.isNotEmpty:
+            df_visr.pre_save_processing_data()
+            file_manager = TempFileManager(
+                building_id=building_id,
+                processed_data_with_id=df_visr.processed_data_with_id,
+                processed_data_non_id=df_visr.processed_data_non_id,
+            )
+            file_manager.create_dir()
+            file_manager.create_temp_file()
+            response = {"detail": file_manager.path_to_visr_id}
+            print("file_manager.path_to_visr_id", file_manager.path_to_visr_id)
+            print("file_manager.path_to_visr_non_id", file_manager.path_to_visr_non_id)
+        else:
+            response = {"detail": "Данных для обработки не выявлено"}
+    except Exception as err:
+        print(err)
+        raise HTTPException(status_code=500, detail=f"Возникла ошибка: {err}")
+
     # print(TempFileManager.temp_base_folder)
     # temp_df_path = prepare_to_upload(df_excel, evr_path)
     # response = {

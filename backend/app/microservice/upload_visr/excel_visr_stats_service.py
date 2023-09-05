@@ -2,7 +2,7 @@ from io import BytesIO
 from pandas import DataFrame
 import pandas as pd
 from pydantic import BaseModel
-from schemas.upload_schema import PreparingVisr
+from .prepare_visr_data_service import PreparingVisr
 from const.pandas_const import SKIPROWS, VISRCOLNAMES
 
 
@@ -99,18 +99,15 @@ class ExcelAnalyzer:
         return data
 
     def pre_save_processing_data(self) -> None:
-        print("in preSave")
-
+        """Обрабатывает данные с ид и без, возвращает список df с указанием
+          меток признаков ВИСР для дальнейшей обработки"""
         if self.visr_df_id:
             for visr in self.visr_df_id:
                 for visr_id, df in visr.items():
                     self.processed_data_with_id.append(
                         PreparingVisr(df, visr_id).get_process_visr()
                     )  # Можно сделать статическим методом?
-
-        # if self.visr_non_id:
-        #     test = PreparingVisr(self.visr_non_id)
-        else:
-            return {"detail": "Отсутсвуют "}
-
-        print(self.processed_data_with_id[0].loc[0:3, "code"])
+        if self.visr_non_id:
+            self.processed_data_non_id = [
+                PreparingVisr(df).get_process_visr() for df in self.visr_non_id
+            ]  # Можно сделать статическим методом
