@@ -4,6 +4,8 @@ import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from .upload_visr_schema import  UploadFileResponse
 from .upload_service import TempFileManager
 from .excel_visr_stats_service import ExcelAnalyzer
 
@@ -15,19 +17,35 @@ from services.v1.upload_form_service import (
 )
 from services.v1.import_service import create_visr_obj, check_visr_BD, create_visr
 from db.base import get_async_session
-from schemas.visr_schema import ConfirmImport, ImportDataInfo, VisrBaseSchema
+from schemas.visr_schema import ConfirmImport, VisrBaseSchema
 
 
 route = APIRouter(prefix="/v1/import", tags=["import"])
 
 
-@route.post("/visr/{building_id}", response_model=ImportDataInfo | dict[str, str])
-async def upload_estimate(files: list[UploadFile], building_id: int) -> ImportDataInfo:
+@route.post("/visr/{building_id}", response_model=UploadFileResponse )
+async def upload_estimate(
+    files: list[UploadFile], building_id: int
+) -> UploadFileResponse:
+    """Получения файлов в виде Excel с вложенными листами с содержанием ВИСР-ов
+
+    Args:
+        files (list[UploadFile]): *.xlsx
+        building_id (int): Код стройки
+
+    Raises:
+        HTTPException: Файлы обработанны но пустые
+        HTTPException: _description_
+
+    Returns:
+        UploadFileResponse: _description_
+    """
     # Реализовано пока на одном файле
+
     excel_WB = io.BytesIO(files[0].file.read())  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     try:
-        df_visr = ExcelAnalyzer(excel_WB)
-        if df_visr.isNotEmpty:
+        df_visr = ExcelAnalyzer(excel_WB) 
+        if df_visr.isNotEmpty: # Проверка найдены ли листы с ВИСР
             df_visr.pre_save_processing_data()
             file_manager = TempFileManager(
                 building_id=building_id,
@@ -35,29 +53,19 @@ async def upload_estimate(files: list[UploadFile], building_id: int) -> ImportDa
                 processed_data_non_id=df_visr.processed_data_non_id,
             )
             file_manager.create_dir()
-            file_manager.create_temp_file()
-            response = {"detail": file_manager.path_to_visr_id}
-            print("file_manager.path_to_visr_id", file_manager.path_to_visr_id)
-            print("file_manager.path_to_visr_non_id", file_manager.path_to_visr_non_id)
+            await file_manager.create_temp_file()
+            return UploadFileResponse(
+                **file_manager.model_dump(),
+                stats=df_visr.get_stats(),
+            )
+
         else:
-            response = {"detail": "Данных для обработки не выявлено"}
+            raise HTTPException(
+                status_code=400, detail="Данных для обработки не выявлено"
+            )
     except Exception as err:
-        print(err)
         raise HTTPException(status_code=500, detail=f"Возникла ошибка: {err}")
 
-    # print(TempFileManager.temp_base_folder)
-    # temp_df_path = prepare_to_upload(df_excel, evr_path)
-    # response = {
-    #     "filesInfo": [(files[0].filename, len(df_excel))],
-    #     "detail": f"обработано {len(df_excel)} ЕВР",
-    #     "tempFileId": temp_df_path,
-    #     "confirmation": False,
-    # }
-    # Возвращает header с содержанием пути к временному файлу
-
-    # response.headers['X-Temp-Path'] = temp_df_path
-
-    return response
 
 
 @route.post(

@@ -2,21 +2,13 @@ from io import BytesIO
 from pandas import DataFrame
 import pandas as pd
 from pydantic import BaseModel
+
+from .upload_visr_schema import StatsData
 from .prepare_visr_data_service import PreparingVisr
 from const.pandas_const import SKIPROWS, VISRCOLNAMES
 
 
-class StatsData(BaseModel):
-    empty_dfs_count: int
-    visr_df_id: int
-    visr_non_id: int
 
-    def __str__(self) -> str:
-        return (
-            f"Пустых листов: {self.empty_dfs_count}\n"
-            f"ВИСР-ов с идентификатором: {self.visr_df_id}\n"
-            f"ВИСР-ов без идентификатора: {self.visr_non_id}"
-        )
 
 
 class ExcelAnalyzer:
@@ -100,7 +92,7 @@ class ExcelAnalyzer:
 
     def pre_save_processing_data(self) -> None:
         """Обрабатывает данные с ид и без, возвращает список df с указанием
-          меток признаков ВИСР для дальнейшей обработки"""
+        меток признаков ВИСР для дальнейшей обработки"""
         if self.visr_df_id:
             for visr in self.visr_df_id:
                 for visr_id, df in visr.items():

@@ -6,7 +6,12 @@ from typing import Any
 from fastapi import HTTPException
 from pandas import DataFrame
 import pandas as pd
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, computed_field
+from db_redis.redis_connection import RedisKeyGenerator
+
+from db_redis.redis_connection import redis_connect
+
+
 from .prepare_visr_data_service import PreparingVisr
 
 
@@ -27,6 +32,10 @@ class TempFileManager(BaseModel):
     processed_data_non_id: list[DataFrame]
     path_to_visr_id: str | None = None
     path_to_visr_non_id: str | None = None
+
+    @computed_field
+    def redis_key(self) -> bytes:  # converted to a `property` by `computed_field`
+        return RedisKeyGenerator.path_generator(self.building_id, self.temp_base_folder)
 
     def create_dir(self) -> None:
         """
@@ -72,7 +81,14 @@ class TempFileManager(BaseModel):
                 df.to_csv(temp_file, mode="a", index=False)
         return os.path.basename(temp_file.name)
 
-    def create_temp_file(self):
+    async def save_to_redis(self):
+        fields = {
+            "path_to_visr_id": self.path_to_visr_id,
+            "path_to_visr_non_id": self.path_to_visr_non_id,
+        }
+        await redis_connect.hset(self.redis_key, {**self.path_to_visr_id,**self.path_to_visr_non_id})
+
+    async def create_temp_file(self):
         """Создание временного файла и присвоение пути к веременному файлу с ид и без"""
         if self.processed_data_with_id:
             temp_file_name = self.save_temp_file(id=True)
@@ -82,6 +98,12 @@ class TempFileManager(BaseModel):
             self.path_to_visr_non_id = os.path.join(
                 self.temp_base_folder, temp_file_name
             )
+        # В Redis лучше слычайные ключи реализоаывать в формате SHA1, в иделае ключ
+        # должен отражать привязку к клиенту или к стройке и т.д.
+
+        await self.save_to_redis()
+        ss = await redis_connect.hget(self.redis_key)
+        print(ss)
 
 
 def prepare_to_upload(excel_wb: DataFrame, path: str) -> str:
