@@ -2,7 +2,7 @@
 *.xlsx
 *.pyc
 C:\Users\Вадим\Desktop\VSCProject\STNG\backend\app\alembic\versions\*.py
-
+backend/app/config.py
 backend/app/alembic/*
 
 backend/app/alembic/versions/00ec545a23c4_rev.py

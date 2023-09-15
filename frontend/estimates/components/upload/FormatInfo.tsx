@@ -49,6 +49,7 @@ const FormatInfo: React.FC<PropsFormat> = ({
         console.log("importType", importType);
         switch (importType) {
           case "ВИСР":
+            
             try {
               const resultVisr = await postVisrFiles(okFormat, id);
               console.log("in ВИСР", resultVisr);

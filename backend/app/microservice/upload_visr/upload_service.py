@@ -1,13 +1,17 @@
 from asyncio import sleep
+import asyncio
 import os
 import shutil
 import tempfile
 from datetime import datetime
 from typing import Any
+import aiofiles
+import aiofiles.os
 from fastapi import HTTPException
 from pandas import DataFrame
 import pandas as pd
 from pydantic import BaseModel, ConfigDict, computed_field
+import redis
 from db_redis.redis_connection import RedisKeyGenerator
 
 from db_redis.redis_connection import redis_connect
@@ -33,10 +37,15 @@ class TempFileManager(BaseModel):
     processed_data_non_id: list[DataFrame]
     path_to_visr_id: str | None = None
     path_to_visr_non_id: str | None = None
+    redis_key_id: str | None = None
+    redis_key_non_id: str | None = None
+    temp_file_name: str | None = None
+    temp_file_name_id: str | None = None
+    temp_file_name_non_id: str | None = None
 
     @computed_field
-    def redis_key(self) -> bytes:
-        return RedisKeyGenerator.path_generator(self.building_id, self.temp_base_folder)
+    def redis_key(self) -> str:
+        return RedisKeyGenerator.path_generator(self.building_id, self.temp_file_name)
 
     def create_dir(self) -> None:
         """
@@ -70,7 +79,16 @@ class TempFileManager(BaseModel):
         self.temp_base_folder = evr_path
 
     def save_temp_file(self, id: bool) -> str:
-        file_name = "_id.csv" if id else "_no_id.csv"
+        """Проверяет есть ли данные с ID или без и сохраняет во временные каталоги
+
+        Args:
+            id (bool): _description_
+
+        Returns:
+            str: путь к временному файлу
+        """
+        file_name = "_id.csv" if id else "_non_id.csv"
+        attribute_name = "redis_key_id" if id else "redis_key_non_id"
         data_to_write = (
             self.processed_data_with_id if id else self.processed_data_non_id
         )
@@ -80,9 +98,42 @@ class TempFileManager(BaseModel):
             # Сохранение списка DataFrame в файл CSV
             for df in data_to_write:
                 df.to_csv(temp_file, mode="a", index=False)
+                self.temp_file_name = os.path.basename(temp_file.name)
+        setattr(self, attribute_name, self.redis_key)  # формирует ключи для записи
         return os.path.basename(temp_file.name)
 
-    async def save_to_redis(self) -> list[str]:
+    ##################################
+    #!!!!!!!!!!!В случае обработки файла, оставить его в каталоге
+    async def key_expire_listner(self, channel: redis.client.PubSub):
+        # Существует ли каталог
+        if await aiofiles.os.path.exists(self.temp_base_folder):
+            temp_files = await aiofiles.os.listdir(self.temp_base_folder)
+            await asyncio.sleep(10)
+            # Есть ли файлы в каталоге
+            if len(temp_files) > 0:
+                # пока не очистится список от вложенных файлов в базовый каталог
+                while temp_files:
+                    # Получение сообщений от издателя
+                    message = await channel.get_message(ignore_subscribe_messages=True)
+                    # Проверка сообщения на окончание TTL ключа
+                    if message is not None and message["data"].decode() == "expired":
+                        deleted_key: str = message["channel"].decode()
+                        for file in temp_files:
+                            if file in deleted_key:
+                                full_path = os.path.join(self.temp_base_folder, file)
+                                if await aiofiles.os.path.exists(full_path):
+                                    await aiofiles.os.remove(full_path)
+                                    temp_files.remove(file)
+                # Удаление каталога после удаления вложенных файлов
+                await aiofiles.os.rmdir(self.temp_base_folder)
+            elif self.temp_base_folder is not None:
+                await aiofiles.os.rmdir(self.temp_base_folder)
+                return
+            else:
+                return
+
+    ##################################
+    async def save_to_redis(self) -> list[str | None]:
         """Создает ключи с для Redis с меткой о типе ВИСР с id или без
 
         Returns:
@@ -90,41 +141,47 @@ class TempFileManager(BaseModel):
         """
         redis_path_key = []
         if self.path_to_visr_id:
-            _key = f"{self.redis_key}#id"
-            await redis_connect.set(_key, self.path_to_visr_id, ex=15)
-
-            redis_path_key.append(_key)
+            await redis_connect.set(self.redis_key_id, self.path_to_visr_id, ex=15)
+            redis_path_key.append(self.redis_key_id)
         if self.path_to_visr_non_id:
-            _key = f"{self.redis_key}#non_id"
-            await redis_connect.set(_key, self.path_to_visr_non_id, ex=15)
-            redis_path_key.append(_key)
-        await redis_connect.publish('myfoo', message="fromPython")
+            await redis_connect.set(
+                self.redis_key_non_id, self.path_to_visr_non_id, ex=15
+            )
+            redis_path_key.append(self.redis_key_non_id)
+
         return redis_path_key
 
     async def create_temp_file(self):
-        print('INSUB')
-        temp_key_folder = redis_connect.pubsub()
-        foo= await temp_key_folder.psubscribe("*foo")
-        """Создание временного файла и присвоение пути к веременному файлу с ид и без"""
+        """Создание временного файла и присвоение пути к веременному файлу с ид и без
+        Создает корутины для проверке удалены ли временные файлы, и удаляет их"""
+        path_subscriber = redis_connect.pubsub()
+        await path_subscriber.psubscribe(
+            "__keyspace@*:*build*temp_file*", "__keyevent@*:expired"
+        )  #
+        tasks = []
         if self.processed_data_with_id:
-            temp_file_name = self.save_temp_file(id=True)
-            self.path_to_visr_id = os.path.join(self.temp_base_folder, temp_file_name)
-        if self.processed_data_with_id:
-            temp_file_name = self.save_temp_file(id=False)
-            self.path_to_visr_non_id = os.path.join(
-                self.temp_base_folder, temp_file_name
+            self.temp_file_name_id = self.save_temp_file(id=True)
+            self.path_to_visr_id = os.path.join(
+                self.temp_base_folder, self.temp_file_name_id
             )
+        if self.processed_data_non_id:
+            self.temp_file_name_non_id = self.save_temp_file(id=False)
+            self.path_to_visr_non_id = os.path.join(
+                self.temp_base_folder, self.temp_file_name_non_id
+            )
+        await asyncio.sleep(10)
+        task_del_temp_path = asyncio.create_task(
+            self.key_expire_listner(path_subscriber)
+        )
         # В Redis лучше случайные ключи реализоаывать в формате SHA1, в иделае ключ
         # должен отражать привязку к клиенту или к стройке и нести ссмысловой контекст т.д.
 
-        temp_keys = await self.save_to_redis()
-        print('saved')
+        ss = await self.save_to_redis()
+
+        await task_del_temp_path
+        print("Foo")
         # ss1 = await redis_connect.mget(temp_keys)
         # print("ss1", ss1)
-
-        xs = await temp_key_folder.get_message()
-        print('foo',foo)
-        print("xs,xs", xs)
 
 
 def prepare_to_upload(excel_wb: DataFrame, path: str) -> str:

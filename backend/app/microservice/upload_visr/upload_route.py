@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, sta
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .upload_visr_schema import  UploadFileResponse
+from .upload_visr_schema import UploadFileResponse
 from .upload_service import TempFileManager
 from .excel_visr_stats_service import ExcelAnalyzer
 
@@ -23,7 +23,7 @@ from schemas.visr_schema import ConfirmImport, VisrBaseSchema
 route = APIRouter(prefix="/v1/import", tags=["import"])
 
 
-@route.post("/visr/{building_id}", response_model=UploadFileResponse )
+@route.post("/visr/{building_id}", response_model=UploadFileResponse)
 async def upload_estimate(
     files: list[UploadFile], building_id: int
 ) -> UploadFileResponse:
@@ -43,29 +43,26 @@ async def upload_estimate(
     # Реализовано пока на одном файле
 
     excel_WB = io.BytesIO(files[0].file.read())  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    try:
-        df_visr = ExcelAnalyzer(excel_WB) 
-        if df_visr.isNotEmpty: # Проверка найдены ли листы с ВИСР
-            df_visr.pre_save_processing_data()
-            file_manager = TempFileManager(
-                building_id=building_id,
-                processed_data_with_id=df_visr.processed_data_with_id,
-                processed_data_non_id=df_visr.processed_data_non_id,
-            )
-            file_manager.create_dir()
-            await file_manager.create_temp_file()
-            return UploadFileResponse(
-                **file_manager.model_dump(),
-                stats=df_visr.get_stats(),
-            )
+    # try:
+    df_visr = ExcelAnalyzer(excel_WB)
+    if df_visr.isNotEmpty:  # Проверка найдены ли листы с ВИСР
+        df_visr.pre_save_processing_data()
+        file_manager = TempFileManager(
+            building_id=building_id,
+            processed_data_with_id=df_visr.processed_data_with_id,
+            processed_data_non_id=df_visr.processed_data_non_id,
+        )
+        file_manager.create_dir()
+        await file_manager.create_temp_file()
+        return UploadFileResponse(
+            **file_manager.model_dump(),
+            stats=df_visr.get_stats(),
+        )
 
-        else:
-            raise HTTPException(
-                status_code=400, detail="Данных для обработки не выявлено"
-            )
-    except Exception as err:
-        raise HTTPException(status_code=500, detail=f"Возникла ошибка: {err}")
-
+    else:
+        raise HTTPException(status_code=400, detail="Данных для обработки не выявлено")
+    # except Exception as err:
+    #     raise HTTPException(status_code=500, detail=f"Возникла ошибка: {err}")
 
 
 @route.post(

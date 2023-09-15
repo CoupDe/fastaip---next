@@ -27,10 +27,7 @@ const postVisrFiles = async (
     formData.append(`files`, data[i]);
   }
   //  Странно, но с передачей header сервер выдает ошибку
-  const response = await fetch(postImportVIsrRout(id), {
-    method: "POST",
-    body: formData,
-  });
+ 
 
   try {
     const response = await fetch(postImportVIsrRout(id), {
@@ -42,6 +39,7 @@ const postVisrFiles = async (
       const errorText = await response.text(); // или await response.json() для JSON
       throw new Error(`Failed to fetch data: ${errorText}`);
     }
+  
     return response.json();
   } catch (error) {
     throw error;

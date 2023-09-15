@@ -4,9 +4,10 @@ import hashlib
 
 class RedisKeyGenerator:
     @staticmethod
-    def path_generator(building_id: int, temp_base_folder: str) -> bytes:
-        key_str = f"building_id/{building_id}/temp_import_path/:{temp_base_folder}"
-        return key_str.encode("utf-8")
+    def path_generator(building_id: int, temp_file_name_id:str ) -> str:
+        key_str = f"building_id/#{building_id}/temp_file_name/#{temp_file_name_id}"
+        return key_str
 
 
-redis_connect = redis.Redis()
+redis_connect = redis.ConnectionPool()
+redis_connect = redis.Redis(connection_pool=redis_connect)

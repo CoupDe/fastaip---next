@@ -1,8 +1,8 @@
+import asyncio
+
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
-import redis.asyncio as redis
-
 
 from controllers.v1 import (
     building_route,
