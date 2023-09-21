@@ -11,9 +11,10 @@ from fastapi import HTTPException
 from pandas import DataFrame
 import pandas as pd
 from pydantic import BaseModel, ConfigDict, computed_field
-import redis
+import redis # type: ignore
+from .temp_file_controller_queue import TempFileTaskManager
 from db_redis.redis_connection import RedisKeyGenerator
-
+from .temp_file_controller_queue import TempFileTaskManager
 from db_redis.redis_connection import redis_connect
 
 
@@ -42,6 +43,7 @@ class TempFileManager(BaseModel):
     temp_file_name: str | None = None
     temp_file_name_id: str | None = None
     temp_file_name_non_id: str | None = None
+    temp_file_tasks_queue: TempFileTaskManager
 
     @computed_field
     def redis_key(self) -> str:
@@ -105,30 +107,44 @@ class TempFileManager(BaseModel):
     ##################################
     #!!!!!!!!!!!В случае обработки файла, оставить его в каталоге
     async def key_expire_listner(self, channel: redis.client.PubSub):
-        # Существует ли каталог
-        if await aiofiles.os.path.exists(self.temp_base_folder):
-            temp_files = await aiofiles.os.listdir(self.temp_base_folder)
-            await asyncio.sleep(10)
-            # Есть ли файлы в каталоге
-            if len(temp_files) > 0:
-                # пока не очистится список от вложенных файлов в базовый каталог
-                while temp_files:
-                    # Получение сообщений от издателя
-                    message = await channel.get_message(ignore_subscribe_messages=True)
-                    # Проверка сообщения на окончание TTL ключа
-                    if message is not None and message["data"].decode() == "expired":
-                        deleted_key: str = message["channel"].decode()
-                        for file in temp_files:
-                            if file in deleted_key:
-                                full_path = os.path.join(self.temp_base_folder, file)
-                                if await aiofiles.os.path.exists(full_path):
-                                    await aiofiles.os.remove(full_path)
-                                    temp_files.remove(file)
-                # Удаление каталога после удаления вложенных файлов
-                await aiofiles.os.rmdir(self.temp_base_folder)
-            elif self.temp_base_folder is not None:
-                await aiofiles.os.rmdir(self.temp_base_folder)
-                return
+        """Функция слушает если пользователь не отреагировал на сообщение о импорте,
+        через некоторое время функция удаляет временные каталоги"""
+        print(self.temp_base_folder)
+        if self.temp_base_folder:
+            # Существует ли каталог
+            if await aiofiles.os.path.exists(self.temp_base_folder):
+                temp_files = await aiofiles.os.listdir(self.temp_base_folder)
+                await asyncio.sleep(10)
+                # Есть ли файлы в каталоге
+                if len(temp_files) > 0:
+                    # пока не очистится список от вложенных файлов в базовый каталог
+                    while temp_files:
+                        # Получение сообщений от издателя
+                        message = await channel.get_message(
+                            ignore_subscribe_messages=True
+                        )
+
+                        # Проверка сообщения на окончание TTL ключа
+                        if (
+                            message is not None
+                            and message["data"].decode() == "expired"
+                        ):
+                            deleted_key: str = message["channel"].decode()
+                            for file in temp_files:
+                                if file in deleted_key:
+                                    full_path = os.path.join(
+                                        self.temp_base_folder, file
+                                    )
+                                    if await aiofiles.os.path.exists(full_path):
+                                        await aiofiles.os.remove(full_path)
+                                        temp_files.remove(file)
+                    # Удаление каталога после удаления вложенных файлов
+                    await aiofiles.os.rmdir(self.temp_base_folder)
+                elif self.temp_base_folder is not None:
+                    await aiofiles.os.rmdir(self.temp_base_folder)
+                    return
+                else:
+                    return
             else:
                 return
 
@@ -142,6 +158,7 @@ class TempFileManager(BaseModel):
         redis_path_key = []
         if self.path_to_visr_id:
             await redis_connect.set(self.redis_key_id, self.path_to_visr_id, ex=15)
+
             redis_path_key.append(self.redis_key_id)
         if self.path_to_visr_non_id:
             await redis_connect.set(
@@ -157,8 +174,8 @@ class TempFileManager(BaseModel):
         path_subscriber = redis_connect.pubsub()
         await path_subscriber.psubscribe(
             "__keyspace@*:*build*temp_file*", "__keyevent@*:expired"
-        )  #
-        tasks = []
+        )  
+
         if self.processed_data_with_id:
             self.temp_file_name_id = self.save_temp_file(id=True)
             self.path_to_visr_id = os.path.join(
@@ -169,17 +186,21 @@ class TempFileManager(BaseModel):
             self.path_to_visr_non_id = os.path.join(
                 self.temp_base_folder, self.temp_file_name_non_id
             )
-        await asyncio.sleep(10)
+
         task_del_temp_path = asyncio.create_task(
             self.key_expire_listner(path_subscriber)
         )
+
+        await self.temp_file_tasks_queue.add_task(self.temp_base_folder, task_del_temp_path, redis_connect)
+        
+
         # В Redis лучше случайные ключи реализоаывать в формате SHA1, в иделае ключ
         # должен отражать привязку к клиенту или к стройке и нести ссмысловой контекст т.д.
 
         ss = await self.save_to_redis()
 
-        await task_del_temp_path
-        print("Foo")
+        # await task_del_temp_path
+        print("Foo", task_del_temp_path)
         # ss1 = await redis_connect.mget(temp_keys)
         # print("ss1", ss1)
 

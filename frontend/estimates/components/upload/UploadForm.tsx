@@ -14,7 +14,6 @@ const searchFormats = function (files: FileList): SearchFormats {
   return { badFormat, okFormat };
 };
 
-
 const formats = [".xls", ".xlsx", ".xlsm"];
 const UploadForm = () => {
   const [dragActive, setDragActive] = React.useState(false);

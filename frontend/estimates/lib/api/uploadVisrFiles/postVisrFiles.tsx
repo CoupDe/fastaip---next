@@ -6,15 +6,17 @@ export interface ImportData {
   tempFileId: string;
   confirmation: boolean;
 }
-interface StatsData {
+export interface StatsData {
   empty_dfs_count?: number; // int | None
-  visr_df_id?: number; // int | None
-  visr_non_id?: number; // int | None
+  visr_df_id: number; // int | None
+  visr_non_id: number; // int | None
 }
 
 export interface UploadFileResponse {
+  file_name: string;
   path_to_visr_id?: string; // str | None
   path_to_visr_non_id?: string; // str | None
+  tasks_key?: string;
   stats: StatsData;
 }
 const postVisrFiles = async (
@@ -27,7 +29,6 @@ const postVisrFiles = async (
     formData.append(`files`, data[i]);
   }
   //  Странно, но с передачей header сервер выдает ошибку
- 
 
   try {
     const response = await fetch(postImportVIsrRout(id), {
@@ -39,7 +40,7 @@ const postVisrFiles = async (
       const errorText = await response.text(); // или await response.json() для JSON
       throw new Error(`Failed to fetch data: ${errorText}`);
     }
-  
+
     return response.json();
   } catch (error) {
     throw error;

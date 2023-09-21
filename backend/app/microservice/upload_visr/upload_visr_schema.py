@@ -6,9 +6,9 @@ class BaseErrorResponse(BaseModel):
 
 
 class StatsData(BaseModel):
-    empty_dfs_count: int | None = None
-    visr_df_id: int | None = None
-    visr_non_id: int | None = None
+    empty_dfs_count: int 
+    visr_df_id: int 
+    visr_non_id: int 
 
     def __str__(self) -> str:
         return (
@@ -19,7 +19,9 @@ class StatsData(BaseModel):
 
 
 class UploadFileResponse(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra="ignore")
     path_to_visr_id: str | None = None
     path_to_visr_non_id: str | None = None
+    tasks_key: str
+    file_name: str
     stats: StatsData

@@ -5,8 +5,10 @@ from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, sta
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from .temp_file_controller_queue import TempFileTaskManager
+
 from .upload_visr_schema import UploadFileResponse
-from .upload_service import TempFileManager
+from .upload_service import TempFileManager, check_file
 from .excel_visr_stats_service import ExcelAnalyzer
 
 
@@ -21,6 +23,7 @@ from schemas.visr_schema import ConfirmImport, VisrBaseSchema
 
 
 route = APIRouter(prefix="/v1/import", tags=["import"])
+temp_file_tasks_queue = TempFileTaskManager()
 
 
 @route.post("/visr/{building_id}", response_model=UploadFileResponse)
@@ -44,6 +47,7 @@ async def upload_estimate(
 
     excel_WB = io.BytesIO(files[0].file.read())  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # try:
+    assert files[0].filename is not None
     df_visr = ExcelAnalyzer(excel_WB)
     if df_visr.isNotEmpty:  # Проверка найдены ли листы с ВИСР
         df_visr.pre_save_processing_data()
@@ -51,12 +55,19 @@ async def upload_estimate(
             building_id=building_id,
             processed_data_with_id=df_visr.processed_data_with_id,
             processed_data_non_id=df_visr.processed_data_non_id,
+            temp_file_tasks_queue=temp_file_tasks_queue,
         )
+
         file_manager.create_dir()
         await file_manager.create_temp_file()
+        # Разобраться как реализовать TypeGuard not None
+        assert temp_file_tasks_queue.redis_task_key is not None
+       
         return UploadFileResponse(
             **file_manager.model_dump(),
             stats=df_visr.get_stats(),
+            tasks_key=temp_file_tasks_queue.redis_task_key,
+            file_name=files[0].filename,
         )
 
     else:
@@ -76,7 +87,8 @@ async def confirm_import(
     """Подтверждение импорта файлов, принимает путь
     к временному документу"""
     # Удалени или создание Dataframe
-    visrs_dataframe = check_file(**confirmationInfo.dict())
+    print('confirmationInfo',confirmationInfo)
+    visrs_dataframe = check_file(**confirmationInfo.model_dump())
     if not visrs_dataframe.empty:
         # Получение списка ВИСР
         visrs = create_visr_obj(visrs_dataframe, building_id)

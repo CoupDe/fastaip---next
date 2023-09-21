@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from "react";
-import FileDownloadDoneIcon from "@mui/icons-material/FileDownloadDone";
-import FileDownloadOffIcon from "@mui/icons-material/FileDownloadOff";
-import { useAppSelector, useAppDispatch } from "@/redux/hook";
+import postImportFormFile from "@/lib/api/postImportForm";
+import postVisrFiles, {
+  UploadFileResponse,
+} from "@/lib/api/uploadVisrFiles/postVisrFiles";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { ActiveBuilding } from "@/redux/slice/buildingSlice";
-import { ImportData } from "@/lib/api/postImportVisr_del";
-import UploadModal from "./UploadModal";
 import {
   SelectImportError,
   SelectedImportType,
+  setImportError,
 } from "@/redux/slice/uploadSlice";
+import FileDownloadDoneIcon from "@mui/icons-material/FileDownloadDone";
+import FileDownloadOffIcon from "@mui/icons-material/FileDownloadOff";
+import React, { useState } from "react";
 import { PopupImport } from "./PopupImport";
-import { setImportError } from "@/redux/slice/uploadSlice";
-import postImportFormFile from "@/lib/api/postImportForm";
-import postVisrFiles, { UploadFileResponse } from "@/lib/api/uploadVisrFiles/postVisrFiles";
+import UploadModal from "./UploadModal";
 
 type PropsFormat = {
   format: SearchFormats;
@@ -22,7 +23,7 @@ const FormatInfo: React.FC<PropsFormat> = ({
   format,
   setShow,
 }: PropsFormat) => {
-  const [importInfo, setImportInfo] = useState<UploadFileResponse>();
+  const [importData, setimportData] = useState<UploadFileResponse>();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [noFiles, setNoFiles] = useState(false);
   const importError = useAppSelector(SelectImportError);
@@ -45,15 +46,14 @@ const FormatInfo: React.FC<PropsFormat> = ({
   ) => {
     event.preventDefault();
     if (okFormat.length !== 0) {
-      if (!!!importInfo) {
+      if (!!!importData) {
         console.log("importType", importType);
         switch (importType) {
           case "ВИСР":
-            
             try {
               const resultVisr = await postVisrFiles(okFormat, id);
               console.log("in ВИСР", resultVisr);
-              setImportInfo(resultVisr);
+              setimportData(resultVisr);
 
               setShowModal(true);
             } catch (error) {
@@ -64,7 +64,7 @@ const FormatInfo: React.FC<PropsFormat> = ({
             try {
               const resultForm = await postImportFormFile(okFormat, id);
 
-              setImportInfo(resultForm);
+              setimportData(resultForm);
 
               setShowModal(true);
             } catch (error) {
@@ -108,9 +108,9 @@ const FormatInfo: React.FC<PropsFormat> = ({
         </span>
       </button>
       {noFiles && <p>Нет доступных файлов для загрузки</p>}
-      {importInfo && showModal && (
+      {importData && showModal && (
         <UploadModal
-          {...importInfo}
+          importData={importData}
           onClose={() => {
             setShowModal(false);
           }}

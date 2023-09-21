@@ -391,8 +391,12 @@ class ImportDataInfo(BaseModel):
 
 # post Model route.post("/{building_id}/confirm/",
 class ConfirmImport(BaseModel):
-    tempFileId: str
+    path_to_visr_id: str|None=None
+    path_to_visr_non_id: str|None=None
+    tasks_key: str|None=None
     confirmation: bool
+    id: int
+
 
 
 # return Model route.post("/{building_id}/confirm/"

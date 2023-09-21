@@ -1,4 +1,5 @@
 import { postImportFilesConfirmRout } from "@/const/apiRout";
+import { UploadFileResponse } from "./uploadVisrFiles/postVisrFiles";
 
 export interface ImportVisrResponse {
   name_visr: string;
@@ -11,19 +12,23 @@ export type ErrorImportResponse = {
 export interface IDetailResponseImport {
   detail: ImportVisrResponse[];
 }
+export type FileRequestPath = Pick<
+  UploadFileResponse,
+  "path_to_visr_id" | "path_to_visr_non_id" | "tasks_key"
+>;
 export const acceptImport = async (
-  tempFileId: string,
+  importData: FileRequestPath,
   confirmation: boolean,
   id: string
 ): Promise<IDetailResponseImport | ErrorImportResponse> => {
-  const data = { tempFileId, confirmation, id };
-
+  const data = { ...importData, confirmation, id };
+  console.log("data", data);
   const response = await fetch(postImportFilesConfirmRout(id, "confirm"), {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
       "Content-Type": "application/json",
-    }
+    },
   });
   if (!response.ok) {
     const errorImportResponse: ErrorImportResponse = await response.json();
