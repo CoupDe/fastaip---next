@@ -28,4 +28,5 @@ async def get_all_building_visr(
     )
 
     result = await session.execute(stmt)
+    
     return list(result.scalars().all())

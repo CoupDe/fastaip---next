@@ -11,7 +11,9 @@ from fastapi import HTTPException
 from pandas import DataFrame
 import pandas as pd
 from pydantic import BaseModel, ConfigDict, computed_field
-import redis # type: ignore
+import redis
+
+from schemas.visr_schema import ConfirmImport
 from .temp_file_controller_queue import TempFileTaskManager
 from db_redis.redis_connection import RedisKeyGenerator
 from .temp_file_controller_queue import TempFileTaskManager
@@ -109,12 +111,12 @@ class TempFileManager(BaseModel):
     async def key_expire_listner(self, channel: redis.client.PubSub):
         """Функция слушает если пользователь не отреагировал на сообщение о импорте,
         через некоторое время функция удаляет временные каталоги"""
-        print(self.temp_base_folder)
+
         if self.temp_base_folder:
             # Существует ли каталог
             if await aiofiles.os.path.exists(self.temp_base_folder):
                 temp_files = await aiofiles.os.listdir(self.temp_base_folder)
-                await asyncio.sleep(10)
+                await asyncio.sleep(280)
                 # Есть ли файлы в каталоге
                 if len(temp_files) > 0:
                     # пока не очистится список от вложенных файлов в базовый каталог
@@ -127,9 +129,9 @@ class TempFileManager(BaseModel):
                         # Проверка сообщения на окончание TTL ключа
                         if (
                             message is not None
-                            and message["data"].decode() == "expired"
+                            and message["data"] == "expired"
                         ):
-                            deleted_key: str = message["channel"].decode()
+                            deleted_key: str = message["channel"]
                             for file in temp_files:
                                 if file in deleted_key:
                                     full_path = os.path.join(
@@ -157,12 +159,12 @@ class TempFileManager(BaseModel):
         """
         redis_path_key = []
         if self.path_to_visr_id:
-            await redis_connect.set(self.redis_key_id, self.path_to_visr_id, ex=15)
+            await redis_connect.set(self.redis_key_id, self.path_to_visr_id, ex=300)
 
             redis_path_key.append(self.redis_key_id)
         if self.path_to_visr_non_id:
             await redis_connect.set(
-                self.redis_key_non_id, self.path_to_visr_non_id, ex=15
+                self.redis_key_non_id, self.path_to_visr_non_id, ex=300
             )
             redis_path_key.append(self.redis_key_non_id)
 
@@ -174,7 +176,7 @@ class TempFileManager(BaseModel):
         path_subscriber = redis_connect.pubsub()
         await path_subscriber.psubscribe(
             "__keyspace@*:*build*temp_file*", "__keyevent@*:expired"
-        )  
+        )
 
         if self.processed_data_with_id:
             self.temp_file_name_id = self.save_temp_file(id=True)
@@ -191,8 +193,9 @@ class TempFileManager(BaseModel):
             self.key_expire_listner(path_subscriber)
         )
 
-        await self.temp_file_tasks_queue.add_task(self.temp_base_folder, task_del_temp_path, redis_connect)
-        
+        await self.temp_file_tasks_queue.add_task(
+            self.temp_base_folder, task_del_temp_path, redis_connect
+        )
 
         # В Redis лучше случайные ключи реализоаывать в формате SHA1, в иделае ключ
         # должен отражать привязку к клиенту или к стройке и нести ссмысловой контекст т.д.
@@ -200,45 +203,45 @@ class TempFileManager(BaseModel):
         ss = await self.save_to_redis()
 
         # await task_del_temp_path
-        print("Foo", task_del_temp_path)
+
         # ss1 = await redis_connect.mget(temp_keys)
         # print("ss1", ss1)
 
 
-def prepare_to_upload(excel_wb: DataFrame, path: str) -> str:
-    """
-    :param excel_wb: Активная книга Excel
-    :param path: Путь где будет расположен обработанный временный файл
-    :return str относительный путь к каталогу в котором создан временный
-    файл с DataFrame в формате csv
-    """
-    evr_count = 0
-    test_lst = []
+# def prepare_to_upload(excel_wb: DataFrame, path: str) -> str:
+#     """
+#     :param excel_wb: Активная книга Excel
+#     :param path: Путь где будет расположен обработанный временный файл
+#     :return str относительный путь к каталогу в котором создан временный
+#     файл с DataFrame в формате csv
+#     """
+#     evr_count = 0
+#     test_lst = []
 
-    for _sheet_name, sheet_df in excel_wb.items():
-        parseVisr = PreparingVisr(sheet_df)
+#     for _sheet_name, sheet_df in excel_wb.items():
+#         parseVisr = PreparingVisr(sheet_df)
 
-        parseVisr.set_field_category()
+#         parseVisr.set_field_category()
 
-        test_lst.append(parseVisr.get_estimate)
-        evr_count += 1
-    with tempfile.NamedTemporaryFile(
-        suffix=".csv", delete=False, dir=path
-    ) as temp_file:
-        # Сохранение списка DataFrame в файл CSV
-        for df in test_lst:
-            df.to_csv(temp_file, mode="a", index=False)
+#         test_lst.append(parseVisr.get_estimate)
+#         evr_count += 1
+#     with tempfile.NamedTemporaryFile(
+#         suffix=".csv", delete=False, dir=path
+#     ) as temp_file:
+#         # Сохранение списка DataFrame в файл CSV
+#         for df in test_lst:
+#             df.to_csv(temp_file, mode="a", index=False)
 
-    # Получение пути к временному файлу
+#     # Получение пути к временному файлу
 
-    temp_path = os.path.relpath(os.path.dirname(temp_file.name))
-    temp_file_name = os.path.basename(temp_file.name)
-    temp_folder.append({temp_file_name: temp_path})
+#     temp_path = os.path.relpath(os.path.dirname(temp_file.name))
+#     temp_file_name = os.path.basename(temp_file.name)
+#     temp_folder.append({temp_file_name: temp_path})
 
-    return temp_file_name
+#     return temp_file_name
 
 
-def check_file(tempFileId: str, confirmation: bool) -> DataFrame | HTTPException:
+async def check_file(data_to_import: ConfirmImport) -> DataFrame | HTTPException:
     """
     Функция поиска пути для удаления или дальнейшей обработки
 
@@ -248,18 +251,20 @@ def check_file(tempFileId: str, confirmation: bool) -> DataFrame | HTTPException
     """
     # Надо разобраться, есть решения но я их не понимаю, связанны с typeGuard MyPy
     # найти путь по ключу ID временного файла
-    tmp_file: dict[Any, Any] = next(
-        filter(lambda file: tempFileId in file, temp_folder), None
-    )
+    # tmp_file: dict[Any, Any] = next(
+    #     filter(lambda file: tempFileId in file, temp_folder), None
+    # )
 
-    if tmp_file is not None:
-        if confirmation:
-            # Полный путь к файлу для создания DF
-            temp_csv = f"{tmp_file[tempFileId]}\{tempFileId}"  # noqa Потом Убрать
-            visrs_df = pd.read_csv(
-                "..\\upload_files\\23-06-2023\\9\\11_35\\tmpb_u9ckd2.csv"
-            )
-            return visrs_df
+    temp_paths: list[str] = await redis_connect.mget(*data_to_import.file_paths)
+    print(type(temp_paths[0]))
+    if temp_paths:
+        if data_to_import.confirmation:
+            for file in temp_paths:
+                # Полный путь к файлу для создания DF
+
+                visrs_df = pd.read_csv(file)
+                print("visrs_df,(visrs_df)", visrs_df)
+                return visrs_df
 
         else:
             shutil.rmtree(tmp_file[tempFileId])

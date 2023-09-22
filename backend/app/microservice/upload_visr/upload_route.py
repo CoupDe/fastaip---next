@@ -62,7 +62,7 @@ async def upload_estimate(
         await file_manager.create_temp_file()
         # Разобраться как реализовать TypeGuard not None
         assert temp_file_tasks_queue.redis_task_key is not None
-       
+
         return UploadFileResponse(
             **file_manager.model_dump(),
             stats=df_visr.get_stats(),
@@ -87,8 +87,8 @@ async def confirm_import(
     """Подтверждение импорта файлов, принимает путь
     к временному документу"""
     # Удалени или создание Dataframe
-    print('confirmationInfo',confirmationInfo)
-    visrs_dataframe = check_file(**confirmationInfo.model_dump())
+  
+    visrs_dataframe = await check_file(confirmationInfo)
     if not visrs_dataframe.empty:
         # Получение списка ВИСР
         visrs = create_visr_obj(visrs_dataframe, building_id)
@@ -123,7 +123,6 @@ async def upload_form(
     building_id: int,
     session: AsyncSession = Depends(get_async_session),
 ):
-    print("In from Import")
     try:
         excel_WB = io.BytesIO(files[0].file.read())
         df_raw_data_form = pd.read_excel(excel_WB, sheet_name=0)

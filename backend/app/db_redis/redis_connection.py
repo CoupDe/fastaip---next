@@ -9,5 +9,5 @@ class RedisKeyGenerator:
         return key_str
 
 
-redis_connect = redis.ConnectionPool()
+redis_connect = redis.ConnectionPool(decode_responses=True)
 redis_connect = redis.Redis(connection_pool=redis_connect)

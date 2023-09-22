@@ -6,7 +6,8 @@ from fastapi import HTTPException
 from pandas import DataFrame
 from pydantic import ConfigDict, BaseModel
 
-from const.enums import AdditionalEstimatedEnum, LaborEnum, VisrDataEnum
+
+from const.enums import AdditionalEstimatedEnum,LaborEnum, VisrDataEnum
 
 
 class EstimateInterface(ABC):
@@ -121,13 +122,15 @@ class PreparingVisr(BaseModel, EstimateInterface):
         Функция по поиску трудозатрат Тип 'OZ MM AM MA' и приведение к типу float64
         стоимостных показателей
         """
+        
         _temp_df = DataFrame()
         for labor_type in LaborEnum:
+        
             tzo_df = self.data.loc[:].query("pos == @labor_type.value")
             tzo_df.loc[:, "quantity":"total_cost"] = tzo_df.loc[
                 :, "quantity":"total_cost"
             ].astype("Float64")
-            tzo_df["temp"] = labor_type.name
+            tzo_df["temp"] = labor_type.value
             _temp_df = pd.concat([_temp_df, tzo_df])
 
         return _temp_df
@@ -145,7 +148,7 @@ class PreparingVisr(BaseModel, EstimateInterface):
             additional_df.loc[:, "total_cost"] = additional_df.loc[
                 :, "total_cost"
             ].astype("Float64")
-            additional_df.loc[:, "temp"] = additional_type.name
+            additional_df.loc[:, "temp"] = additional_type.value
             _temp_df = pd.concat([_temp_df, additional_df])
             _temp_df["name"].str.replace(" ", "")
         return _temp_df
@@ -165,15 +168,15 @@ class PreparingVisr(BaseModel, EstimateInterface):
 
     def set_general_data(self) -> None:
         """Устанавливает признак общей информаци о ВИСР (Наименование ВИСР "GN", Наименование вида работ "GW")"""
-
-        if self.data.at[3, "pos"] != "":
-            self.data.at[3, "temp"] = "GN"
+        
+        if self.data.at[1, "pos"] != "":
+            self.data.at[1, "temp"] = "GN"
         else:
             raise HTTPException(
                 status_code=422, detail="Наименование объекта имеет пустое значение"
             )
-        if self.data.at[4, "pos"] != "":
-            self.data.at[4, "temp"] = "GW"
+        if self.data.at[2, "pos"] != "":
+            self.data.at[2, "temp"] = "GW"
         else:
             raise HTTPException(
                 status_code=422, detail="Наименование объекта имеет пустое значение"

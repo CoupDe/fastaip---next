@@ -14,7 +14,7 @@ export interface IDetailResponseImport {
 }
 export type FileRequestPath = Pick<
   UploadFileResponse,
-  "path_to_visr_id" | "path_to_visr_non_id" | "tasks_key"
+  "redis_key_id" | "redis_key_non_id" | "tasks_key"
 >;
 export const acceptImport = async (
   importData: FileRequestPath,

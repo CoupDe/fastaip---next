@@ -30,10 +30,10 @@ const UploadModal: React.FC<UploadModalProps> = ({ importData, onClose }) => {
   const dispatch = useAppDispatch();
   const { id } = useAppSelector(ActiveBuilding);
   const totalVisr = importData.stats.visr_df_id + importData.stats.visr_non_id;
-  const { path_to_visr_id, path_to_visr_non_id, tasks_key } = importData;
+  const { redis_key_id, redis_key_non_id, tasks_key } = importData;
   const sendFiles: FileRequestPath = {
-    path_to_visr_id,
-    path_to_visr_non_id,
+    redis_key_id,
+    redis_key_non_id,
     tasks_key,
   };
   const handleConfirmImport = async (confirmation: boolean) => {
@@ -42,7 +42,6 @@ const UploadModal: React.FC<UploadModalProps> = ({ importData, onClose }) => {
       if (Array.isArray(result.detail)) {
         const data = result.detail as unknown as ImportVisrResponse[];
 
-        console.log("data in modal", importData.stats);
         dispatch(setImportDataResponse(data));
         router.refresh();
       }

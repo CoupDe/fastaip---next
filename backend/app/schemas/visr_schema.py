@@ -5,7 +5,7 @@ from fastapi import HTTPException
 
 from pandas import DataFrame
 import pandas as pd
-from pydantic import ConfigDict, BaseModel, validator
+from pydantic import ConfigDict, BaseModel, computed_field, validator
 from db.models.visr_models import (
     VisrModel,
     EstimateModel,
@@ -102,7 +102,8 @@ class EstimatedPrice(PriceComponent):
             data["pos"] = data["Index"]
             data.pop("Index")
             match data["temp"]:
-                case "NR":
+                case AdditionalEstimatedEnum.NR.value:
+                    print('data',data)
                     self.additional_prices.append(
                         AdditionalPrice(
                             pos=data["pos"],
@@ -110,7 +111,7 @@ class EstimatedPrice(PriceComponent):
                             total_cost=data["total_cost"],
                         )
                     )
-                case "SP":
+                case  AdditionalEstimatedEnum.SP.value:       
                     self.additional_prices.append(
                         AdditionalPrice(
                             pos=data["pos"],
@@ -119,6 +120,7 @@ class EstimatedPrice(PriceComponent):
                         )
                     )
                 case _:
+                    
                     self.labors.append(LaborPrice(**data))
 
         # self.labors.append(LaborPrice(self.labor_df))
@@ -134,12 +136,12 @@ class EstimatedPrice(PriceComponent):
             total_cost=self.total_cost,
             labors=[
                 LaborPriceModel(
-                    category=labor.category, **labor.dict(exclude={"temp", "category"})
+                    category=labor.category, **labor.model_dump(exclude={"temp", "category"})
                 )
                 for labor in self.labors
             ],
             additional_prices=[
-                AdditionalPriceModel(**additional_price.dict())
+                AdditionalPriceModel(**additional_price.model_dump())
                 for additional_price in self.additional_prices
             ],
         )
@@ -391,11 +393,23 @@ class ImportDataInfo(BaseModel):
 
 # post Model route.post("/{building_id}/confirm/",
 class ConfirmImport(BaseModel):
-    path_to_visr_id: str|None=None
-    path_to_visr_non_id: str|None=None
+    redis_key_id: str|None=None
+    redis_key_non_id: str|None=None
     tasks_key: str|None=None
     confirmation: bool
     id: int
+    
+
+    @computed_field # type: ignore[misc]
+    @property
+    def file_paths (self)->list[str]:
+        temp_list:list[str]=[]
+        if (self.redis_key_id):
+            temp_list.append(self.redis_key_id)
+        if (self.redis_key_non_id):
+            temp_list.append(self.redis_key_non_id)
+        return temp_list
+        
 
 
 

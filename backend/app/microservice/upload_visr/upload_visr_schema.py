@@ -20,8 +20,8 @@ class StatsData(BaseModel):
 
 class UploadFileResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    path_to_visr_id: str | None = None
-    path_to_visr_non_id: str | None = None
+    redis_key_id: str | None = None
+    redis_key_non_id: str | None = None
     tasks_key: str
     file_name: str
     stats: StatsData

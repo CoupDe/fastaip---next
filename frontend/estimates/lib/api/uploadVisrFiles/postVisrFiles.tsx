@@ -14,8 +14,8 @@ export interface StatsData {
 
 export interface UploadFileResponse {
   file_name: string;
-  path_to_visr_id?: string; // str | None
-  path_to_visr_non_id?: string; // str | None
+  redis_key_id?: string; // str | None
+  redis_key_non_id?: string; // str | None
   tasks_key?: string;
   stats: StatsData;
 }

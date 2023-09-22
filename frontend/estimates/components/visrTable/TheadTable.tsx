@@ -17,7 +17,7 @@ const TheadTable = (props: Props) => {
       <tr className="[&_th]:p-1 bg-gray-800 sticky z-10 top-0">
         <th className="">Код</th>
         <th className="">Номер</th>
-        {props.isForm && <th className="">Обоснование</th>}
+        {/* <th className="">Обоснование</th> */}
         <th className="">Наименование работ</th>
         <th className="">Ед. измерения</th>
         <th className="">Количество</th>
