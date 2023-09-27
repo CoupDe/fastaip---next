@@ -1,7 +1,4 @@
 import { getAllFormDataRout } from "@/const/apiRout";
-import { reject } from "core-js/fn/promise";
-import next from "next/types";
-import { resolve } from "path";
 
 export interface FormKS {
   visr_identifier: string | null;
@@ -17,9 +14,9 @@ export interface FormKS {
 }
 
 export async function getAllFormData(building_id: string): Promise<FormKS[]> {
-  await new Promise((res, rej) => setTimeout(res, 12000));
+  await new Promise((res, rej) => setTimeout(res, 100));
   const result = await fetch(getAllFormDataRout(building_id), {
-    cache: "no-store",
+    cache: "force-cache",
   });
 
   if (!result.ok) {

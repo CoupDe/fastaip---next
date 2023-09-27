@@ -51,9 +51,10 @@ export const TruncatedRow = ({
 
   return (
     <motion.td
-      className={`bg-gray-800 text-white p-1 ${
-        isTruncated && "hover:cursor-pointer border-r-2 border-r-gray-400"
-      } ${isSelected && isTruncated && "text-cyan-400"}`}
+      className={`bg-gray-800 p-1 w-20 whitespace-nowrap ${
+        isTruncated &&
+        "hover:cursor-pointer hover:text-cyan-400 border-r-2 border-r-gray-400"
+      } ${isSelected && isTruncated ? "text-cyan-400" : "text-white"}`}
       onMouseEnter={() => {
         if (isTruncated && !isBlocked) handleMouseEnter();
       }}

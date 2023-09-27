@@ -8,9 +8,6 @@ from .prepare_visr_data_service import PreparingVisr
 from const.pandas_const import SKIPROWS, VISRCOLNAMES
 
 
-
-
-
 class ExcelAnalyzer:
     """Класс проверяет пусты листы, исключает их и сохраняет чистый df,
     проверяет на соответсвие требованиям формата для импорта и дальнейшей работы с файлами

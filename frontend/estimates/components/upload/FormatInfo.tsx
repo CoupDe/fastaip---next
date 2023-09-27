@@ -18,10 +18,16 @@ import UploadModal from "./UploadModal";
 type PropsFormat = {
   format: SearchFormats;
   setShow: React.Dispatch<React.SetStateAction<boolean>>;
+  setFileFormats: React.Dispatch<
+    React.SetStateAction<SearchFormats | undefined>
+  >;
+  setDragActive: React.Dispatch<React.SetStateAction<boolean>>;
 };
 const FormatInfo: React.FC<PropsFormat> = ({
   format,
   setShow,
+  setDragActive,
+  setFileFormats,
 }: PropsFormat) => {
   const [importData, setimportData] = useState<UploadFileResponse>();
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -113,6 +119,8 @@ const FormatInfo: React.FC<PropsFormat> = ({
           importData={importData}
           onClose={() => {
             setShowModal(false);
+            setFileFormats(undefined);
+            setDragActive(false);
           }}
         />
       )}

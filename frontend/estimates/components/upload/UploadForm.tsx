@@ -60,7 +60,12 @@ const UploadForm = () => {
         >
           <div className="flex flex-col items-center justify-center py-2">
             {fileFormats ? (
-              <FormatInfo format={fileFormats} setShow={setShowFiles} />
+              <FormatInfo
+                format={fileFormats}
+                setShow={setShowFiles}
+                setFileFormats={setFileFormats}
+                setDragActive={setDragActive}
+              />
             ) : (
               <>
                 <svg

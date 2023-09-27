@@ -20,7 +20,7 @@ class EstimateInterface(ABC):
         pass
 
     @abstractmethod
-    def set_labor_price(self, dt: DataFrame) -> DataFrame:
+    def set_labor_price(self) -> DataFrame:
         pass
 
 

@@ -12,7 +12,7 @@ const variants = {
 const PopUpForm: React.FC<Props> = ({ dataRow }: Props) => {
   return (
     <motion.div
-      className={`absolute bottom-0 right-[50px] max-w-[300px] text-white  bg-gray-500 p-1 opacity-50`}
+      className={`absolute bottom-0 right-[50px] max-w-[300px] whitespace-normal text-white  bg-gray-500 p-1 opacity-50`}
       animate="open"
       initial="hidden"
       variants={variants}

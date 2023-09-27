@@ -43,6 +43,7 @@ function createTable(
       const dtRow = convertToDataRow({
         id: dt.id,
         parentId: parentId,
+        pos: dt.visrs_id,
         code: dt.name_visr.slice(0, 50),
         name: dt.type_work,
         total_cost: dt.total_cost,
@@ -164,8 +165,8 @@ const VisrCard: FC<VisrProp> = ({ visrs }) => {
   const data = useAppSelector(getAllVisrs);
   return (
     <div className="w-full">
-      <div className="w-full overflow-auto">
-        <table className="table w-full border-separate space-y-6 text-sm text-gray-400">
+      <div className="w-full overflow-x-clip overflow-y-auto h-[80vh]">
+          <table className="table-auto w-full mx-2 border-separate space-y-6 text-sm text-gray-400">
           <TheadTable />
           <tbody>{createTable(data, null)}</tbody>
         </table>

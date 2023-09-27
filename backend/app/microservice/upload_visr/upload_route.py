@@ -3,6 +3,7 @@ from typing import List, Optional
 import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, status
 from fastapi.responses import JSONResponse
+from pandas import DataFrame
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .temp_file_controller_queue import TempFileTaskManager
@@ -83,13 +84,13 @@ async def confirm_import(
     confirmationInfo: ConfirmImport,
     building_id: int,
     session: AsyncSession = Depends(get_async_session),
-) -> Optional[dict[str, list[VisrBaseSchema]] | Response]:
+) -> dict[str, list[VisrBaseSchema]] | Response:
     """Подтверждение импорта файлов, принимает путь
     к временному документу"""
-    # Удалени или создание Dataframe
-  
+    # Удалени каталога или создание Dataframe
     visrs_dataframe = await check_file(confirmationInfo)
-    if not visrs_dataframe.empty:
+  
+    if visrs_dataframe is not None:
         # Получение списка ВИСР
         visrs = create_visr_obj(visrs_dataframe, building_id)
         # Исклчение дублирование ВИСР в БД

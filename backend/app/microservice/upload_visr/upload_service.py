@@ -1,6 +1,7 @@
 from asyncio import sleep
 import asyncio
 import os
+
 import shutil
 import tempfile
 from datetime import datetime
@@ -24,7 +25,6 @@ from .prepare_visr_data_service import PreparingVisr
 
 
 # список созданных каталогов
-temp_folder = []
 
 
 class TempFileManager(BaseModel):
@@ -127,10 +127,7 @@ class TempFileManager(BaseModel):
                         )
 
                         # Проверка сообщения на окончание TTL ключа
-                        if (
-                            message is not None
-                            and message["data"] == "expired"
-                        ):
+                        if message is not None and message["data"] == "expired":
                             deleted_key: str = message["channel"]
                             for file in temp_files:
                                 if file in deleted_key:
@@ -202,46 +199,8 @@ class TempFileManager(BaseModel):
 
         ss = await self.save_to_redis()
 
-        # await task_del_temp_path
 
-        # ss1 = await redis_connect.mget(temp_keys)
-        # print("ss1", ss1)
-
-
-# def prepare_to_upload(excel_wb: DataFrame, path: str) -> str:
-#     """
-#     :param excel_wb: Активная книга Excel
-#     :param path: Путь где будет расположен обработанный временный файл
-#     :return str относительный путь к каталогу в котором создан временный
-#     файл с DataFrame в формате csv
-#     """
-#     evr_count = 0
-#     test_lst = []
-
-#     for _sheet_name, sheet_df in excel_wb.items():
-#         parseVisr = PreparingVisr(sheet_df)
-
-#         parseVisr.set_field_category()
-
-#         test_lst.append(parseVisr.get_estimate)
-#         evr_count += 1
-#     with tempfile.NamedTemporaryFile(
-#         suffix=".csv", delete=False, dir=path
-#     ) as temp_file:
-#         # Сохранение списка DataFrame в файл CSV
-#         for df in test_lst:
-#             df.to_csv(temp_file, mode="a", index=False)
-
-#     # Получение пути к временному файлу
-
-#     temp_path = os.path.relpath(os.path.dirname(temp_file.name))
-#     temp_file_name = os.path.basename(temp_file.name)
-#     temp_folder.append({temp_file_name: temp_path})
-
-#     return temp_file_name
-
-
-async def check_file(data_to_import: ConfirmImport) -> DataFrame | HTTPException:
+async def check_file(data_to_import: ConfirmImport) -> DataFrame | None:
     """
     Функция поиска пути для удаления или дальнейшей обработки
 
@@ -249,34 +208,16 @@ async def check_file(data_to_import: ConfirmImport) -> DataFrame | HTTPException
     размещения в бд, иначе удалить
 
     """
-    # Надо разобраться, есть решения но я их не понимаю, связанны с typeGuard MyPy
-    # найти путь по ключу ID временного файла
-    # tmp_file: dict[Any, Any] = next(
-    #     filter(lambda file: tempFileId in file, temp_folder), None
-    # )
 
     temp_paths: list[str] = await redis_connect.mget(*data_to_import.file_paths)
-    print(type(temp_paths[0]))
+
     if temp_paths:
         if data_to_import.confirmation:
-            for file in temp_paths:
-                # Полный путь к файлу для создания DF
-
-                visrs_df = pd.read_csv(file)
-                print("visrs_df,(visrs_df)", visrs_df)
-                return visrs_df
-
+            ss = pd.concat([pd.read_csv(file) for file in temp_paths])
+            return ss
         else:
-            shutil.rmtree(tmp_file[tempFileId])
-            # исключить найденный путь из глобальнго списка объектов
-            temp_folder.remove(tmp_file)
+            dir_to_del = os.path.dirname(temp_paths[0])
+            shutil.rmtree(dir_to_del)
             raise HTTPException(status_code=200, detail="Каталог удален")
-
     else:
-        # !!!УБРАТЬ
-        visrs_df = pd.read_csv(
-            "..\\upload_files\\23-06-2023\\9\\11_35\\tmpb_u9ckd2.csv"
-        )
-        return visrs_df
-        # !!!УБРАТЬ
-        # raise HTTPException(status_code=404, detail="Файл обработан или удален")
+        raise HTTPException(status_code=404, detail="Файл обработан или удален")

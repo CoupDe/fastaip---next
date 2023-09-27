@@ -5,7 +5,7 @@ from fastapi import HTTPException
 
 from pandas import DataFrame
 import pandas as pd
-from pydantic import ConfigDict, BaseModel, computed_field, validator
+from pydantic import ConfigDict, BaseModel, computed_field, field_validator, validator
 from db.models.visr_models import (
     VisrModel,
     EstimateModel,
@@ -21,7 +21,7 @@ from const.enums import LaborEnum, VisrDataEnum, AdditionalEstimatedEnum
 # Abstract class Visr
 class AbstractVisr(ABC, BaseModel):
     @abstractmethod
-    def get_estimates_ranges(self, criteria: tuple[str, str]) -> list[range]:
+    def get_estimates_ranges(self, criteria: tuple[Enum, Enum]) -> list[range]:
         pass
 
 
@@ -29,7 +29,7 @@ class AbstractVisr(ABC, BaseModel):
 class AbstractEstimate(ABC, BaseModel):
     @abstractmethod
     def get_estimated_price_ranges(
-        self, criteria: tuple[str, str], estimated_range: range
+        self, criteria: tuple[Enum, Enum], estimated_range: range
     ) -> list[DataFrame]:
         pass
 
@@ -103,7 +103,6 @@ class EstimatedPrice(PriceComponent):
             data.pop("Index")
             match data["temp"]:
                 case AdditionalEstimatedEnum.NR.value:
-                    print('data',data)
                     self.additional_prices.append(
                         AdditionalPrice(
                             pos=data["pos"],
@@ -111,7 +110,7 @@ class EstimatedPrice(PriceComponent):
                             total_cost=data["total_cost"],
                         )
                     )
-                case  AdditionalEstimatedEnum.SP.value:       
+                case AdditionalEstimatedEnum.SP.value:
                     self.additional_prices.append(
                         AdditionalPrice(
                             pos=data["pos"],
@@ -120,7 +119,6 @@ class EstimatedPrice(PriceComponent):
                         )
                     )
                 case _:
-                    
                     self.labors.append(LaborPrice(**data))
 
         # self.labors.append(LaborPrice(self.labor_df))
@@ -136,7 +134,8 @@ class EstimatedPrice(PriceComponent):
             total_cost=self.total_cost,
             labors=[
                 LaborPriceModel(
-                    category=labor.category, **labor.model_dump(exclude={"temp", "category"})
+                    category=labor.category,
+                    **labor.model_dump(exclude={"temp", "category"}),
                 )
                 for labor in self.labors
             ],
@@ -227,7 +226,7 @@ class EstimateImpl(AbstractEstimate):
         return uniq_data.replace(" ", "").split("\n")
 
     def get_estimated_price_ranges(
-        self, criteria: tuple[str, str], estimated_range: range
+        self, criteria: tuple[Enum, Enum], estimated_range: range
     ) -> list[DataFrame]:
         """Функция для фильтрации диапазонов расценок
 
@@ -316,10 +315,27 @@ class VisrImpl(AbstractVisr):
 
         self.visr_df = df
 
+    @computed_field  # type: ignore[misc]
+    @property
+    def visr_id(self) -> str | None:
+        visr_id = self.name_visr.split(None, 1)[0]
+        if visr_id[0].isdigit() and visr_id.count(".") > 1:
+            return visr_id
+        else:
+            return None
+        # for visr in self.visrs_df:
+        #     for sheets_name, df in visr.items():
+        #         visr_id = sheets_name.split(None, 1)[0]  # Получение id
+        #         if visr_id[0].isdigit() and visr_id.count(".") > 1:
+        #             visr_with_id.append({visr_id: df})
+        #         else:
+        #             visr_without_id.append(df)
+        # return visr_with_id, visr_without_id
+
     def __str__(self) -> str:
         return f"{self.name_visr} {self.type_work}"
 
-    def get_estimates_ranges(self, criteria: tuple[str, str]) -> list[range]:
+    def get_estimates_ranges(self, criteria: tuple[Enum, Enum]) -> list[range]:
         """Функция осуществляет фильтрацию диапазонов локальных смет,
         и спользуя переданные критерии
 
@@ -368,6 +384,7 @@ class VisrImpl(AbstractVisr):
         transform_visr = VisrModel(
             building_id=VisrImpl.building_id,
             name_visr=self.name_visr,
+            visrs_id=self.visr_id,
             type_work=self.type_work,
             total_cost=self.total_cost,
             estimates=[estimates._data_to_db() for estimates in self.estimates],
@@ -393,24 +410,21 @@ class ImportDataInfo(BaseModel):
 
 # post Model route.post("/{building_id}/confirm/",
 class ConfirmImport(BaseModel):
-    redis_key_id: str|None=None
-    redis_key_non_id: str|None=None
-    tasks_key: str|None=None
+    redis_key_id: str | None = None
+    redis_key_non_id: str | None = None
+    tasks_key: str | None = None
     confirmation: bool
     id: int
-    
 
-    @computed_field # type: ignore[misc]
+    @computed_field  # type: ignore[misc]
     @property
-    def file_paths (self)->list[str]:
-        temp_list:list[str]=[]
-        if (self.redis_key_id):
+    def file_paths(self) -> list[str]:
+        temp_list: list[str] = []
+        if self.redis_key_id:
             temp_list.append(self.redis_key_id)
-        if (self.redis_key_non_id):
+        if self.redis_key_non_id:
             temp_list.append(self.redis_key_non_id)
         return temp_list
-        
-
 
 
 # return Model route.post("/{building_id}/confirm/"
@@ -452,6 +466,7 @@ class VisrBaseSchema(BaseModel):
     name_visr: str
     type_work: str
     total_cost: float
+    visrs_id: str | None = None
 
 
 class VisrSchema(VisrBaseSchema):

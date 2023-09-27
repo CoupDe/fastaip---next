@@ -45,6 +45,7 @@ export interface Visr {
   id: number;
   name_visr: string;
   type_work: string;
+  visrs_id: string;
   total_cost: number;
   building_id: number;
 }
@@ -57,5 +58,6 @@ export type OmitPos<T> = Omit<T, "pos">;
 export interface RowData extends OmitPos<Partial<CommonPriceVisr>> {
   parentId: number | null;
   type_work?: string;
+  numberData?: string;
   pos?: number | string;
 }

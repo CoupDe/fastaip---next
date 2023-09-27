@@ -1,3 +1,4 @@
+from collections import Counter
 from fastapi import HTTPException, Response
 import pandas as pd
 from pandas import DataFrame
@@ -39,6 +40,7 @@ def create_visr_obj(visrs_df: DataFrame, building_id: int) -> list[VisrModel]:
     for visr in visr_ranges:
         visr_slice: DataFrame = (df.loc[list(visr), :]).reset_index(drop=True)
         visr_instance = VisrImpl(visr_slice)
+       
         visr_instance.merging_structure()
         visrs.append(visr_instance._data_to_db())
     return visrs

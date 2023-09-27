@@ -1,5 +1,4 @@
 import asyncio
-import json
 
 from redis import Redis  # type: ignore
 

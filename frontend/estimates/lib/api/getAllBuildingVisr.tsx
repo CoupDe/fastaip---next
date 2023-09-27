@@ -22,5 +22,5 @@ export const getAllBuildingsVisr = async (
     throw Error(errorMessage || result.statusText);
   }
  
-  return result.json();
+  return result.json() as Promise<StructureVisrResponse[]>;;
 };
