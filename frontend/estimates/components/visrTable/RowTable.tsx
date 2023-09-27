@@ -75,6 +75,7 @@ const RowTable: React.FC<TableData> = ({ dataRow, depth, children }) => {
             </div>
           </div>
         </td>
+          
         <td className="p-1 text-xs">{dataRow.code}</td>
         <td className="p-1 text-xs font-semibold ">{dataRow.name}</td>
         <td className="text-xs" align="center">

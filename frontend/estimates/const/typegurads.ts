@@ -30,5 +30,5 @@ export function isLaborPrice(obj: any): obj is LaborPrice {
   return "category" in obj;
 }
 export function isAdditionPrice(obj: any): obj is AdditionPrice {
-  return "name" in obj && (obj.name === "NR" || obj.name === "SP");
+  return "name" in obj && (obj.name === "НР" || obj.name === "СП");
 }

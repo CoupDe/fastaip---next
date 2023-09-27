@@ -14,7 +14,6 @@ const searchFormats = function (files: FileList): SearchFormats {
   return { badFormat, okFormat };
 };
 
-
 const formats = [".xls", ".xlsx", ".xlsm"];
 const UploadForm = () => {
   const [dragActive, setDragActive] = React.useState(false);
@@ -61,7 +60,12 @@ const UploadForm = () => {
         >
           <div className="flex flex-col items-center justify-center py-2">
             {fileFormats ? (
-              <FormatInfo format={fileFormats} setShow={setShowFiles} />
+              <FormatInfo
+                format={fileFormats}
+                setShow={setShowFiles}
+                setFileFormats={setFileFormats}
+                setDragActive={setDragActive}
+              />
             ) : (
               <>
                 <svg

@@ -15,5 +15,5 @@ async def get_all_building_visr(
     building_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     visrs = await structure_visr_service.get_all_building_visr(building_id, session)
-
+ 
     return visrs

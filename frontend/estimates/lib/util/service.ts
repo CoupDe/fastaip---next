@@ -16,6 +16,7 @@ export function convertToDataRow(data: RowData): RowData {
     id: data.id,
     parentId: data.parentId,
     pos: data.pos,
+    numberData:data.numberData || '',
     code: data.code || "",
     name: data.name?.trim() || "",
     unit: data.unit || "",

@@ -11,7 +11,6 @@ export const getAllBuildingsVisr = async (
     let errorMessage;
 
     const contentType = result.headers.get("content-type");
-    console.log("contentType", contentType);
     if (contentType && contentType.includes("application/json")) {
       const errorData = await result.json();
       console.log("errorData", errorData);
@@ -22,5 +21,6 @@ export const getAllBuildingsVisr = async (
 
     throw Error(errorMessage || result.statusText);
   }
-  return result.json();
+ 
+  return result.json() as Promise<StructureVisrResponse[]>;;
 };

@@ -5,7 +5,7 @@ type Props = { params: { building_id: string } };
 
 export default async function VisrStructure({ params }: Props) {
   const structureVisr = await getAllBuildingsVisr(params.building_id);
-
+ 
   return (
     <>
       {structureVisr.length ? (

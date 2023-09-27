@@ -8,6 +8,6 @@ type Props = { params: { building_id: string } };
 
 export default async function page({ params }: Props) {
   const result = await getAllFormData(params.building_id);
-
+  console.log(result.length)
   return <FormTable dataForm={result} />;
 }

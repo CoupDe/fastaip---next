@@ -16,14 +16,17 @@ module.exports = {
         closemenu: "closemenu 0.2s ease-in",
         showArrow: "showArrow 0.2s ease-in 3",
         slideErrorPopupLeft:
-          "slideErrorPopupLeft 0.2s , slideErrorPopupLeftPause 3s "
+          "slideErrorPopupLeft 0.2s , slideErrorPopupLeftPause 3s ",
+        rotate: "rotate 1s infinite",
+        ball1: "ball1 1s infinite",
+        ball2: "ball2 1s infinite",
       },
       fontFamily: {
         overpass: "var(--font-overpass)",
         sans: "var(--font-dmMono)",
         sspro: "var(--font-sspro)",
       },
-    
+
       // that is actual animation
       keyframes: (theme) => ({
         fadeOut: {
@@ -54,15 +57,14 @@ module.exports = {
             transform: "translateX(100px)",
           },
         },
+        openmenu: {
+          // initial position
+          "0%": { opacity: 0 },
+          // final position
+          "100%": { opacity: 1 },
+        },
       }),
-
-      openmenu: {
-        // initial position
-        "0%": { opacity: 0 },
-        // final position
-        "100%": { opacity: 1 },
-      },
     },
+    plugins: [],
   },
-  plugins: [],
 };

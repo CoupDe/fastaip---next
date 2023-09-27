@@ -55,10 +55,10 @@ async def update_structure(
     structure: structure_schema.UpdateStructure,
     session: AsyncSession = Depends(get_async_session),
 ) -> UpdateStructure | None:
-    print("enter route", structure)
+   
     structures = await structure_service.patch_structure(structure, session=session)
 
-    print("in PATCH", structures)
+   
 
     return structures
     # if not structure:

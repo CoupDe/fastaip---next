@@ -6,7 +6,8 @@ from fastapi import HTTPException
 from pandas import DataFrame
 from pydantic import ConfigDict, BaseModel
 
-from const.enums import AdditionalEstimatedEnum, LaborEnum, VisrDataEnum
+
+from const.enums import AdditionalEstimatedEnum,LaborEnum, VisrDataEnum
 
 
 class EstimateInterface(ABC):
@@ -19,7 +20,7 @@ class EstimateInterface(ABC):
         pass
 
     @abstractmethod
-    def set_labor_price(self, dt: DataFrame) -> DataFrame:
+    def set_labor_price(self) -> DataFrame:
         pass
 
 
@@ -32,19 +33,17 @@ class PreparingVisr(BaseModel, EstimateInterface):
     """
 
     data: DataFrame = pd.DataFrame()
+    visr_id: str | None = None
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    def __init__(self, dt: DataFrame):
+    def __init__(self, dt: DataFrame, visr_id: str | None = None):
         super().__init__()
         self.data = dt
+        self.visr_id = visr_id
 
-    @property
-    def get_estimate(self) -> DataFrame:
-        return self.data
-
-    def set_field_category(self):
-        self.data.update(self.set_header())
+    def get_process_visr(self) -> DataFrame:
+        self.set_header()
         self.data.update(self.set_estimated_price())
         self.data.update(self.set_local_estimate())
         self.data.update(self.set_labor_price())
@@ -52,36 +51,19 @@ class PreparingVisr(BaseModel, EstimateInterface):
         self.set_total_estimate_cost()
         self.set_general_data()
         self.data = self.get_final_format()
+        return self.data
+
+    def set_field_category(self):
+        pass
 
     def set_header(self) -> None:
         """Установка фиксированных наименований
         колонок и добавление колонки temp"""
 
-        try:
-            self.data.columns = pd.Index(
-                [
-                    "pos",
-                    "code",
-                    "name",
-                    "unit",
-                    "quantity",
-                    "unit_cost",
-                    "total_cost",
-                ]
-            )
-            self.data = self.data.assign(temp=None)
-            # Удаление пробелов
-            self.data.loc[:, "unit":"total_cost"] = self.data.loc[
-                :, "unit":"total_cost"
-            ].replace(r"\s+", "", regex=True)
-
-        except ValueError:
-            raise HTTPException(
-                status_code=422,
-                detail=f"""Количество колонок не соответсвует
-                  требуемому формату, должно быть
-                  7 колонок, присутвует {self.data.shape[1]}""",
-            )
+        # Удаление пробелов
+        self.data.loc[:, "unit":"total_cost"] = self.data.loc[
+            :, "unit":"total_cost"
+        ].replace(r"\s+", "", regex=True)
 
     def set_estimated_price(self) -> DataFrame:
         """
@@ -89,14 +71,14 @@ class PreparingVisr(BaseModel, EstimateInterface):
         """
         # to_numeric пробует конвертировать любые значения во float,
         # что не получается, конвертирует в NaN
-
-        _temp_dt = self.data.loc[:, "pos":"total_cost"]
+        # не нашел решение, похоже на нормальное поведение выбора срезов по названию колонок
+        _temp_dt = self.data.loc[:, "pos":"total_cost"]  # type: ignore
         convert_toFloat = pd.to_numeric(
             _temp_dt["pos"], errors="coerce", downcast="integer"
         )
         # Исключить шапку из возможного типа расценки 'E'
         # Разобраться с преобразованием
-        _head_index: int = convert_toFloat.first_valid_index()
+        _head_index: float = convert_toFloat.first_valid_index()
         if _temp_dt.loc[_head_index - 1, "pos":"quantity"].isna().all():
             convert_toFloat.loc[_head_index] = pd.NA
         # Создается условие для конвертации в float
@@ -108,7 +90,7 @@ class PreparingVisr(BaseModel, EstimateInterface):
         _temp_dt.loc[cond, "quantity":"total_cost"] = _temp_dt.loc[
             cond, "quantity":"total_cost"
         ].astype("Float64")
-        _temp_dt.loc[cond, "temp"] = VisrDataEnum.E.value
+        _temp_dt.loc[cond, "temp"] = str(VisrDataEnum.E.value)
         return _temp_dt
 
     def set_local_estimate(self) -> DataFrame:
@@ -120,7 +102,6 @@ class PreparingVisr(BaseModel, EstimateInterface):
             self.data["code"].str.contains("\n", case=False, na=False)
             & (self.data["total_cost"].isna())
         ]
-
         try:
             # проверка на инстанс str и что последний символ не является переносом строки
             _local_num_df.loc[:, "temp"] = _local_num_df.loc[:, "code"].apply(
@@ -141,13 +122,15 @@ class PreparingVisr(BaseModel, EstimateInterface):
         Функция по поиску трудозатрат Тип 'OZ MM AM MA' и приведение к типу float64
         стоимостных показателей
         """
+        
         _temp_df = DataFrame()
         for labor_type in LaborEnum:
+        
             tzo_df = self.data.loc[:].query("pos == @labor_type.value")
             tzo_df.loc[:, "quantity":"total_cost"] = tzo_df.loc[
                 :, "quantity":"total_cost"
             ].astype("Float64")
-            tzo_df["temp"] = labor_type.name
+            tzo_df["temp"] = labor_type.value
             _temp_df = pd.concat([_temp_df, tzo_df])
 
         return _temp_df
@@ -165,7 +148,7 @@ class PreparingVisr(BaseModel, EstimateInterface):
             additional_df.loc[:, "total_cost"] = additional_df.loc[
                 :, "total_cost"
             ].astype("Float64")
-            additional_df.loc[:, "temp"] = additional_type.name
+            additional_df.loc[:, "temp"] = additional_type.value
             _temp_df = pd.concat([_temp_df, additional_df])
             _temp_df["name"].str.replace(" ", "")
         return _temp_df
@@ -185,15 +168,15 @@ class PreparingVisr(BaseModel, EstimateInterface):
 
     def set_general_data(self) -> None:
         """Устанавливает признак общей информаци о ВИСР (Наименование ВИСР "GN", Наименование вида работ "GW")"""
-
-        if self.data.at[3, "pos"] != "":
-            self.data.at[3, "temp"] = "GN"
+        
+        if self.data.at[1, "pos"] != "":
+            self.data.at[1, "temp"] = "GN"
         else:
             raise HTTPException(
                 status_code=422, detail="Наименование объекта имеет пустое значение"
             )
-        if self.data.at[4, "pos"] != "":
-            self.data.at[4, "temp"] = "GW"
+        if self.data.at[2, "pos"] != "":
+            self.data.at[2, "temp"] = "GW"
         else:
             raise HTTPException(
                 status_code=422, detail="Наименование объекта имеет пустое значение"
@@ -202,4 +185,6 @@ class PreparingVisr(BaseModel, EstimateInterface):
     def get_final_format(self) -> DataFrame:
         """Фильтраци по признакам из колонки temp и возвращение чистого dataframe"""
         final = self.data[self.data["temp"].notna()].reset_index(drop=True)
+        if self.visr_id is not None:
+            final.loc[1, "code"] = self.visr_id
         return final

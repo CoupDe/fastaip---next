@@ -15,8 +15,11 @@ const parseData = (num: number | null): number | null =>
 function FormTableRow({ row, setSelectedId, selectedId, isBlocked }: Props) {
   return (
     <tr className="text-xs ">
-      <td className="bg-gray-800 text-white  p-1" align="center">
+      <td className="bg-gray-800 text-white w-6  p-1" align="center">
         {row.visr_identifier}
+      </td>
+      <td className="bg-gray-800 w-1" align="center">
+        <div className="w-2 h-2 bg-red-400 rounded-full"></div>
       </td>
       <TruncatedRow
         dataRow={row.building_code}
@@ -33,7 +36,8 @@ function FormTableRow({ row, setSelectedId, selectedId, isBlocked }: Props) {
         isBlocked={isBlocked}
       />
 
-      <td className="bg-gray-800 text-white p-1">{row.type_work}</td>
+      <td className="bg-gray-800 min-w-56 text-white p-1">{row.type_work}</td>
+
       <td className="bg-gray-800 text-white p-1 " align="center">
         {row.unit}
       </td>

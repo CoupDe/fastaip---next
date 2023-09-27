@@ -1,10 +1,16 @@
 import io
 from typing import List, Optional
-
 import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, status
 from fastapi.responses import JSONResponse
+from pandas import DataFrame
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from .temp_file_controller_queue import TempFileTaskManager
+
+from .upload_visr_schema import UploadFileResponse
+from .upload_service import TempFileManager, check_file
+from .excel_visr_stats_service import ExcelAnalyzer
 
 
 from services.v1.upload_form_service import (
@@ -12,36 +18,63 @@ from services.v1.upload_form_service import (
     insert_form_data,
     create_form,
 )
-
-
-from db.models.visr_models import VisrModel, AdditionalPriceModel
 from services.v1.import_service import create_visr_obj, check_visr_BD, create_visr
 from db.base import get_async_session
-from schemas.visr_schema import ConfirmImport, ImportDataInfo, VisrBaseSchema
-from services.v1.upload_service import check_file, create_dir, prepare_to_upload
+from schemas.visr_schema import ConfirmImport, VisrBaseSchema
+
 
 route = APIRouter(prefix="/v1/import", tags=["import"])
+temp_file_tasks_queue = TempFileTaskManager()
 
 
-@route.post("/visr/{building_id}", response_model=ImportDataInfo)
-async def upload_estimate(files: List[UploadFile], building_id: int) -> ImportDataInfo:
-    excel_WB = io.BytesIO(files[0].file.read())
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    df_excel = pd.read_excel(excel_WB, sheet_name=None, header=None)
-    evr_path = create_dir(building_id)
+@route.post("/visr/{building_id}", response_model=UploadFileResponse)
+async def upload_estimate(
+    files: list[UploadFile], building_id: int
+) -> UploadFileResponse:
+    """Получения файлов в виде Excel с вложенными листами с содержанием ВИСР-ов
 
-    temp_df_path = prepare_to_upload(df_excel, evr_path)
-    response = {
-        "filesInfo": [(files[0].filename, len(df_excel))],
-        "detail": f"обработано {len(df_excel)} ЕВР",
-        "tempFileId": temp_df_path,
-        "confirmation": False,
-    }
-    # Возвращает header с содержанием пути к временному файлу
+    Args:
+        files (list[UploadFile]): *.xlsx
+        building_id (int): Код стройки
 
-    # response.headers['X-Temp-Path'] = temp_df_path
+    Raises:
+        HTTPException: Файлы обработанны но пустые
+        HTTPException: _description_
 
-    return response
+    Returns:
+        UploadFileResponse: _description_
+    """
+    # Реализовано пока на одном файле
+
+    excel_WB = io.BytesIO(files[0].file.read())  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    # try:
+    assert files[0].filename is not None
+    df_visr = ExcelAnalyzer(excel_WB)
+    if df_visr.isNotEmpty:  # Проверка найдены ли листы с ВИСР
+        df_visr.pre_save_processing_data()
+        file_manager = TempFileManager(
+            building_id=building_id,
+            processed_data_with_id=df_visr.processed_data_with_id,
+            processed_data_non_id=df_visr.processed_data_non_id,
+            temp_file_tasks_queue=temp_file_tasks_queue,
+        )
+
+        file_manager.create_dir()
+        await file_manager.create_temp_file()
+        # Разобраться как реализовать TypeGuard not None
+        assert temp_file_tasks_queue.redis_task_key is not None
+
+        return UploadFileResponse(
+            **file_manager.model_dump(),
+            stats=df_visr.get_stats(),
+            tasks_key=temp_file_tasks_queue.redis_task_key,
+            file_name=files[0].filename,
+        )
+
+    else:
+        raise HTTPException(status_code=400, detail="Данных для обработки не выявлено")
+    # except Exception as err:
+    #     raise HTTPException(status_code=500, detail=f"Возникла ошибка: {err}")
 
 
 @route.post(
@@ -51,12 +84,13 @@ async def confirm_import(
     confirmationInfo: ConfirmImport,
     building_id: int,
     session: AsyncSession = Depends(get_async_session),
-) -> Optional[dict[str, list[VisrBaseSchema]] | Response]:
+) -> dict[str, list[VisrBaseSchema]] | Response:
     """Подтверждение импорта файлов, принимает путь
     к временному документу"""
-    # Удалени или создание Dataframe
-    visrs_dataframe = check_file(**confirmationInfo.dict())
-    if not visrs_dataframe.empty:
+    # Удалени каталога или создание Dataframe
+    visrs_dataframe = await check_file(confirmationInfo)
+  
+    if visrs_dataframe is not None:
         # Получение списка ВИСР
         visrs = create_visr_obj(visrs_dataframe, building_id)
         # Исклчение дублирование ВИСР в БД
@@ -90,7 +124,6 @@ async def upload_form(
     building_id: int,
     session: AsyncSession = Depends(get_async_session),
 ):
-    print("In from Import")
     try:
         excel_WB = io.BytesIO(files[0].file.read())
         df_raw_data_form = pd.read_excel(excel_WB, sheet_name=0)
