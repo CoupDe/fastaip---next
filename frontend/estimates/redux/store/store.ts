@@ -39,6 +39,7 @@ const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        warnAfter: 200, //Изменить предупреждение о ошибке в связи с долгой загрузкой данных
       },
     }),
 });

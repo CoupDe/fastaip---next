@@ -4,7 +4,7 @@ import { StructureVisrResponse } from "@/const/interfaces";
 export const getAllBuildingsVisr = async (
   building_id: string
 ): Promise<StructureVisrResponse[]> => {
-  const result = await fetch(getAllBuildingsVisrRout(building_id, "allVisr"), {
+  const result = await fetch(getAllBuildingsVisrRout(building_id, "/allVisr"), {
     cache: "no-store",
   });
   if (!result.ok) {

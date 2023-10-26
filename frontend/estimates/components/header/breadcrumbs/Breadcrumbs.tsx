@@ -7,14 +7,14 @@ import {
 } from "@/redux/slice/buildingSlice";
 import { Popover } from "@headlessui/react";
 import HomeWorkIcon from "@mui/icons-material/HomeWork";
+
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Fragment, useState } from "react";
+import { useParams, useSelectedLayoutSegment } from "next/navigation";
+import { useState } from "react";
 import AddConstructionBtn from "./constructionBtn/AddConstructionBtn";
-import { useSelectedLayoutSegment } from "next/navigation";
 import ImportRadioBtn from "./importBtn/ImportRadioBtn";
-import { revalidatePath, revalidateTag } from "next/cache";
-import { getAllFormData } from "@/lib/api/getAllFormData";
+import SynchBtn from "./synchBtn/SynchBtn";
 
 const list = {
   visible: {
@@ -41,15 +41,14 @@ export default function Breadcrumbs() {
   const buildingName = useAppSelector(ActiveBuilding);
   const dispatch = useAppDispatch();
   const segment = useSelectedLayoutSegment() as ActiveLink;
-
+  const params = useParams();
   const buildingList = useAppSelector(ReverseBuildingList);
   const handleSelectBuilding = (building: Building) => {
     setIsShow(false);
     dispatch(setBuilding(building));
   };
   const test = async (building_id: string) => {
-    const result = await getAllFormData(buildingName.id!);
-    console.log("result", result);
+    console.log("result", params);
   };
 
   return (
@@ -60,14 +59,13 @@ export default function Breadcrumbs() {
     >
       {segment === "projects" && <AddConstructionBtn />}
       {segment === "import" && <ImportRadioBtn />}
-      {segment === "form" && (
-        <button onClick={() => test("3")}>addVisrButton</button>
-      )}
+      {segment === "form" && <SynchBtn building_id={buildingName.id} />}
+
       <motion.nav
         layout="position"
         transition={{ duration: 0.7 }}
         animate={{ opacity: [1, 0, 1, 0.5, 1] }}
-        className="mr-3    flex items-center opacity-70"
+        className="    flex items-center opacity-70"
       >
         <Popover className="relative mr-3">
           <Popover.Button>
@@ -90,7 +88,7 @@ export default function Breadcrumbs() {
                         className="cursor-pointer px-1 hover:rounded hover:bg-slate-400"
                         onClick={() => handleSelectBuilding(build)}
                       >
-                        <Link href={`/main/srv/${build.id}`} className="block">
+                        <Link href={`/main/srv/${build.id}`} className="block ">
                           {build.name}
                         </Link>
                       </motion.li>

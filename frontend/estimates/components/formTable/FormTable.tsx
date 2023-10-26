@@ -1,6 +1,6 @@
 "use client";
 import { FormKS } from "@/lib/api/getAllFormData";
-import React, { useState } from "react";
+import React from "react";
 
 import FormTableRow from "./FormTableRow";
 
@@ -13,7 +13,7 @@ const FormTable = (props: Props) => {
     <>
       {props.dataForm.map((row) => (
         <FormTableRow
-          key={row.visr_identifier}
+          key={row.id}
           row={row}
           setSelectedId={setSelectedId}
           selectedId={selectedId}

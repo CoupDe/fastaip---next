@@ -4,10 +4,8 @@ export interface IAppProps {}
 
 export default function Loading(props: IAppProps) {
   return (
-    <tr className="bg-gray-500 h-[70vh] ">
-      <td className="w-full " colSpan={9} align="center">
-        <div className="loader "></div>
-      </td>
-    </tr>
+    <div className="flex flex-row h-full place-content-center ">
+      <div className="loader place-self-center">111</div>
+    </div>
   );
 }

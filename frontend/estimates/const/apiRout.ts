@@ -8,7 +8,7 @@ function generateRoute(endpoint: string) {
       apiVersion +
       endpoint +
       (id ? `${id}` : "") +
-      (param ? `/${param}` : "")
+      (param ? `${param}` : "")
     );
   };
 }

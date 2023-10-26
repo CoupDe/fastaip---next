@@ -23,7 +23,7 @@ export const acceptImport = async (
 ): Promise<IDetailResponseImport | ErrorImportResponse> => {
   const data = { ...importData, confirmation, id };
   console.log("data", data);
-  const response = await fetch(postImportFilesConfirmRout(id, "confirm"), {
+  const response = await fetch(postImportFilesConfirmRout(id, "/confirm"), {
     method: "POST",
     body: JSON.stringify(data),
     headers: {

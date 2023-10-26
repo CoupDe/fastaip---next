@@ -35,6 +35,7 @@ taChapter = TypeAdapter(Chapter)
 
 class FormKS(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+
     visr_identifier: constr(strip_whitespace=True) | None  # type: ignore[valid-type]
     building_code: constr(strip_whitespace=True) | None  # type: ignore[valid-type]
     blueprint_project_number: constr(strip_whitespace=True) | None  # type: ignore[valid-type]
@@ -83,3 +84,7 @@ class MyInfoError(BaseModel):
     index: int
     errorObj: List[dict]
     row_data: List[Any]
+
+
+class FormKsWithId(FormKS):
+    id: int

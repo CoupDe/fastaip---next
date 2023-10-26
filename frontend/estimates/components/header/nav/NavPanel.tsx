@@ -18,6 +18,7 @@ const NavPanel = (props: Props) => {
     {
       name: "формы КС-6",
       link: `/main/form/${selectedBuilding.id ? selectedBuilding.id : ""}`,
+      query: { page: "5", limit: "1000" },
     },
     { name: "Импорт", link: "/main/import" },
     { name: "Отчеты", link: "/reports" },
@@ -27,10 +28,7 @@ const NavPanel = (props: Props) => {
       <ul className="flex gap-2 place-content-center uppercase  ">
         {navigetionLink.map((link, i) => (
           <li key={i}>
-            <Link
-              className="navLink  text-sm  sm:text-lg"
-              href={link.link}
-            >
+            <Link className="navLink  text-sm  sm:text-lg" href={link.link}>
               {link.name}
             </Link>
           </li>

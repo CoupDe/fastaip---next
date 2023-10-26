@@ -6,14 +6,14 @@
   transform: rotateX(65deg) rotate(45deg);
 
   transform: perspective(200px) rotateX(65deg) rotate(45deg);
-  color: #fff;
+  color: rgb(157, 156, 156);
   animation: layers1 0.5s linear infinite alternate;
 }
 .loader:after {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255);
+  background: rgb(157, 156, 156);
   animation: layerTr 0.5s  linear infinite alternate;
 }
 
