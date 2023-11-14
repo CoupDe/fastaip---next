@@ -1,5 +1,6 @@
 from sqlalchemy import ForeignKey, String, UniqueConstraint
 
+
 from db.models.modelBase import (
     CommonAbstractBase,
 )
@@ -28,8 +29,9 @@ class FormKS(CommonAbstractBase):
     unit_cost: Mapped[float | None] = mapped_column(nullable=True)
     total_cost: Mapped[float | None] = mapped_column(nullable=True)
     visr: Mapped["VisrModel"] = relationship(  # type: ignore [name-defined]
-        back_populates="formks"
+        "VisrModel", back_populates="formks", uselist=False
     )
+    visr_id: Mapped[int] = mapped_column(ForeignKey("visrs_table.id"), nullable=True)
     building_id: Mapped[int] = mapped_column(
         ForeignKey("buildings_table.id"), nullable=False
     )

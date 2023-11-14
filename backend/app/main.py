@@ -3,6 +3,7 @@ import asyncio
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
+from microservice.synchFormWithVisr import synch_route
 
 from controllers.v1 import (
     building_route,
@@ -21,8 +22,9 @@ app = FastAPI(title="Parser")
 app.include_router(building_route.route, prefix="/api")
 app.include_router(structure_route.route, prefix="/api")
 app.include_router(upload_route.route, prefix="/api")
-app.include_router(visr_route.route, prefix="/api")
+app.include_router(visr_route.router, prefix="/api")
 app.include_router(formks_route.route, prefix="/api")
+app.include_router(synch_route.router, prefix="/api")
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,

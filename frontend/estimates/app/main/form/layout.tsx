@@ -5,27 +5,25 @@ import { Metadata } from "next";
 import { Suspense } from "react";
 import Loading from "./loading";
 
-export const metadata: Metadata = {
-  title: "Home",
-  description: "Welcome to Programm",
-};
-export default function MainLayout({
-  children,
-}: {
+type FormLayoutProps = {
   children: React.ReactNode;
-}) {
+  params: { building_id: string; query?: { page?: string; limit: string } };
+};
+
+export const metadata: Metadata = {
+  title: "Form",
+  description: "Work with form",
+};
+export default function MainLayout({ children, params }: FormLayoutProps) {
+
+
   return (
     <>
-      <div className="">
-        <div className="w-full overflow-x-clip overflow-y-auto h-[80vh]">
-          <table className="table-auto w-full mx-2 border-separate space-y-6 text-sm text-gray-400">
-            <TheadTable isForm={true} />
-            <tbody>
-              <Suspense fallback={<Loading />}>{children}</Suspense>
-            </tbody>
-          </table>
+      <Suspense fallback={<Loading />}>
+        <div className="w-full ">
+          {children}
         </div>
-      </div>
+      </Suspense>
     </>
   );
 }

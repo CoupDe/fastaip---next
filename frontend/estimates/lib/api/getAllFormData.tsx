@@ -11,16 +11,26 @@ export interface FormKS {
   unit_cost: number | null;
   total_cost: number | null;
   chapter: number | null;
+  id: number;
+  visr_id: number;
 }
 
-export async function getAllFormData(building_id: string): Promise<FormKS[]> {
-  await new Promise((res, rej) => setTimeout(res, 100));
-  const result = await fetch(getAllFormDataRout(building_id), {
-    cache: "force-cache",
-  });
+export async function getAllFormData(
+  building_id: string,
+  param: { page?: string; limit: string }
+): Promise<FormKS[]> {
+  const searchParams = new URLSearchParams(param).toString();
+  console.log(
+    "getAllFormDataRout(building_id, `?${searchParams}`)",
+    getAllFormDataRout(building_id, `?${searchParams}`)
+  );
+  const result = await fetch(
+    getAllFormDataRout(building_id, `?${searchParams}`),
+    { cache: "no-store" }
+  );
 
   if (!result.ok) {
-    throw Error("Failed");
+    throw Error(result.url);
   }
   return result.json();
 }

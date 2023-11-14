@@ -8,7 +8,7 @@ function generateRoute(endpoint: string) {
       apiVersion +
       endpoint +
       (id ? `${id}` : "") +
-      (param ? `/${param}` : "")
+      (param ? `${param}` : "")
     );
   };
 }
@@ -28,3 +28,5 @@ export const postImportFormRout = generateRoute("import/form/");
 export const getAllBuildingsVisrRout = generateRoute("building/");
 //-------------------//-Form-data-//---------//-----------------
 export const getAllFormDataRout = generateRoute("form/");
+//-------------------//-Synch-Visr_Form-data-//---------//-----------------
+export const postSynchVisrForms = generateRoute("synch/");

@@ -13,13 +13,20 @@ const parseData = (num: number | null): number | null =>
   num ? (Number.isInteger(num) ? num : parseFloat(num.toFixed(3))) : null;
 
 function FormTableRow({ row, setSelectedId, selectedId, isBlocked }: Props) {
+  if (row.visr_id !== null) {
+    console.log(row.visr_identifier);
+  }
   return (
     <tr className="text-xs ">
       <td className="bg-gray-800 text-white w-6  p-1" align="center">
         {row.visr_identifier}
       </td>
       <td className="bg-gray-800 w-1" align="center">
-        <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+        <div
+          className={`w-2 h-2 ${
+            row.visr_id ? "bg-green-300" : "bg-red-400"
+          } rounded-full`}
+        ></div>
       </td>
       <TruncatedRow
         dataRow={row.building_code}

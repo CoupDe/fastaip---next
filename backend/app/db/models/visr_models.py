@@ -20,9 +20,11 @@ class VisrModel(CommonAbstractBase):
     estimates: Mapped[list["EstimateModel"]] = relationship(
         back_populates="visr", cascade="all, delete"
     )
-    formks_id: Mapped[int] = mapped_column(ForeignKey("formks_table.id"), nullable=True)
     visrs_id: Mapped[str] = mapped_column(String(300), nullable=True)
-    formks: Mapped["FormKS"] = relationship(back_populates="visr")
+    formks: Mapped["FormKS"] = relationship(
+        "FormKS", 
+        back_populates="visr"
+    )
     building_id: Mapped[int] = mapped_column(
         ForeignKey("buildings_table.id"), nullable=False
     )
