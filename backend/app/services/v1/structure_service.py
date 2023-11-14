@@ -82,11 +82,11 @@ async def delete_structure(id_structure: int, session: AsyncSession) -> str | No
 async def patch_structure(
     structure: structure_schema.UpdateStructure, session: AsyncSession
 ) -> UpdateStructure | None:
-    print("structure in SERVICE", structure)
+
     stmt = (
         update(Structure)
         .where(Structure.id == structure.id)
-        .values(**structure.dict(exclude_unset=True))
+        .values(**structure.model_dump(exclude_unset=True))
         .returning(Structure)
     )
     res = await session.scalar(stmt)

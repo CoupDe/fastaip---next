@@ -1,4 +1,3 @@
-from typing import List
 from pydantic import (
     BaseModel,
     AfterValidator,
@@ -11,12 +10,12 @@ from pydantic import (
 
 from typing_extensions import Annotated, Any
 
-from pydantic_core import ErrorDetails
+from schemas.visr_schema import VisrSchema
 
 
 def check_range_chapter(chapter_num: int) -> int:
     if 1 <= chapter_num and chapter_num > 12:
-        print("in validate chapter_num")
+      
         raise ValueError("Глава должна быть в диапазоне 1-12")
     return chapter_num
 
@@ -82,9 +81,10 @@ class FormKS(BaseModel):
 
 class MyInfoError(BaseModel):
     index: int
-    errorObj: List[dict]
-    row_data: List[Any]
+    errorObj: list[dict]
+    row_data: list[Any]
 
 
 class FormKsWithId(FormKS):
     id: int
+    visr_id: int | None

@@ -7,10 +7,10 @@ from schemas.visr_schema import VisrSchema
 
 from services.v1 import structure_visr_service
 
-route = APIRouter(prefix="/v1/building", tags=["buildingVIsr"])
+router = APIRouter(prefix="/v1/building", tags=["buildingVIsr"])
 
 
-@route.get("/{building_id}/allVisr", response_model=list[VisrSchema])
+@router.get("/{building_id}/allVisr", response_model=list[VisrSchema])
 async def get_all_building_visr(
     building_id: int, session: AsyncSession = Depends(get_async_session)
 ):

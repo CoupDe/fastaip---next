@@ -473,4 +473,4 @@ class VisrSchema(VisrBaseSchema):
     building_id: int
     id: int
     estimates: list[EstimateSchema]
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, from_attributes=True)

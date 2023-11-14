@@ -1,9 +1,7 @@
 import FormTable from "@/components/formTable/FormTable";
 import TheadTable from "@/components/visrTable/TheadTable";
 import { getAllFormData } from "@/lib/api/getAllFormData";
-import SkipNextIcon from "@mui/icons-material/SkipNext";
-import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
-import Link from "next/link";
+
 import PaginationForm from "./pagination";
 type Props = {
   params: { building_id: string };
