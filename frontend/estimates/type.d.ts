@@ -22,7 +22,7 @@ interface Structure {
 }
 
 type FormStatus = "newConstruction" | "editConstruction" | "newBuilding";
-type ActiveLink = "projects" | "import" | "form" | null;
+type ActiveLink = "projects" | "import" | "form" | "(home)" | null;
 interface ModalFormProps {
   construction?: Construction;
   showForm: FormStatus;

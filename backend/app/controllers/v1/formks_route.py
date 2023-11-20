@@ -16,8 +16,10 @@ async def get_all_formData(
     building_id: int,
     page: int,
     limit: int,
+    isFiltered: bool | None = None,
     session: AsyncSession = Depends(get_async_session),
 ):
-    result = await paginate(building_id, page, limit, session)
-   
+    print(building_id)
+    result = await paginate(building_id, page, limit, isFiltered, session)
+
     return result

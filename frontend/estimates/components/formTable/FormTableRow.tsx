@@ -2,6 +2,7 @@ import { FormKS } from "@/lib/api/getAllFormData";
 import React from "react";
 import { TruncatedRow } from "./TruncatedRow";
 
+
 type Props = {
   row: FormKS;
   setSelectedId: React.Dispatch<React.SetStateAction<string | null>>;
@@ -16,6 +17,7 @@ function FormTableRow({ row, setSelectedId, selectedId, isBlocked }: Props) {
   if (row.visr_id !== null) {
     console.log(row.visr_identifier);
   }
+ 
   return (
     <tr className="text-xs ">
       <td className="bg-gray-800 text-white w-6  p-1" align="center">

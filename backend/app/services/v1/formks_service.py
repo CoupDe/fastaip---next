@@ -17,18 +17,30 @@ async def get_all_data(
 
 
 async def paginate(
-    bulding_id: int,
+    building_id: int,
     page: int,
     limit: int,
+    isFiltered: bool | None = None,
     session: AsyncSession = Depends(get_async_session),
 ) -> list[FormKS]:
+    print("isFiltered,isFiltered", isFiltered)
+    print("isFiltered,isFiltered", building_id)
     offset = (page - 1) * limit
-    stmt = select(FormKS).where(FormKS.visr_id is not None).offset(offset).limit(limit)
+    if isFiltered:
+        stmt = (
+            select(FormKS)
+            .where(FormKS.visr_id.isnot(None) & (FormKS.building_id == building_id))
+            .offset(offset)
+            .limit(limit)
+        )
+    else:
+        stmt = (
+            select(FormKS)
+            .where(FormKS.building_id == building_id)
+            .offset(offset)
+            .limit(limit)
+        )
     result = await session.scalars(stmt)
     formks_list = list(result.all())
-    for form in formks_list:
-        if form.visr_id != None:
-          
-   
 
     return formks_list

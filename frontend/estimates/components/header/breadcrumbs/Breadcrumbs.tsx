@@ -47,10 +47,10 @@ export default function Breadcrumbs() {
     setIsShow(false);
     dispatch(setBuilding(building));
   };
-  const test = async (building_id: string) => {
-    console.log("result", params);
-  };
-
+  console.log(segment);
+  if (segment === "(home)") {
+    return null;
+  }
   return (
     <div
       className={`flex ${

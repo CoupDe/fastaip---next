@@ -28,7 +28,7 @@ const NavPanel = (props: Props) => {
       <ul className="flex gap-2 place-content-center uppercase  ">
         {navigetionLink.map((link, i) => (
           <li key={i}>
-            <Link className="navLink  text-sm  sm:text-lg" href={link.link}>
+            <Link className="navLink  text-xs  sm:text-sm lg:text-lg" href={link.link}>
               {link.name}
             </Link>
           </li>

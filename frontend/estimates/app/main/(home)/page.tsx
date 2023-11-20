@@ -6,7 +6,7 @@ type Props = {};
 
 const HomeInfo = (props: Props) => {
   return (
-    <div className="container mx-auto h-full flex flex-col px-3 justify-center items-center font-sspro sm:flex-row">
+    <div className=" mx-auto h-full flex flex-col px-3 justify-center items-center font-sspro sm:flex-row">
       <div className="flex-1  flex flex-col  justify-center items-center ">
         <button>
           <Image
@@ -24,14 +24,14 @@ const HomeInfo = (props: Props) => {
       </div>
 
       {/* <span className="h-[400px] w-1 bg-red-600 shadow-xl  shadow-sky-600 "></span> */}
-      <div className="flex-1 flex flex-col justify-center items-center">
+      <div className="flex-1 flex flex-col justify-center items-center ">
         <h3 className={`text-lg font-bold `}>
           Добро пожаловать в{" "}
           <a className="decoration-sky-600 underline underline-offset-4 dark:decoration-red-900">
             ПК ...
           </a>
         </h3>
-        <p className="italic line-clamp-5 leading-relaxed mt-3 normal-case indent-4">
+        <p className="italic line-clamp-5 leading-relaxed mt-3 normal-case max-w-lg indent-4">
           Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum quam
           quae omnis, consequatur soluta veniam amet maxime provident pariatur
           totam sint esse quaerat dolorem ad illum atque? Natus, hic soluta!

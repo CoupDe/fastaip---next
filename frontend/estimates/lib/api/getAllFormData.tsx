@@ -17,7 +17,7 @@ export interface FormKS {
 
 export async function getAllFormData(
   building_id: string,
-  param: { page?: string; limit: string }
+  param: { page?: string; limit: string; isFiltered?: "true" | "false" }
 ): Promise<FormKS[]> {
   const searchParams = new URLSearchParams(param).toString();
   console.log(
