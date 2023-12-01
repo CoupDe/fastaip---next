@@ -3,13 +3,9 @@ const apiVersion = "/api/v1/";
 // Все стройки
 function generateRoute(endpoint: string) {
   return (id?: string, param?: string) => {
-    return (
-      BASEURL +
-      apiVersion +
-      endpoint +
-      (id ? `${id}` : "") +
-      (param ? `${param}` : "")
-    );
+    return `${BASEURL}${apiVersion}${endpoint}${id ? `${id}` : ""}${
+      param ? `/${param}` : ""
+    }`;
   };
 }
 //-------------------//-building-//---------//-----------------------
@@ -26,6 +22,7 @@ export const postImportFilesConfirmRout = generateRoute("import/visr/");
 export const postImportFormRout = generateRoute("import/form/");
 //-------------------//-Structure_VISR-//---------//-----------------
 export const getAllBuildingsVisrRout = generateRoute("building/");
+export const getVisrByIdRout = generateRoute("building/");
 //-------------------//-Form-data-//---------//-----------------
 export const getAllFormDataRout = generateRoute("form/");
 //-------------------//-Synch-Visr_Form-data-//---------//-----------------

@@ -12,7 +12,7 @@ const SynchBtn = ({ building_id }: Props) => {
 
   const searchParams = useSearchParams();
   const rout = useRouter();
-  console.log(searchParams?.get("page"));
+
   if (building_id !== undefined) {
     async function handleSynchData(building_id: string) {
       const result = await synchVisrWIthForm(building_id);

@@ -1,4 +1,4 @@
-import { Dialog } from "@headlessui/react";
+
 import { Fragment, useState } from "react";
 import ConstructionFormCreate from "../FormCreateConstruction";
 
@@ -40,28 +40,33 @@ export default function MyModalForm(props: FormProps) {
   return (
     <>
       {isOpen && (
-        <Dialog as="div" open={isOpen} className="relative z-10" onClose={() => { }}>
+        <div
+          as="div"
+          open={isOpen}
+          className="relative z-10"
+          onClose={() => {}}
+        >
           <div className="fixed inset-0 bg-black bg-opacity-25" />
 
           <div className="fixed inset-0 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <Dialog.Title
+              <div className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <div
                   as="h3"
                   className="text-sm font-medium leading-6 text-gray-900"
                 >
                   <MyTitle {...props.modalProps} />
-                </Dialog.Title>
+                </div>
                 <div className="mt-2">
                   <ConstructionFormCreate
                     closeModal={closeModal}
                     modalProps={props.modalProps}
                   />
                 </div>
-              </Dialog.Panel>
+              </div>
             </div>
           </div>
-        </Dialog>
+        </div>
       )}
     </>
   );

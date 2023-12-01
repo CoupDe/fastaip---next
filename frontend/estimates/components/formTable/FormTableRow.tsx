@@ -1,7 +1,8 @@
 import { FormKS } from "@/lib/api/getAllFormData";
 import React from "react";
 import { TruncatedRow } from "./TruncatedRow";
-
+import Link from "next/link";
+import { usePathname, useSearchParams, useParams } from "next/navigation";
 
 type Props = {
   row: FormKS;
@@ -15,20 +16,25 @@ const parseData = (num: number | null): number | null =>
 
 function FormTableRow({ row, setSelectedId, selectedId, isBlocked }: Props) {
   if (row.visr_id !== null) {
-    console.log(row.visr_identifier);
+  
   }
- 
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const params = useParams();
+
   return (
     <tr className="text-xs ">
       <td className="bg-gray-800 text-white w-6  p-1" align="center">
         {row.visr_identifier}
       </td>
       <td className="bg-gray-800 w-1" align="center">
-        <div
-          className={`w-2 h-2 ${
-            row.visr_id ? "bg-green-300" : "bg-red-400"
-          } rounded-full`}
-        ></div>
+        {row.visr_id ? (
+          <Link href={`${pathname}/${row.visr_id}`}>
+            <div className="w-2 h-2 bg-green-300 rounded-full"></div>
+          </Link>
+        ) : (
+          <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+        )}
       </td>
       <TruncatedRow
         dataRow={row.building_code}

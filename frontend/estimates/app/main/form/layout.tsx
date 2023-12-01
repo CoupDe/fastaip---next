@@ -1,29 +1,23 @@
-import Header from "@/components/header/Header";
-import Breadcrumbs from "@/components/header/breadcrumbs/Breadcrumbs";
-import TheadTable from "@/components/visrTable/TheadTable";
 import { Metadata } from "next";
 import { Suspense } from "react";
 import Loading from "./loading";
 
 type FormLayoutProps = {
   children: React.ReactNode;
-  params: { building_id: string; query?: { page?: string; limit: string } };
+  modal: React.ReactNode;
 };
 
 export const metadata: Metadata = {
   title: "Form",
   description: "Work with form",
 };
-export default function MainLayout({ children, params }: FormLayoutProps) {
-
-
+export default function MainLayout({ children, modal }: FormLayoutProps) {
   return (
     <>
       <Suspense fallback={<Loading />}>
-        <div className="w-full ">
-          {children}
-        </div>
+        <div className="w-full h-1/2">{children}</div>
       </Suspense>
+      {modal}
     </>
   );
 }

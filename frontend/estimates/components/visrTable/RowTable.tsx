@@ -27,6 +27,7 @@ const bgColorLevel = (depth: number): string => {
 const RowTable: React.FC<TableData> = ({ dataRow, depth, children }) => {
   const [show, setShow] = React.useState<boolean>(false);
   const [isEditing, setIsEditing] = useState(false);
+  
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const [percentField, setPercentField] = useState<number | string | null>(
     null

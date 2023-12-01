@@ -13,7 +13,7 @@ import {
   setImportDataResponse,
   setImportError,
 } from "@/redux/slice/uploadSlice";
-import { Dialog } from "@headlessui/react";
+
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useRouter } from "next/navigation";
 import React, { Fragment, useState } from "react";
@@ -36,7 +36,11 @@ const UploadModal: React.FC<UploadModalProps> = ({ importData, onClose }) => {
     redis_key_non_id,
     tasks_key,
   };
-  const handleConfirmImport = async (confirmation: boolean) => {
+  const handleConfirmImport = async (
+    confirmation: boolean,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
     try {
       const result = await acceptImport(sendFiles, confirmation, id!);
       if (Array.isArray(result.detail)) {
@@ -60,12 +64,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ importData, onClose }) => {
   return (
     <>
       {isOpen && (
-        <Dialog
-          as="div"
-          open={isOpen}
-          className="relative z-10"
-          onClose={() => {}}
-        >
+        <div className="relative z-10">
           <>
             <div className="fixed inset-0 bg-black bg-opacity-25" />
           </>
@@ -73,16 +72,13 @@ const UploadModal: React.FC<UploadModalProps> = ({ importData, onClose }) => {
           <div className="fixed inset-0 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center p-4 text-center">
               <>
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-sm  font-medium leading-6 text-gray-900"
-                  >
+                <div className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <div className="text-sm  font-medium leading-6 text-gray-900">
                     Статистика импорта:
                     <span className="ml-2 text-sm text-red-500 font-light">
                       Указать количество файлов
                     </span>
-                  </Dialog.Title>
+                  </div>
                   <div>
                     <div className="my-2 h-32 w-full rounded-md border-[0.5px] border-solid  border-sky-600 dark:border-red-900">
                       <Fragment key={importData.file_name}>
@@ -103,22 +99,22 @@ const UploadModal: React.FC<UploadModalProps> = ({ importData, onClose }) => {
                   <div className="mt-4 flex justify-between justify-self-end sm:space-x-4">
                     <button
                       className="inline-flex min-w-[100px] justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                      onClick={() => handleConfirmImport(false)}
+                      onClick={(e) => handleConfirmImport(false, e)}
                     >
                       close
                     </button>
                     <button
                       className="inline-flex min-w-[100px] justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                      onClick={() => handleConfirmImport(true)}
+                      onClick={(e) => handleConfirmImport(true, e)}
                     >
                       загрузить в бд
                     </button>
                   </div>
-                </Dialog.Panel>
+                </div>
               </>
             </div>
           </div>
-        </Dialog>
+        </div>
       )}
     </>
   );

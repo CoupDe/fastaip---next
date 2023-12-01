@@ -7,12 +7,15 @@ export const metadata: Metadata = {
 };
 export default function ImportLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   return (
     <>
       <section className={`cantainer`}>{children}</section>
+      <section>{modal}</section>
     </>
   );
 }

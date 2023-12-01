@@ -1,18 +1,24 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
-  experimental: {
-    serverActions: true,
-  },
+
 
   // webpack(config) {
   //   config.experiments = { ...config.experiments, topLevelAwait: true };
   //   return config;
   // },
   images: {
-    domains: [
-      "sun1-92.userapi.com",
-      "sun6-23.userapi.com",
-      "avatars.githubusercontent.com",
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'sun1-92.userapi.com',
+
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+
+      },
+
     ],
   },
 };

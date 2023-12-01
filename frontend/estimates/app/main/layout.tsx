@@ -16,7 +16,9 @@ export default function MainLayout({
       {/* @ts-expect-error Async Server Component */}
       <Header />
       <Breadcrumbs />
-      <main className={`mt-3 h-[80vh] font-dmMono px-1`}>{children}</main>
+      <main className={` h-[80vh] font-dmMono px-1 relative flex-col`}>
+        {children}
+      </main>
     </>
   );
 }

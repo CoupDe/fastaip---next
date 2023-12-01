@@ -30,3 +30,23 @@ async def get_all_building_visr(
     result = await session.execute(stmt)
 
     return list(result.scalars().all())
+
+
+async def get_visr(building_id: int, visr_id: int, session: AsyncSession) -> VisrModel:
+    print("building_id", building_id, "visr_id", visr_id)
+    stmt = (
+        select(VisrModel)
+        .where((VisrModel.building_id == building_id) & (VisrModel.id == visr_id))
+        .options(
+            selectinload(VisrModel.estimates)
+            .selectinload(EstimateModel.estimated_prices)
+            .selectinload(EstimatedPriceModel.labors),
+            selectinload(VisrModel.estimates)
+            .selectinload(EstimateModel.estimated_prices)
+            .selectinload(EstimatedPriceModel.additional_prices),
+        )
+    )
+    print("stmt", stmt)
+    result = await session.scalar(stmt)
+
+    return result

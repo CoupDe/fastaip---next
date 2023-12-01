@@ -53,6 +53,8 @@ export interface StructureVisrResponse extends Visr {
   estimates: EstimateVisr[];
 }
 
+export type IModalVisr = Omit<StructureVisrResponse, 'building_id'>;
+
 export type OmitPos<T> = Omit<T, "pos">;
 
 export interface RowData extends OmitPos<Partial<CommonPriceVisr>> {

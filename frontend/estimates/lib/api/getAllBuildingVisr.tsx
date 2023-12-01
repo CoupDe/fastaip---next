@@ -4,7 +4,7 @@ import { StructureVisrResponse } from "@/const/interfaces";
 export const getAllBuildingsVisr = async (
   building_id: string
 ): Promise<StructureVisrResponse[]> => {
-  const result = await fetch(getAllBuildingsVisrRout(building_id, "/allVisr"), {
+  const result = await fetch(getAllBuildingsVisrRout(building_id, "allVisr"), {
     cache: "no-store",
   });
   if (!result.ok) {
@@ -16,11 +16,11 @@ export const getAllBuildingsVisr = async (
       console.log("errorData", errorData);
       errorMessage = errorData.message;
     } else {
-      errorMessage = await result.text(); // Чтение тела ответа как простого текста
+      errorMessage = await result.text(); // Чтение тела ответа как текст
     }
 
     throw Error(errorMessage || result.statusText);
   }
- 
-  return result.json() as Promise<StructureVisrResponse[]>;;
+  const data = await result.json()
+  return data
 };

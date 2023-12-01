@@ -5,7 +5,7 @@ import {
   ReverseBuildingList,
   setBuilding,
 } from "@/redux/slice/buildingSlice";
-import { Popover } from "@headlessui/react";
+
 import HomeWorkIcon from "@mui/icons-material/HomeWork";
 
 import { motion } from "framer-motion";
@@ -47,7 +47,7 @@ export default function Breadcrumbs() {
     setIsShow(false);
     dispatch(setBuilding(building));
   };
-  console.log(segment);
+
   if (segment === "(home)") {
     return null;
   }
@@ -55,7 +55,7 @@ export default function Breadcrumbs() {
     <div
       className={`flex ${
         segment ? "justify-between" : "justify-end"
-      } mx-3 mt-2  min-h-[39px] items-center opacity-70`}
+      } mx-3 mt-2  min-h-[39px] items-center `}
     >
       {segment === "projects" && <AddConstructionBtn />}
       {segment === "import" && <ImportRadioBtn />}
@@ -65,27 +65,27 @@ export default function Breadcrumbs() {
         layout="position"
         transition={{ duration: 0.7 }}
         animate={{ opacity: [1, 0, 1, 0.5, 1] }}
-        className="    flex items-center opacity-70"
+        className=" relative   flex items-center "
       >
-        <Popover className="relative mr-3">
-          <Popover.Button>
+        <div className="relative mr-3">
+          <div>
             <HomeWorkIcon
               onMouseEnter={() => buildingList.length && setIsShow(true)}
             />
-          </Popover.Button>
+          </div>
           {isShow && (
             <>
               <div
-                className="absolute z-20 -left-20 -top-2 h-20 min-w-[110px] "
+                className="absolute  -left-20 -top-2 h-20 min-w-[110px]"
                 onMouseLeave={() => setIsShow(false)}
               >
-                <div className="absolute  top-8 z-20 min-w-[150px] rounded bg-neutral-400/70 ">
+                <div className="absolute z-50  top-8 min-w-[150px] rounded bg-neutral-400/70 opacity-80">
                   <motion.ul initial="hidden" animate="visible" variants={list}>
                     {buildingList.map((build) => (
                       <motion.li
                         variants={item}
                         key={build.id}
-                        className="cursor-pointer px-1 hover:rounded hover:bg-slate-400"
+                        className="cursor-pointer px-1  hover:rounded hover:bg-slate-400"
                         onClick={() => handleSelectBuilding(build)}
                       >
                         <Link href={`/main/srv/${build.id}`} className="block ">
@@ -98,7 +98,7 @@ export default function Breadcrumbs() {
               </div>
             </>
           )}
-        </Popover>
+        </div>
 
         <Link
           className="cursor-pointer text-xs"

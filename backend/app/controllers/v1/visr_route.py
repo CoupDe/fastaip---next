@@ -15,5 +15,14 @@ async def get_all_building_visr(
     building_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     visrs = await structure_visr_service.get_all_building_visr(building_id, session)
- 
+
     return visrs
+
+
+@router.get("/{building_id}/{visr_id}", response_model=VisrSchema)
+async def get_visr(
+    building_id: int, visr_id: int, session: AsyncSession = Depends(get_async_session)
+):
+    visr = await structure_visr_service.get_visr(building_id, visr_id, session)
+    print(visr)
+    return visr

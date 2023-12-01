@@ -23,8 +23,8 @@ export default async function page({ params, searchParams }: Props) {
 
   return (
     <>
-      <div className=" overflow-x-clip overflow-y-auto h-[80vh]">
-        <table className="table-auto w-full border-separate space-y-6 text-sm text-gray-400">
+      <div className="mt-2 overflow-x-clip overflow-y-auto h-[80vh]">
+        <table className="table-auto  w-full border-separate space-y-6 text-sm text-gray-400">
           <TheadTable isForm={true} />
           <tbody>
             <FormTable dataForm={result} />
